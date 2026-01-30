@@ -1,10 +1,12 @@
 --[[
     TRADING MODULE
-    Core trade logic and retry system
+    Multi-Resource with Priority System
 ]]
 
 local M = {}
 local Config, State, Helpers, UI
+
+local ManageAlliance = workspace:WaitForChild("GameManager"):WaitForChild("ManageAlliance")
 
 function M.init(cfg, state, helpers, ui)
     Config = cfg
@@ -13,235 +15,254 @@ function M.init(cfg, state, helpers, ui)
     UI = ui
 end
 
-function M.attemptTrade(country, amount)
-    local priceTiers = Helpers.getPriceTiers(country)
-    local beforePartners = Helpers.getTradingPartners(country)
+-- Attempt single trade
+local function attemptTrade(country, resource, amount, price)
+    local before = Helpers.getTradeCount(country, resource.gameName)
     
-    for attempt, price in ipairs(priceTiers) do
-        local args = {
-            country.Name,
-            "ResourceTrade",
-            {"Electronics", "Sell", amount, price, "Trade"}
-        }
-        
-        local ok, err = pcall(function()
-            State.ManageAlliance:FireServer(unpack(args))
-        end)
-        
-        if not ok then
-            return false, "FireServer error"
-        end
-        
-        task.wait(Config.WaitTime)
-        
-        local afterPartners = Helpers.getTradingPartners(country)
-        if #afterPartners > #beforePartners then
-            return true, price
-        end
-        
-        if attempt < #priceTiers then
-            UI.log(string.format("  Retry %s @ %.1fx", country.Name, priceTiers[attempt + 1]), "warning")
-            task.wait(0.5)
-        end
-    end
+    pcall(function()
+        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
+    end)
     
-    return false, "No buyers"
+    task.wait(Config.WaitTime)
+    return Helpers.getTradeCount(country, resource.gameName) > before
 end
 
-function M.processCountry(country, index, total)
-    -- Skip own country
-    if Config.SkipOwnCountry and country.Name == Helpers.myCountryName then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Own country"
+-- Process a single country for a specific resource
+function M.processCountryResource(country, resource, i, total, buyers, retryState)
+    local name = country.Name
+    local resName = resource.name
+    local isRetry = retryState and retryState[resName]
+    local prefix = isRetry and "🔄" or ""
+    local icon = resName == "ConsumerGoods" and "🛒" or "⚡"
+    
+    -- Flow check for this resource
+    local avail = Helpers.getAvailableFlow(resource)
+    if Config.SmartSell and avail < Config.MinAmount then
+        return false, false, "No Flow"
     end
     
-    -- Skip existing buyers
-    local myBuyers = Helpers.getMyBuyers()
-    if Config.SkipExistingBuyers and myBuyers[country.Name] then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Already buyer"
-    end
+    -- Skip checks (only need to do once per country, but safe to repeat)
+    if Config.SkipOwnCountry and country == Helpers.myCountry then return false, false, "Own" end
+    if Helpers.isPlayerCountry(name) then return false, false, "Player" end
     
-    -- Check can trade
-    local canTrade, reason = Helpers.canTrade(country)
-    if not canTrade then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", reason
-    end
+    -- Check if already buying this resource from us
+    local resourceBuyers = buyers[resName] or {}
+    if Config.SkipExistingBuyers and resourceBuyers[name] then return false, false, "Buyer" end
     
-    -- Skip player countries
-    if Config.SkipPlayerCountries and Helpers.isPlayerCountry(country) then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Player owned"
-    end
-    
-    -- Skip producing countries
-    local flow = Helpers.getCountryFlow(country)
-    if Config.SkipProducingCountries and flow > 0 then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Producing"
-    end
+    -- Get country data for this resource
+    local data = Helpers.getCountryResourceData(country, resource)
+    if not data.valid then return false, false, "Invalid" end
+    if data.revenue <= 0 or data.balance <= 0 then return false, false, "No Revenue" end
+    if data.hasSell then return false, false, "Already Selling" end
+    if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
     -- Calculate amount
-    local revenue = Helpers.getRevenue(country)
-    local affordable = math.min(Config.MaxAmount, revenue / Config.BuyPrice)
+    local affordable = math.min(Config.MaxAmount, data.revenue / resource.buyPrice)
+    if affordable < Config.MinAmount then return false, false, "Insufficient" end
+    local remaining = affordable - data.buyAmount
+    if remaining < Config.MinAmount then return false, false, "Max Capacity" end
     
-    if affordable < Config.MinAmount then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Can't afford"
+    -- Cap to available flow
+    local amount = math.min(remaining, avail)
+    if amount < Config.MinAmount then return false, false, "Flow Protection" end
+    
+    -- Get price tier
+    local price = Helpers.getPriceTier(data.revenue)
+    
+    -- If retry, use lower price
+    if isRetry and retryState[resName .. "_price"] then
+        price = Helpers.getNextPriceTier(retryState[resName .. "_price"])
+        if not price then return false, false, "No Buyers" end
     end
     
-    -- Check available flow BEFORE trading
-    local availableFlow = Helpers.getAvailableFlow()
-    if Config.SmartSell and availableFlow < Config.MinAmount then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "No available flow"
-    end
+    -- Store price for potential retry
+    if not retryState then retryState = {} end
+    retryState[resName .. "_price"] = price
     
-    -- Limit trade to available flow
-    local tradeAmount = math.min(affordable, availableFlow)
-    if tradeAmount < Config.MinAmount then
-        State.Stats.Skipped = State.Stats.Skipped + 1
-        return "skip", "Trade too small"
-    end
+    UI.log(string.format("[%d/%d] %s%s %s | %.2f @ %.1fx", i, total, prefix, icon, name, amount, price), "info")
     
-    -- Attempt trade
-    UI.log(string.format("[%d/%d] TRY %s (%.2f)", index, total, country.Name, tradeAmount), "info")
-    
-    local success, result = M.attemptTrade(country, tradeAmount)
-    
-    if success then
-        State.Stats.Success = State.Stats.Success + 1
-        UI.log(string.format("[%d/%d] OK %s @ %.1fx", index, total, country.Name, result), "success")
-        return "success"
+    if attemptTrade(country, resource, amount, price) then
+        UI.log(string.format("[%d/%d] %s✓ %s %s", i, total, icon, name, resource.gameName), "success")
+        return true, false, nil
     else
-        -- Add to retry queue
-        if Config.RetryEnabled then
-            table.insert(State.retryQueue, {country = country, amount = tradeAmount, attempts = 1})
-            State.Stats.Failed = State.Stats.Failed + 1
-            return "queued", result
-        else
-            State.Stats.Failed = State.Stats.Failed + 1
-            return "fail", result
+        -- Check if we can retry with lower price
+        local nextPrice = Helpers.getNextPriceTier(price)
+        if Config.RetryEnabled and nextPrice and not isRetry then
+            return false, true, "Queued"
         end
+        return false, false, "No Buyers"
     end
 end
 
-function M.processRetryQueue()
-    if #State.retryQueue == 0 then return end
-    
-    UI.log(string.format("--- Retry Queue: %d countries ---", #State.retryQueue), "info")
-    
-    local newQueue = {}
-    
-    for i, item in ipairs(State.retryQueue) do
-        if not State.isRunning then break end
-        while State.isPaused do task.wait(0.5) end
-        
-        -- Check flow before retry
-        local availableFlow = Helpers.getAvailableFlow()
-        if Config.SmartSell and availableFlow < Config.MinAmount then
-            UI.log("Retry paused - no flow", "warning")
-            table.insert(newQueue, item)
-            continue
-        end
-        
-        local tradeAmount = math.min(item.amount, availableFlow)
-        local success, result = M.attemptTrade(item.country, tradeAmount)
-        
-        if success then
-            State.Stats.Success = State.Stats.Success + 1
-            State.Stats.Failed = State.Stats.Failed - 1
-            UI.log(string.format("RETRY OK %s", item.country.Name), "success")
-        else
-            item.attempts = item.attempts + 1
-            if item.attempts < Config.MaxRetryPasses then
-                table.insert(newQueue, item)
-            else
-                UI.log(string.format("RETRY FAIL %s (max attempts)", item.country.Name), "error")
-            end
-        end
-        
-        UI.updateStats()
-        task.wait(0.5)
-    end
-    
-    State.retryQueue = newQueue
-end
-
+-- Main trading run
 function M.run()
-    if State.isRunning then
-        UI.log("Already running!", "warning")
-        return
-    end
-    
+    if State.isRunning then return end
     State.isRunning = true
     State.isPaused = false
-    State.Stats = {Success = 0, Skipped = 0, Failed = 0}
     State.retryQueue = {}
+    State.Stats = {
+        Success = 0, 
+        Skipped = 0, 
+        Failed = 0, 
+        FlowProtected = 0,
+        ByResource = {}
+    }
     
-    local startTime = tick()
-    
-    UI.log("=== Trade Run Started ===", "info")
-    UI.log(string.format("Flow: %.2f | Avail: %.2f", Helpers.getMyFlow(), Helpers.getAvailableFlow()), "info")
-    
-    -- Check if we have any flow to sell
-    local availableFlow = Helpers.getAvailableFlow()
-    if availableFlow <= 0 then
-        UI.log("[!] No more flow", "warning")
-        UI.log("=== Complete ===", "info")
-        State.isRunning = false
-        return
+    -- Initialize per-resource stats
+    for _, res in ipairs(Helpers.getEnabledResources()) do
+        State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
     end
     
-    local countries = Helpers.getSortedCountries()
-    local total = #countries
+    local startTime = tick()
+    local enabledResources = Helpers.getEnabledResources()
     
-    UI.log(string.format("Processing %d countries...", total), "info")
+    -- Log initial state
+    UI.log("═══ Multi-Resource Trade Started ═══", "info")
+    for _, res in ipairs(enabledResources) do
+        local icon = res.name == "ConsumerGoods" and "🛒" or "⚡"
+        UI.log(string.format("%s %s: Flow %.2f | Avail %.2f", 
+            icon, res.gameName, Helpers.getFlow(res), Helpers.getAvailableFlow(res)), "info")
+    end
     
+    local countries = Helpers.getCountries()
+    local allBuyers = Helpers.getAllBuyers()
+    Helpers.refreshPlayerCache()
+    
+    local totalCountries = #countries
+    local processedTrades = 0
+    
+    -- Main pass: For each country, try all resources in priority order
     for i, country in ipairs(countries) do
         if not State.isRunning then break end
         while State.isPaused do task.wait(0.5) end
         
-        -- Re-check available flow each iteration
-        availableFlow = Helpers.getAvailableFlow()
-        if Config.SmartSell and availableFlow < Config.MinAmount then
-            UI.log(string.format("[!] Flow depleted at %d/%d", i, total), "warning")
-            break
+        UI.updateProgress(i, totalCountries)
+        
+        local countryRetryState = {}
+        local tradedThisCountry = false
+        
+        -- Try each resource in priority order
+        for _, resource in ipairs(enabledResources) do
+            if not State.isRunning then break end
+            
+            -- Check if we have flow for this resource
+            local avail = Helpers.getAvailableFlow(resource)
+            if avail < Config.MinAmount then
+                -- No flow for this resource, skip to next
+                continue
+            end
+            
+            local ok, err = pcall(function()
+                local success, retry, reason = M.processCountryResource(
+                    country, resource, i, totalCountries, allBuyers, countryRetryState
+                )
+                
+                if success then
+                    State.Stats.Success = State.Stats.Success + 1
+                    State.Stats.ByResource[resource.name].Success = State.Stats.ByResource[resource.name].Success + 1
+                    tradedThisCountry = true
+                    processedTrades = processedTrades + 1
+                    
+                    -- Update buyers cache
+                    if not allBuyers[resource.name] then allBuyers[resource.name] = {} end
+                    allBuyers[resource.name][country.Name] = true
+                    
+                elseif retry then
+                    -- Add to retry queue
+                    table.insert(State.retryQueue, {
+                        country = country,
+                        resource = resource,
+                        retryState = countryRetryState
+                    })
+                else
+                    State.Stats.Skipped = State.Stats.Skipped + 1
+                    State.Stats.ByResource[resource.name].Skipped = State.Stats.ByResource[resource.name].Skipped + 1
+                end
+                
+                UI.updateStats()
+            end)
+            
+            if not ok then
+                State.Stats.Failed = State.Stats.Failed + 1
+                warn("[Trading] Error: " .. tostring(err))
+            end
+            
+            -- Small delay between resource attempts on same country
+            if tradedThisCountry then
+                task.wait(Config.ResourceDelay)
+            end
         end
-        
-        UI.updateProgress(i, total)
-        
-        local result, reason = M.processCountry(country, i, total)
-        
-        if result == "skip" then
-            -- Silent skip, don't spam logs
-        elseif result == "queued" then
-            UI.log(string.format("  -> Queued for retry (%s)", reason), "warning")
-        end
-        
-        UI.updateStats()
     end
     
-    -- Process retry queue
-    for pass = 1, Config.MaxRetryPasses do
-        if #State.retryQueue == 0 then break end
-        if not State.isRunning then break end
+    -- Retry pass
+    if Config.RetryEnabled and #State.retryQueue > 0 then
+        UI.log(string.format("🔄 RETRY QUEUE: %d items", #State.retryQueue), "info")
         
-        UI.log(string.format("--- Retry Pass %d ---", pass), "info")
-        M.processRetryQueue()
+        for pass = 1, Config.MaxRetryPasses do
+            if #State.retryQueue == 0 then break end
+            if not State.isRunning then break end
+            
+            UI.log(string.format("🔄 Retry Pass %d/%d", pass, Config.MaxRetryPasses), "info")
+            
+            local queue = State.retryQueue
+            State.retryQueue = {}
+            
+            for idx, item in ipairs(queue) do
+                if not State.isRunning then break end
+                
+                -- Check flow
+                local avail = Helpers.getAvailableFlow(item.resource)
+                if avail < Config.MinAmount then
+                    -- Re-queue for later if we might get more flow
+                    if pass < Config.MaxRetryPasses then
+                        table.insert(State.retryQueue, item)
+                    end
+                    continue
+                end
+                
+                -- Mark as retry
+                item.retryState[item.resource.name] = true
+                
+                local ok, err = pcall(function()
+                    local success, retry, reason = M.processCountryResource(
+                        item.country, item.resource, idx, #queue, allBuyers, item.retryState
+                    )
+                    
+                    if success then
+                        State.Stats.Success = State.Stats.Success + 1
+                        State.Stats.ByResource[item.resource.name].Success = 
+                            State.Stats.ByResource[item.resource.name].Success + 1
+                    elseif retry and pass < Config.MaxRetryPasses then
+                        table.insert(State.retryQueue, item)
+                    else
+                        State.Stats.Failed = State.Stats.Failed + 1
+                        State.Stats.ByResource[item.resource.name].Failed = 
+                            State.Stats.ByResource[item.resource.name].Failed + 1
+                    end
+                    
+                    UI.updateStats()
+                end)
+                
+                if not ok then
+                    State.Stats.Failed = State.Stats.Failed + 1
+                end
+            end
+        end
     end
     
+    -- Summary
     local elapsed = tick() - startTime
+    UI.log("═══ Complete ═══", "info")
+    UI.log(string.format("⏱️ %.1fs | ✓%d ⊘%d ✗%d", 
+        elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
     
-    UI.log("=== Complete ===", "info")
-    UI.log(string.format("%.1fs | +%d -%d x%d Q%d", 
-        elapsed, 
-        State.Stats.Success, 
-        State.Stats.Skipped, 
-        State.Stats.Failed,
-        #State.retryQueue), "info")
-    UI.log(string.format("Flow: %.2f -> %.2f", Helpers.getMyFlow(), Helpers.getAvailableFlow()), "info")
+    -- Per-resource summary
+    for _, res in ipairs(enabledResources) do
+        local stats = State.Stats.ByResource[res.name]
+        local icon = res.name == "ConsumerGoods" and "🛒" or "⚡"
+        UI.log(string.format("%s %s: ✓%d ⊘%d | Flow: %.2f", 
+            icon, res.gameName, stats.Success, stats.Skipped, Helpers.getFlow(res)), "info")
+    end
     
     State.isRunning = false
     UI.updateStats()
