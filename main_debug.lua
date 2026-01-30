@@ -1,9 +1,9 @@
 --[[
     Electronics Trade Hub v3 - Modular Edition
-    With error handling for debugging
+    With correct GitHub URL format
 ]]
 
-local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/main/"
+local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
 
 -- Safe loader function
 local function loadModule(name)
@@ -12,7 +12,12 @@ local function loadModule(name)
     
     local success, result = pcall(function()
         local content = game:HttpGet(url)
-        print("[Loader] Got content for " .. name .. " (" .. #content .. " chars)")
+        
+        if content:find("404") or #content < 20 then
+            error("Got 404 or empty response")
+        end
+        
+        print("[Loader] Got " .. name .. " (" .. #content .. " chars)")
         
         local func, err = loadstring(content)
         if not func then
