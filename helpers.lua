@@ -54,6 +54,7 @@ function M.getAvailableFlow()
     return math.max(0, M.getMyFlow() - Config.SmartSellReserve)
 end
 
+-- Get all countries buying from you (your sell trades)
 function M.getMyBuyers()
     if not M.myCountry then return {} end
     local r = M.myCountry:FindFirstChild("Resources")
@@ -65,11 +66,30 @@ function M.getMyBuyers()
     
     local buyers = {}
     for _, obj in ipairs(t:GetChildren()) do
+        -- Negative X value = you are SELLING to them
         if obj:IsA("Vector3Value") and obj.Value.X < -0.01 and obj.Name ~= M.myCountryName then
             buyers[obj.Name] = math.abs(obj.Value.X)
         end
     end
     return buyers
+end
+
+-- Get total amount you're currently selling
+function M.getTotalSelling()
+    local total = 0
+    for _, amt in pairs(M.getMyBuyers()) do
+        total = total + amt
+    end
+    return total
+end
+
+-- Get number of buyers
+function M.getBuyerCount()
+    local count = 0
+    for _ in pairs(M.getMyBuyers()) do
+        count = count + 1
+    end
+    return count
 end
 
 function M.getTradeCount(country)
