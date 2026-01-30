@@ -1,37 +1,36 @@
 --[[
-    Trade Hub v4.0 - Multi-Resource Edition
-    Consumer Goods + Electronics with Priority System
+    Trade Hub v4.1 - Multi-Resource
+    Auto-start, simplified controls
 ]]
 
 local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
 
 local function loadModule(name)
     local url = BASE_URL .. name .. ".lua"
-    print("[Loader] Loading: " .. name)
+    print("[Loader] " .. name)
     
     local success, result = pcall(function()
         local content = game:HttpGet(url)
         if content:find("404") or #content < 20 then
-            error("Got 404 or empty response")
+            error("404 or empty")
         end
         local func, err = loadstring(content)
-        if not func then error("Loadstring failed: " .. tostring(err)) end
+        if not func then error(tostring(err)) end
         return func()
     end)
     
     if success then
-        print("[Loader] ✓ " .. name)
+        print("[OK] " .. name)
         return result
     else
-        warn("[Loader] ✗ " .. name .. " - " .. tostring(result))
+        warn("[FAIL] " .. name .. ": " .. tostring(result))
         return nil
     end
 end
 
-print("═══════════════════════════════════════")
-print("  Trade Hub v4.0 - Multi-Resource")
-print("  🛒 Consumer Goods + ⚡ Electronics")
-print("═══════════════════════════════════════")
+print("══════════════════════════")
+print("  Trade Hub v4.1")
+print("══════════════════════════")
 
 local Config = loadModule("config")
 local Helpers = loadModule("helpers")
@@ -40,26 +39,17 @@ local Trading = loadModule("trading")
 local AutoSell = loadModule("autosell")
 
 if not (Config and Helpers and UI and Trading and AutoSell) then
-    error("Failed to load modules!")
+    error("Module load failed!")
 end
-
-print("═══════════════════════════════════════")
 
 -- Shared state
 local State = {
     isRunning = false,
-    isPaused = false,
     retryQueue = {},
-    Stats = {
-        Success = 0,
-        Skipped = 0,
-        Failed = 0,
-        FlowProtected = 0,
-        ByResource = {}
-    }
+    Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
 }
 
--- Initialize modules
+-- Initialize
 Helpers.init(Config)
 UI.init(Config, State, Helpers, Trading, AutoSell)
 Trading.init(Config, State, Helpers, UI)
@@ -68,10 +58,10 @@ AutoSell.init(Config, State, Helpers, Trading, UI)
 -- Create UI
 UI.createWindow()
 
--- Start auto-sell if enabled
+-- Auto-start if enabled
 if Config.AutoSellEnabled then
     task.wait(1)
     AutoSell.start()
 end
 
-print("[Init] ✓ Ready!")
+print("[Ready]")
