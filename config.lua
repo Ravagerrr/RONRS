@@ -10,7 +10,8 @@ return {
             name = "ConsumerGoods",
             gameName = "Consumer Goods",
             buyPrice = 82400,
-            maxAmount = 999,      -- No cap, only limited by revenue
+            hasCap = false,        -- NO CAP - revenue only
+            capAmount = nil,
             enabled = true,
             priority = 1,
         },
@@ -18,7 +19,8 @@ return {
             name = "Electronics",
             gameName = "Electronics",
             buyPrice = 102000,
-            maxAmount = 5,        -- Hard cap at 5
+            hasCap = true,         -- HAS CAP
+            capAmount = 5,         -- Max 5
             enabled = true,
             priority = 2,
         },
