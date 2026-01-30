@@ -41,7 +41,7 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         return false, false, "No Flow"
     end
     
-    -- Skip checks (only need to do once per country, but safe to repeat)
+    -- Skip checks
     if Config.SkipOwnCountry and country == Helpers.myCountry then return false, false, "Own" end
     if Helpers.isPlayerCountry(name) then return false, false, "Player" end
     
@@ -56,9 +56,14 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
-    -- Calculate amount
-    local affordable = math.min(Config.MaxAmount, data.revenue / resource.buyPrice)
+    -- Calculate amount based on resource-specific rules
+    -- Use the resource's maxAmount (999 for CG = effectively unlimited, 5 for Electronics)
+    local maxForResource = resource.maxAmount or 999
+    local affordable = math.min(maxForResource, data.revenue / resource.buyPrice)
+    
     if affordable < Config.MinAmount then return false, false, "Insufficient" end
+    
+    -- Subtract what they're already buying
     local remaining = affordable - data.buyAmount
     if remaining < Config.MinAmount then return false, false, "Max Capacity" end
     
@@ -120,8 +125,9 @@ function M.run()
     UI.log("═══ Multi-Resource Trade Started ═══", "info")
     for _, res in ipairs(enabledResources) do
         local icon = res.name == "ConsumerGoods" and "🛒" or "⚡"
-        UI.log(string.format("%s %s: Flow %.2f | Avail %.2f", 
-            icon, res.gameName, Helpers.getFlow(res), Helpers.getAvailableFlow(res)), "info")
+        local capInfo = res.maxAmount >= 999 and "No Cap" or string.format("Max %d", res.maxAmount)
+        UI.log(string.format("%s %s: Flow %.2f | Avail %.2f | %s", 
+            icon, res.gameName, Helpers.getFlow(res), Helpers.getAvailableFlow(res), capInfo), "info")
     end
     
     local countries = Helpers.getCountries()
@@ -129,7 +135,6 @@ function M.run()
     Helpers.refreshPlayerCache()
     
     local totalCountries = #countries
-    local processedTrades = 0
     
     -- Main pass: For each country, try all resources in priority order
     for i, country in ipairs(countries) do
@@ -148,7 +153,6 @@ function M.run()
             -- Check if we have flow for this resource
             local avail = Helpers.getAvailableFlow(resource)
             if avail < Config.MinAmount then
-                -- No flow for this resource, skip to next
                 continue
             end
             
@@ -161,14 +165,12 @@ function M.run()
                     State.Stats.Success = State.Stats.Success + 1
                     State.Stats.ByResource[resource.name].Success = State.Stats.ByResource[resource.name].Success + 1
                     tradedThisCountry = true
-                    processedTrades = processedTrades + 1
                     
                     -- Update buyers cache
                     if not allBuyers[resource.name] then allBuyers[resource.name] = {} end
                     allBuyers[resource.name][country.Name] = true
                     
                 elseif retry then
-                    -- Add to retry queue
                     table.insert(State.retryQueue, {
                         country = country,
                         resource = resource,
@@ -187,7 +189,7 @@ function M.run()
                 warn("[Trading] Error: " .. tostring(err))
             end
             
-            -- Small delay between resource attempts on same country
+            -- Delay between resource attempts
             if tradedThisCountry then
                 task.wait(Config.ResourceDelay)
             end
@@ -210,17 +212,14 @@ function M.run()
             for idx, item in ipairs(queue) do
                 if not State.isRunning then break end
                 
-                -- Check flow
                 local avail = Helpers.getAvailableFlow(item.resource)
                 if avail < Config.MinAmount then
-                    -- Re-queue for later if we might get more flow
                     if pass < Config.MaxRetryPasses then
                         table.insert(State.retryQueue, item)
                     end
                     continue
                 end
                 
-                -- Mark as retry
                 item.retryState[item.resource.name] = true
                 
                 local ok, err = pcall(function()
@@ -256,7 +255,6 @@ function M.run()
     UI.log(string.format("⏱️ %.1fs | ✓%d ⊘%d ✗%d", 
         elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
     
-    -- Per-resource summary
     for _, res in ipairs(enabledResources) do
         local stats = State.Stats.ByResource[res.name]
         local icon = res.name == "ConsumerGoods" and "🛒" or "⚡"
