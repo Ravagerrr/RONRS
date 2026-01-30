@@ -1,46 +1,71 @@
 --[[
     HELPERS MODULE
-    Utility functions for trading
+    Utility functions for trade calculations
 ]]
 
 local M = {}
-local Config
 
--- Services
 local Players = game:GetService("Players")
 local CountryData = workspace:WaitForChild("CountryData")
 local LocalPlayer = Players.LocalPlayer
 
--- Player cache
-local playerCache = {}
-local cacheTime = 0
+-- Dynamic country detection (refreshes each call)
+M.myCountryName = nil
+M.myCountry = nil
 
--- Your country
-M.myCountryName = LocalPlayer:GetAttribute("Country")
-M.myCountry = M.myCountryName and CountryData:FindFirstChild(M.myCountryName)
-
-function M.init(cfg)
-    Config = cfg
+function M.refreshMyCountry()
+    -- Try to get country from attribute
+    local name = LocalPlayer:GetAttribute("Country")
+    
+    -- If no attribute, try to find it another way
+    if not name then
+        -- Some games store it differently
+        for _, country in ipairs(CountryData:GetChildren()) do
+            local owner = country:GetAttribute("Owner")
+            if owner == LocalPlayer.UserId or owner == LocalPlayer.Name then
+                name = country.Name
+                break
+            end
+        end
+    end
+    
+    if name then
+        M.myCountryName = name
+        M.myCountry = CountryData:FindFirstChild(name)
+    end
+    
+    return M.myCountry ~= nil
 end
+
+-- Initialize on load
+M.refreshMyCountry()
+
+-- Player cache for skip checks
+local playerCountryCache = {}
+local cacheTime = 0
 
 function M.refreshPlayerCache()
     if tick() - cacheTime < 10 then return end
-    playerCache = {}
-    for _, p in ipairs(Players:GetPlayers()) do
-        local c = p:GetAttribute("Country")
-        if c then playerCache[c] = true end
+    playerCountryCache = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        local c = player:GetAttribute("Country")
+        if c then playerCountryCache[c] = true end
     end
     cacheTime = tick()
 end
 
-function M.isPlayerCountry(name)
-    if not Config.SkipPlayerCountries then return false end
+function M.isPlayerCountry(country)
     M.refreshPlayerCache()
-    return playerCache[name] == true
+    return playerCountryCache[country.Name] == true
 end
 
 function M.getMyFlow()
+    -- Refresh country detection each time
+    if not M.myCountry then
+        M.refreshMyCountry()
+    end
     if not M.myCountry then return 0 end
+    
     local r = M.myCountry:FindFirstChild("Resources")
     if not r then return 0 end
     local e = r:FindFirstChild("Electronics")
@@ -50,13 +75,16 @@ function M.getMyFlow()
 end
 
 function M.getAvailableFlow()
-    if not Config.SmartSell then return 999999 end
+    local Config = M.Config or {SmartSellReserve = 1}
     return math.max(0, M.getMyFlow() - Config.SmartSellReserve)
 end
 
--- Get all countries buying from you (your sell trades)
 function M.getMyBuyers()
+    if not M.myCountry then
+        M.refreshMyCountry()
+    end
     if not M.myCountry then return {} end
+    
     local r = M.myCountry:FindFirstChild("Resources")
     if not r then return {} end
     local e = r:FindFirstChild("Electronics")
@@ -66,15 +94,15 @@ function M.getMyBuyers()
     
     local buyers = {}
     for _, obj in ipairs(t:GetChildren()) do
-        -- Negative X value = you are SELLING to them
-        if obj:IsA("Vector3Value") and obj.Value.X < -0.01 and obj.Name ~= M.myCountryName then
-            buyers[obj.Name] = math.abs(obj.Value.X)
+        if obj:IsA("Vector3Value") and obj.Value.X < -0.01 then
+            if obj.Name ~= M.myCountryName then
+                buyers[obj.Name] = math.abs(obj.Value.X)
+            end
         end
     end
     return buyers
 end
 
--- Get total amount you're currently selling
 function M.getTotalSelling()
     local total = 0
     for _, amt in pairs(M.getMyBuyers()) do
@@ -83,7 +111,6 @@ function M.getTotalSelling()
     return total
 end
 
--- Get number of buyers
 function M.getBuyerCount()
     local count = 0
     for _ in pairs(M.getMyBuyers()) do
@@ -92,70 +119,75 @@ function M.getBuyerCount()
     return count
 end
 
-function M.getTradeCount(country)
+function M.getCountryFlow(country)
     local r = country:FindFirstChild("Resources")
     if not r then return 0 end
     local e = r:FindFirstChild("Electronics")
     if not e then return 0 end
-    local t = e:FindFirstChild("Trade")
-    if not t then return 0 end
-    
-    local count = 0
-    for _, obj in ipairs(t:GetChildren()) do
-        if obj:IsA("Vector3Value") then count = count + 1 end
-    end
-    return count
+    local f = e:FindFirstChild("Flow")
+    return f and f.Value or 0
 end
 
-function M.getCountryData(country)
-    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false}
-    
+function M.getRevenue(country)
     local eco = country:FindFirstChild("Economy")
-    if not eco then return data end
-    local rev, bal = eco:FindFirstChild("Revenue"), eco:FindFirstChild("Balance")
-    if not rev or not bal then return data end
+    if not eco then return 0 end
+    local rev = eco:FindFirstChild("Revenue")
+    if not rev then return 0 end
+    return rev:GetAttribute("Total") or 0
+end
+
+function M.canTrade(country)
+    local eco = country:FindFirstChild("Economy")
+    if not eco then return false, "No Economy" end
+    local rev = eco:FindFirstChild("Revenue")
+    local bal = eco:FindFirstChild("Balance")
+    if not rev or not bal then return false, "No Revenue/Balance" end
+    if bal.Value <= 0 then return false, "Negative Balance" end
     
     local res = country:FindFirstChild("Resources")
-    if not res then return data end
+    if not res then return false, "No Resources" end
     local elec = res:FindFirstChild("Electronics")
-    if not elec then return data end
+    if not elec then return false, "No Electronics" end
     local trade = elec:FindFirstChild("Trade")
-    if not trade then return data end
+    if not trade then return false, "No Trade" end
     
-    data.valid = true
-    data.revenue = rev:GetAttribute("Total") or 0
-    data.balance = bal.Value or 0
-    data.flow = elec:FindFirstChild("Flow") and elec.Flow.Value or 0
+    return true, nil
+end
+
+function M.getTradingPartners(country)
+    local r = country:FindFirstChild("Resources")
+    if not r then return {} end
+    local e = r:FindFirstChild("Electronics")
+    if not e then return {} end
+    local t = e:FindFirstChild("Trade")
+    if not t then return {} end
     
-    for _, obj in ipairs(trade:GetChildren()) do
+    local partners = {}
+    for _, obj in ipairs(t:GetChildren()) do
         if obj:IsA("Vector3Value") then
-            if obj.Value.X > 0.01 then data.buyAmount = data.buyAmount + obj.Value.X
-            elseif obj.Value.X < -0.01 then data.hasSell = true end
+            table.insert(partners, obj)
         end
     end
-    return data
+    return partners
 end
 
-function M.getPriceTier(revenue)
-    if revenue >= 1000000 then return 1.0
-    elseif revenue >= 500000 then return 0.7
-    elseif revenue >= 200000 then return 0.5
-    else return 0.3 end
+function M.getPriceTiers(country)
+    local revenue = M.getRevenue(country)
+    if revenue >= 1000000 then
+        return {1.0, 0.7, 0.5, 0.3}
+    elseif revenue >= 500000 then
+        return {0.7, 0.5, 0.3}
+    elseif revenue >= 200000 then
+        return {0.5, 0.3}
+    else
+        return {0.3}
+    end
 end
 
-function M.getNextPriceTier(current)
-    if current >= 1.0 then return 0.7
-    elseif current >= 0.7 then return 0.5
-    elseif current >= 0.5 then return 0.3
-    else return nil end
-end
-
-function M.getCountries()
+function M.getSortedCountries()
     local countries = CountryData:GetChildren()
     table.sort(countries, function(a, b)
-        local aRev = a:FindFirstChild("Economy") and a.Economy:FindFirstChild("Revenue") and a.Economy.Revenue:GetAttribute("Total") or 0
-        local bRev = b:FindFirstChild("Economy") and b.Economy:FindFirstChild("Revenue") and b.Economy.Revenue:GetAttribute("Total") or 0
-        return aRev > bRev
+        return M.getRevenue(a) > M.getRevenue(b)
     end)
     return countries
 end

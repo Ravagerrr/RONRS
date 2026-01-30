@@ -1,6 +1,6 @@
 --[[
     CONFIG MODULE
-    Edit this file to change settings
+    All settings in one place
 ]]
 
 return {
@@ -10,22 +10,21 @@ return {
     MinAmount = 0.001,
     WaitTime = 0.5,
     
-    -- Retry
-    RetryEnabled = true,
-    MaxRetryPasses = 2,
+    -- Flow Protection
+    SmartSell = true,
+    SmartSellReserve = 1,
     
-    -- Filters
+    -- Skip Filters
     SkipPlayerCountries = true,
     SkipExistingBuyers = true,
     SkipProducingCountries = true,
     SkipOwnCountry = true,
     
-    -- Flow Protection
-    SmartSell = true,
-    SmartSellReserve = 1,
+    -- Retry System
+    RetryEnabled = true,
+    MaxRetryPasses = 2,
     
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
-    AutoSellCheckInterval = 3,
 }
