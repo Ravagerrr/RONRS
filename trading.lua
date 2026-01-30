@@ -27,25 +27,19 @@ local function attemptTrade(country, resource, amount, price)
 end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
-    -- STOP CHECK
     if not State.isRunning then return false, false, "Stopped" end
-    
-    -- Check if resource is still enabled
     if not resource.enabled then return false, false, "Disabled" end
     
     local name = country.Name
     local resName = resource.name
     local isRetry = retryState and retryState[resName]
-    local prefix = isRetry and "🔄" or ""
-    local icon = resName == "ConsumerGoods" and "🛒" or "⚡"
+    local icon = resName == "ConsumerGoods" and "CG" or "EL"
     
-    -- Flow check
     local avail = Helpers.getAvailableFlow(resource)
     if Config.SmartSell and avail < Config.MinAmount then
         return false, false, "No Flow"
     end
     
-    -- Skip checks
     if Config.SkipOwnCountry and country == Helpers.myCountry then return false, false, "Own" end
     if Helpers.isPlayerCountry(name) then return false, false, "Player" end
     
@@ -58,13 +52,10 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
-    -- Calculate amount - DIFFERENT LOGIC FOR CAPPED VS UNCAPPED
     local affordable
     if resource.hasCap then
-        -- Electronics: cap at capAmount (5)
         affordable = math.min(resource.capAmount, data.revenue / resource.buyPrice)
     else
-        -- Consumer Goods: NO CAP, only limited by revenue
         affordable = data.revenue / resource.buyPrice
     end
     
@@ -73,11 +64,9 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local remaining = affordable - data.buyAmount
     if remaining < Config.MinAmount then return false, false, "Max Capacity" end
     
-    -- Cap to available flow
     local amount = math.min(remaining, avail)
     if amount < Config.MinAmount then return false, false, "Flow Protection" end
     
-    -- Price tier
     local price = Helpers.getPriceTier(data.revenue)
     
     if isRetry and retryState[resName .. "_price"] then
@@ -88,10 +77,10 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
-    UI.log(string.format("[%d/%d] %s%s %s | %.2f @ %.1fx", i, total, prefix, icon, name, amount, price), "info")
+    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx", i, total, icon, name, amount, price), "info")
     
     if attemptTrade(country, resource, amount, price) then
-        UI.log(string.format("[%d/%d] %s✓ %s", i, total, icon, name), "success")
+        UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
         return true, false, nil
     else
         local nextPrice = Helpers.getNextPriceTier(price)
@@ -106,12 +95,7 @@ function M.run()
     if State.isRunning then return end
     State.isRunning = true
     State.retryQueue = {}
-    State.Stats = {
-        Success = 0, 
-        Skipped = 0, 
-        Failed = 0, 
-        ByResource = {}
-    }
+    State.Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
     
     for _, res in ipairs(Helpers.getEnabledResources()) do
         State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
@@ -119,9 +103,9 @@ function M.run()
     
     local startTime = tick()
     
-    UI.log("═══ Trade Started ═══", "info")
+    UI.log("=== Trade Started ===", "info")
     for _, res in ipairs(Helpers.getEnabledResources()) do
-        local icon = res.name == "ConsumerGoods" and "🛒" or "⚡"
+        local icon = res.name == "ConsumerGoods" and "CG" or "EL"
         local capInfo = res.hasCap and string.format("Cap: %d", res.capAmount) or "No Cap"
         UI.log(string.format("%s %s: %.2f avail | %s", icon, res.gameName, Helpers.getAvailableFlow(res), capInfo), "info")
     end
@@ -132,11 +116,9 @@ function M.run()
     
     local totalCountries = #countries
     
-    -- Main pass
     for i, country in ipairs(countries) do
-        -- STOP CHECK - exits immediately
         if not State.isRunning then 
-            UI.log("⛔ STOPPED by user", "warning")
+            UI.log("STOPPED by user", "warning")
             break 
         end
         
@@ -145,14 +127,10 @@ function M.run()
         local countryRetryState = {}
         local tradedThisCountry = false
         
-        -- Get fresh list of enabled resources each iteration
         local enabledResources = Helpers.getEnabledResources()
         
         for _, resource in ipairs(enabledResources) do
-            -- STOP CHECK
             if not State.isRunning then break end
-            
-            -- Check resource still enabled
             if not resource.enabled then continue end
             
             local avail = Helpers.getAvailableFlow(resource)
@@ -194,9 +172,8 @@ function M.run()
         end
     end
     
-    -- Retry pass
     if Config.RetryEnabled and #State.retryQueue > 0 and State.isRunning then
-        UI.log(string.format("🔄 RETRY: %d", #State.retryQueue), "info")
+        UI.log(string.format("RETRY: %d", #State.retryQueue), "info")
         
         for pass = 1, Config.MaxRetryPasses do
             if #State.retryQueue == 0 or not State.isRunning then break end
@@ -241,7 +218,16 @@ function M.run()
         end
     end
     
-    -- Summary
     local elapsed = tick() - startTime
-    UI.log("═══ Complete ═══", "info")
-    UI.log(string.format("%.1fs | ✓%d ⊘%d ✗%d",
+    UI.log("=== Complete ===", "info")
+    UI.log(string.format("%.1fs | OK:%d Skip:%d Fail:%d", elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
+    
+    State.isRunning = false
+    UI.updateStats()
+end
+
+function M.stop()
+    State.isRunning = false
+end
+
+return M
