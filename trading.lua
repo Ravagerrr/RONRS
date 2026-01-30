@@ -1,6 +1,7 @@
 --[[
     TRADING MODULE
     Multi-Resource with Priority System
+    FIXED: Calculate amount based on actual price tier
 ]]
 
 local M = {}
@@ -52,21 +53,7 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
-    local affordable
-    if resource.hasCap then
-        affordable = math.min(resource.capAmount, data.revenue / resource.buyPrice)
-    else
-        affordable = data.revenue / resource.buyPrice
-    end
-    
-    if affordable < Config.MinAmount then return false, false, "Insufficient" end
-    
-    local remaining = affordable - data.buyAmount
-    if remaining < Config.MinAmount then return false, false, "Max Capacity" end
-    
-    local amount = math.min(remaining, avail)
-    if amount < Config.MinAmount then return false, false, "Flow Protection" end
-    
+    -- Get price tier FIRST
     local price = Helpers.getPriceTier(data.revenue)
     
     if isRetry and retryState[resName .. "_price"] then
@@ -74,10 +61,34 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         if not price then return false, false, "No Buyers" end
     end
     
+    -- Calculate ACTUAL price per unit at this tier
+    local actualPricePerUnit = resource.buyPrice * price
+    
+    -- Calculate affordable based on ACTUAL price they pay
+    local affordable
+    if resource.hasCap then
+        -- Electronics: cap at capAmount (5), but also check what they can afford at this price
+        local canAfford = data.revenue / actualPricePerUnit
+        affordable = math.min(resource.capAmount, canAfford)
+    else
+        -- Consumer Goods: NO CAP, only limited by what they can afford at this price
+        affordable = data.revenue / actualPricePerUnit
+    end
+    
+    if affordable < Config.MinAmount then return false, false, "Insufficient" end
+    
+    -- Subtract what they're already buying
+    local remaining = affordable - data.buyAmount
+    if remaining < Config.MinAmount then return false, false, "Max Capacity" end
+    
+    -- Cap to available flow
+    local amount = math.min(remaining, avail)
+    if amount < Config.MinAmount then return false, false, "Flow Protection" end
+    
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
-    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx", i, total, icon, name, amount, price), "info")
+    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u)", i, total, icon, name, amount, price, actualPricePerUnit), "info")
     
     if attemptTrade(country, resource, amount, price) then
         UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
