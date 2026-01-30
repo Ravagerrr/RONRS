@@ -1,193 +1,208 @@
 --[[
     HELPERS MODULE
-    Utility functions for trade calculations
+    Multi-Resource Support
 ]]
 
 local M = {}
+local Config
 
+-- Services
 local Players = game:GetService("Players")
 local CountryData = workspace:WaitForChild("CountryData")
 local LocalPlayer = Players.LocalPlayer
 
--- Dynamic country detection (refreshes each call)
-M.myCountryName = nil
-M.myCountry = nil
+-- Player cache
+local playerCache = {}
+local cacheTime = 0
 
-function M.refreshMyCountry()
-    -- Try to get country from attribute
-    local name = LocalPlayer:GetAttribute("Country")
-    
-    -- If no attribute, try to find it another way
-    if not name then
-        -- Some games store it differently
-        for _, country in ipairs(CountryData:GetChildren()) do
-            local owner = country:GetAttribute("Owner")
-            if owner == LocalPlayer.UserId or owner == LocalPlayer.Name then
-                name = country.Name
-                break
-            end
-        end
-    end
-    
-    if name then
-        M.myCountryName = name
-        M.myCountry = CountryData:FindFirstChild(name)
-    end
-    
-    return M.myCountry ~= nil
+-- Your country
+M.myCountryName = LocalPlayer:GetAttribute("Country")
+M.myCountry = M.myCountryName and CountryData:FindFirstChild(M.myCountryName)
+
+function M.init(cfg)
+    Config = cfg
 end
 
--- Initialize on load
-M.refreshMyCountry()
+-- Get enabled resources sorted by priority
+function M.getEnabledResources()
+    local enabled = {}
+    for _, res in ipairs(Config.Resources) do
+        if res.enabled then
+            table.insert(enabled, res)
+        end
+    end
+    table.sort(enabled, function(a, b) return a.priority < b.priority end)
+    return enabled
+end
 
--- Player cache for skip checks
-local playerCountryCache = {}
-local cacheTime = 0
+function M.getResourceByName(name)
+    for _, res in ipairs(Config.Resources) do
+        if res.name == name then return res end
+    end
+    return nil
+end
 
 function M.refreshPlayerCache()
     if tick() - cacheTime < 10 then return end
-    playerCountryCache = {}
-    for _, player in ipairs(Players:GetPlayers()) do
-        local c = player:GetAttribute("Country")
-        if c then playerCountryCache[c] = true end
+    playerCache = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        local c = p:GetAttribute("Country")
+        if c then playerCache[c] = true end
     end
     cacheTime = tick()
 end
 
-function M.isPlayerCountry(country)
+function M.isPlayerCountry(name)
+    if not Config.SkipPlayerCountries then return false end
     M.refreshPlayerCache()
-    return playerCountryCache[country.Name] == true
+    return playerCache[name] == true
 end
 
-function M.getMyFlow()
-    -- Refresh country detection each time
-    if not M.myCountry then
-        M.refreshMyCountry()
-    end
-    if not M.myCountry then return 0 end
-    
-    local r = M.myCountry:FindFirstChild("Resources")
-    if not r then return 0 end
-    local e = r:FindFirstChild("Electronics")
-    if not e then return 0 end
-    local f = e:FindFirstChild("Flow")
+-- Get resource folder for a specific resource
+function M.getResourceFolder(country, resourceGameName)
+    if not country then return nil end
+    local r = country:FindFirstChild("Resources")
+    if not r then return nil end
+    return r:FindFirstChild(resourceGameName)
+end
+
+-- Get flow for specific resource
+function M.getFlow(resource)
+    local res = M.getResourceFolder(M.myCountry, resource.gameName)
+    if not res then return 0 end
+    local f = res:FindFirstChild("Flow")
     return f and f.Value or 0
 end
 
-function M.getAvailableFlow()
-    local Config = M.Config or {SmartSellReserve = 1}
-    return math.max(0, M.getMyFlow() - Config.SmartSellReserve)
+-- Get available flow for specific resource
+function M.getAvailableFlow(resource)
+    if not Config.SmartSell then return 999999 end
+    return math.max(0, M.getFlow(resource) - Config.SmartSellReserve)
 end
 
-function M.getMyBuyers()
-    if not M.myCountry then
-        M.refreshMyCountry()
+-- Get total flow across all enabled resources
+function M.getTotalFlow()
+    local total = 0
+    for _, res in ipairs(M.getEnabledResources()) do
+        total = total + M.getFlow(res)
     end
-    if not M.myCountry then return {} end
-    
-    local r = M.myCountry:FindFirstChild("Resources")
-    if not r then return {} end
-    local e = r:FindFirstChild("Electronics")
-    if not e then return {} end
-    local t = e:FindFirstChild("Trade")
+    return total
+end
+
+-- Get total available flow across all enabled resources
+function M.getTotalAvailableFlow()
+    local total = 0
+    for _, res in ipairs(M.getEnabledResources()) do
+        total = total + M.getAvailableFlow(res)
+    end
+    return total
+end
+
+-- Get buyers for specific resource
+function M.getBuyers(resource)
+    local res = M.getResourceFolder(M.myCountry, resource.gameName)
+    if not res then return {} end
+    local t = res:FindFirstChild("Trade")
     if not t then return {} end
     
     local buyers = {}
     for _, obj in ipairs(t:GetChildren()) do
-        if obj:IsA("Vector3Value") and obj.Value.X < -0.01 then
-            if obj.Name ~= M.myCountryName then
-                buyers[obj.Name] = math.abs(obj.Value.X)
-            end
+        if obj:IsA("Vector3Value") and obj.Value.X < -0.01 and obj.Name ~= M.myCountryName then
+            buyers[obj.Name] = math.abs(obj.Value.X)
         end
     end
     return buyers
 end
 
-function M.getTotalSelling()
+-- Get total selling for specific resource
+function M.getTotalSelling(resource)
     local total = 0
-    for _, amt in pairs(M.getMyBuyers()) do
+    for _, amt in pairs(M.getBuyers(resource)) do
         total = total + amt
     end
     return total
 end
 
-function M.getBuyerCount()
+-- Get buyer count for specific resource
+function M.getBuyerCount(resource)
     local count = 0
-    for _ in pairs(M.getMyBuyers()) do
+    for _ in pairs(M.getBuyers(resource)) do
         count = count + 1
     end
     return count
 end
 
-function M.getCountryFlow(country)
-    local r = country:FindFirstChild("Resources")
-    if not r then return 0 end
-    local e = r:FindFirstChild("Electronics")
-    if not e then return 0 end
-    local f = e:FindFirstChild("Flow")
-    return f and f.Value or 0
+-- Get all buyers across all resources
+function M.getAllBuyers()
+    local allBuyers = {}
+    for _, res in ipairs(M.getEnabledResources()) do
+        allBuyers[res.name] = M.getBuyers(res)
+    end
+    return allBuyers
 end
 
-function M.getRevenue(country)
-    local eco = country:FindFirstChild("Economy")
-    if not eco then return 0 end
-    local rev = eco:FindFirstChild("Revenue")
-    if not rev then return 0 end
-    return rev:GetAttribute("Total") or 0
-end
-
-function M.canTrade(country)
-    local eco = country:FindFirstChild("Economy")
-    if not eco then return false, "No Economy" end
-    local rev = eco:FindFirstChild("Revenue")
-    local bal = eco:FindFirstChild("Balance")
-    if not rev or not bal then return false, "No Revenue/Balance" end
-    if bal.Value <= 0 then return false, "Negative Balance" end
+-- Get trade count for specific resource on a country
+function M.getTradeCount(country, resourceGameName)
+    local res = M.getResourceFolder(country, resourceGameName)
+    if not res then return 0 end
+    local t = res:FindFirstChild("Trade")
+    if not t then return 0 end
     
-    local res = country:FindFirstChild("Resources")
-    if not res then return false, "No Resources" end
-    local elec = res:FindFirstChild("Electronics")
-    if not elec then return false, "No Electronics" end
-    local trade = elec:FindFirstChild("Trade")
-    if not trade then return false, "No Trade" end
-    
-    return true, nil
-end
-
-function M.getTradingPartners(country)
-    local r = country:FindFirstChild("Resources")
-    if not r then return {} end
-    local e = r:FindFirstChild("Electronics")
-    if not e then return {} end
-    local t = e:FindFirstChild("Trade")
-    if not t then return {} end
-    
-    local partners = {}
+    local count = 0
     for _, obj in ipairs(t:GetChildren()) do
+        if obj:IsA("Vector3Value") then count = count + 1 end
+    end
+    return count
+end
+
+-- Get country data for specific resource
+function M.getCountryResourceData(country, resource)
+    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false}
+    
+    local eco = country:FindFirstChild("Economy")
+    if not eco then return data end
+    local rev, bal = eco:FindFirstChild("Revenue"), eco:FindFirstChild("Balance")
+    if not rev or not bal then return data end
+    
+    local res = M.getResourceFolder(country, resource.gameName)
+    if not res then return data end
+    local trade = res:FindFirstChild("Trade")
+    if not trade then return data end
+    
+    data.valid = true
+    data.revenue = rev:GetAttribute("Total") or 0
+    data.balance = bal.Value or 0
+    data.flow = res:FindFirstChild("Flow") and res.Flow.Value or 0
+    
+    for _, obj in ipairs(trade:GetChildren()) do
         if obj:IsA("Vector3Value") then
-            table.insert(partners, obj)
+            if obj.Value.X > 0.01 then data.buyAmount = data.buyAmount + obj.Value.X
+            elseif obj.Value.X < -0.01 then data.hasSell = true end
         end
     end
-    return partners
+    return data
 end
 
-function M.getPriceTiers(country)
-    local revenue = M.getRevenue(country)
-    if revenue >= 1000000 then
-        return {1.0, 0.7, 0.5, 0.3}
-    elseif revenue >= 500000 then
-        return {0.7, 0.5, 0.3}
-    elseif revenue >= 200000 then
-        return {0.5, 0.3}
-    else
-        return {0.3}
-    end
+function M.getPriceTier(revenue)
+    if revenue >= 1000000 then return 1.0
+    elseif revenue >= 500000 then return 0.7
+    elseif revenue >= 200000 then return 0.5
+    else return 0.3 end
 end
 
-function M.getSortedCountries()
+function M.getNextPriceTier(current)
+    if current >= 1.0 then return 0.7
+    elseif current >= 0.7 then return 0.5
+    elseif current >= 0.5 then return 0.3
+    else return nil end
+end
+
+function M.getCountries()
     local countries = CountryData:GetChildren()
     table.sort(countries, function(a, b)
-        return M.getRevenue(a) > M.getRevenue(b)
+        local aRev = a:FindFirstChild("Economy") and a.Economy:FindFirstChild("Revenue") and a.Economy.Revenue:GetAttribute("Total") or 0
+        local bRev = b:FindFirstChild("Economy") and b.Economy:FindFirstChild("Revenue") and b.Economy.Revenue:GetAttribute("Total") or 0
+        return aRev > bRev
     end)
     return countries
 end
