@@ -6,10 +6,12 @@
 local M = {}
 local Config, State, Helpers, Trading, AutoSell
 
+-- Load Rayfield
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 M.Elements = {}
 M.Logs = {}
+M.Rayfield = Rayfield  -- Expose Rayfield
 
 function M.init(cfg, state, helpers, trading, autosell)
     Config = cfg
@@ -58,7 +60,7 @@ end
 function M.updateAutoSell()
     if not M.Elements.AutoSellLabel then return end
     pcall(function()
-        if AutoSell.isMonitoring then
+        if AutoSell and AutoSell.isMonitoring then
             M.Elements.AutoSellLabel:Set(string.format("✓ Monitoring (%.2f avail)", Helpers.getAvailableFlow()))
         else
             M.Elements.AutoSellLabel:Set("⏸ Disabled")
@@ -77,7 +79,7 @@ function M.createWindow()
     local Home = Window:CreateTab("🏠 Home", 4483362458)
     
     Home:CreateButton({Name = "🚀 Start", Callback = function()
-        if not State.isRunning then task.spawn(Trading.run) end
+        if not State.isRunning then task.spawn(function() Trading.run() end) end
     end})
     
     Home:CreateButton({Name = "🛑 Stop", Callback = function() State.isRunning = false end})
@@ -116,7 +118,10 @@ function M.createWindow()
         Callback = function(v) Config.RetryEnabled = v end})
     
     Settings:CreateToggle({Name = "🤖 Auto-Sell", CurrentValue = Config.AutoSellEnabled,
-        Callback = function(v) Config.AutoSellEnabled = v; if v then AutoSell.start() else AutoSell.stop() end end})
+        Callback = function(v) 
+            Config.AutoSellEnabled = v
+            if v then AutoSell.start() else AutoSell.stop() end 
+        end})
     
     Settings:CreateSlider({Name = "Auto-Sell Threshold", Range = {1, 20}, Increment = 0.5, CurrentValue = Config.AutoSellThreshold,
         Callback = function(v) Config.AutoSellThreshold = v end})
@@ -139,6 +144,9 @@ function M.createWindow()
         M.log(string.format("🏴 %s | Flow: %.2f", Helpers.myCountryName, Helpers.getMyFlow()), "info")
     end
     M.updateStats()
+    
+    -- Load saved config
+    Rayfield:LoadConfiguration()
     
     return Window
 end
