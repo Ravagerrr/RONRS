@@ -10,23 +10,24 @@ return {
             name = "ConsumerGoods",
             gameName = "Consumer Goods",
             buyPrice = 82400,
+            maxAmount = 999,      -- No cap, only limited by revenue
             enabled = true,
-            priority = 1,  -- Lower = Higher priority
+            priority = 1,
         },
         {
             name = "Electronics",
             gameName = "Electronics",
             buyPrice = 102000,
+            maxAmount = 5,        -- Hard cap at 5
             enabled = true,
             priority = 2,
         },
     },
     
     -- Trading
-    MaxAmount = 5,
     MinAmount = 0.001,
-    WaitTime = 0.5,          -- Cooldown between trades
-    ResourceDelay = 0.3,      -- Extra delay when switching resources
+    WaitTime = 0.5,
+    ResourceDelay = 0.3,
     
     -- Retry
     RetryEnabled = true,
