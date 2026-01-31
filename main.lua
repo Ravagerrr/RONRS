@@ -1,11 +1,6 @@
 --[[
-    Trade Hub v4.2.006 - Multi-Resource
+    Trade Hub v4.2.005 - Multi-Resource
     Auto-start, simplified controls
-    
-    VERSION HISTORY:
-    v4.2.006 - Added MaxRevenueSpendingPercent to prevent trade rejections
-    
-    REMINDER: Update version number in main.lua and ui.lua for each change
 ]]
 
 local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
@@ -34,7 +29,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.006")
+print("  Trade Hub v4.2.005")
 print("══════════════════════════")
 
 local Config = loadModule("config")
