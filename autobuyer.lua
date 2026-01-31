@@ -2,11 +2,11 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
-    v4.2.010: Now checks factory counts in controlled cities to determine actual
-    resource requirements. This is more reliable than flow values which can be
-    misleading. Falls back to flow-based check if no factories need the resource.
+    v4.2.011: Reads resource deficits directly from city Resources attributes.
+    The game stores deficits at: workspace.Baseplate.Cities.[Country].[City].Resources
+    where attributes like "Iron = -4" indicate a deficit of 4 Iron.
     
-    Path checked: workspace.Baseplate.Cities.[CountryName].[CityName].Buildings.[FactoryType]
+    Falls back to flow-based check if no city deficit exists.
 ]]
 
 local M = {}
@@ -132,24 +132,23 @@ local function checkAndBuyResource(resource)
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
     local targetFlow = Config.AutoBuyTargetSurplus
     
-    -- NEW: Check factory requirements to determine actual need
+    -- Check city resource deficits - reads from workspace.Baseplate.Cities.[Country].[City].Resources
     -- This is more reliable than flow which can be tricked by the game
-    local requiredByFactories = Helpers.getRequiredResourceAmount(resource.gameName)
-    local factoryDeficit = Helpers.getResourceDeficit(resource.gameName)
+    local cityDeficit = Helpers.getResourceDeficit(resource.gameName)
     
-    -- If we have factories that need this resource and we have a deficit, we need to buy
+    -- If cities show a deficit for this resource, we need to buy
     -- Otherwise fall back to flow-based check
     local neededAmount = 0
     
-    if requiredByFactories > 0 then
-        -- Factory-based calculation: buy if factories need more than we produce
+    if cityDeficit > 0 then
+        -- City-based deficit: the game already calculated what we're missing
         -- Add target surplus to ensure we're not running at exactly 0
-        neededAmount = factoryDeficit + targetFlow
+        neededAmount = cityDeficit + targetFlow
         
-        print(string.format("[AutoBuy] %s - Factory-based check: Required=%.2f, Deficit=%.2f, Needed=%.2f", 
-            resource.gameName, requiredByFactories, factoryDeficit, neededAmount))
+        print(string.format("[AutoBuy] %s - City deficit check: Deficit=%.2f, Needed=%.2f", 
+            resource.gameName, cityDeficit, neededAmount))
     else
-        -- Fallback to flow-based check if no factories need this resource
+        -- Fallback to flow-based check if no city deficit exists
         if flowBefore >= targetFlow then
             print(string.format("[AutoBuy] %s flow %.2f >= target %.2f, skipping", resource.gameName, flowBefore, targetFlow))
             return false, "Flow OK"
@@ -158,8 +157,8 @@ local function checkAndBuyResource(resource)
     end
     
     if neededAmount <= 0 then
-        print(string.format("[AutoBuy] %s - No deficit (factories fulfilled), skipping", resource.gameName))
-        return false, "Factories OK"
+        print(string.format("[AutoBuy] %s - No deficit, skipping", resource.gameName))
+        return false, "No Deficit"
     end
     
     if neededAmount < Config.MinAmount then
@@ -168,10 +167,10 @@ local function checkAndBuyResource(resource)
     end
     
     -- Print status before buying
-    if requiredByFactories > 0 then
-        print(string.format("[AutoBuy] %s - Factory need: %.2f, Current flow: %.2f, Deficit: %.2f", 
-            resource.gameName, requiredByFactories, flowBefore, factoryDeficit))
-        UI.log(string.format("[AutoBuy] %s factory need: %.2f, deficit: %.2f", resource.gameName, requiredByFactories, factoryDeficit), "info")
+    if cityDeficit > 0 then
+        print(string.format("[AutoBuy] %s - City deficit: %.2f, Current flow: %.2f", 
+            resource.gameName, cityDeficit, flowBefore))
+        UI.log(string.format("[AutoBuy] %s city deficit: %.2f", resource.gameName, cityDeficit), "info")
     else
         print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, target: %.2f, neededAmount: %.2f", 
             resource.gameName, flowBefore, targetFlow, neededAmount))

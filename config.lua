@@ -4,39 +4,6 @@
 ]]
 
 return {
-    -- Factory Requirements (resource consumption per factory per 5 days)
-    -- Used to calculate actual resource needs based on factory counts
-    FactoryRequirements = {
-        ["Electronics Factory"] = {
-            {resource = "Gold", amount = 2},
-            {resource = "Copper", amount = 2},
-        },
-        ["Steel Factory"] = {
-            {resource = "Iron", amount = 4},
-            {resource = "Titanium", amount = 0.2},
-        },
-        ["Motor Factory"] = {
-            {resource = "Steel", amount = 1},
-            {resource = "Tungsten", amount = 2},
-        },
-        ["Fertilizer Factory"] = {
-            {resource = "Phosphate", amount = 3.5},
-        },
-        ["Civilian Factory"] = {
-            {resource = "Electronics", amount = 3},
-            {resource = "Motor Parts", amount = 2.5},
-            {resource = "Fertilizer", amount = 2.5},
-        },
-        ["Aircraft Factory"] = {
-            {resource = "Aluminum", amount = 2},
-            {resource = "Chromium", amount = 2},
-            {resource = "Titanium", amount = 2},
-        },
-        ["Uranium Enricher"] = {
-            {resource = "Uranium", amount = 20},
-        },
-    },
-    
     -- Resource Settings
     Resources = {
         {

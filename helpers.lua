@@ -243,88 +243,55 @@ function M.getControlledCities()
     return cities
 end
 
--- Count factories of a specific type across all controlled cities
-function M.countFactories(factoryType)
-    local count = 0
+-- Get total resource deficit across all controlled cities
+-- Reads from workspace.Baseplate.Cities.[Country].[City].Resources attributes
+-- The game stores deficits directly as attributes (e.g., Iron = -4 means we need 4 more Iron)
+function M.getTotalCityResourceDeficit(resourceGameName)
+    local totalDeficit = 0
     local cities = M.getControlledCities()
     
     for _, city in ipairs(cities) do
-        local buildings = city:FindFirstChild("Buildings")
-        if buildings then
-            local factory = buildings:FindFirstChild(factoryType)
-            if factory then
-                count = count + 1
+        local resources = city:FindFirstChild("Resources")
+        if resources then
+            -- The game stores the deficit as an attribute on the Resources folder
+            -- Negative values mean we need that resource (deficit)
+            local deficit = resources:GetAttribute(resourceGameName)
+            if deficit and deficit < 0 then
+                -- Deficit is negative in the game, so we convert to positive "need" amount
+                totalDeficit = totalDeficit + math.abs(deficit)
             end
         end
     end
     
-    return count
+    return totalDeficit
 end
 
--- Get all factory counts across controlled cities
-function M.getAllFactoryCounts()
-    local factoryCounts = {}
+-- Get all resource deficits across all controlled cities
+function M.getAllCityResourceDeficits()
+    local deficits = {}
     local cities = M.getControlledCities()
     
     for _, city in ipairs(cities) do
-        local buildings = city:FindFirstChild("Buildings")
-        if buildings then
-            for _, building in ipairs(buildings:GetChildren()) do
-                local name = building.Name
-                factoryCounts[name] = (factoryCounts[name] or 0) + 1
+        local resources = city:FindFirstChild("Resources")
+        if resources then
+            -- Get all attributes from the Resources folder
+            -- GetAttributes() returns a dictionary {name = value}, use pairs() to iterate
+            for attrName, value in pairs(resources:GetAttributes()) do
+                if value and type(value) == "number" and value < 0 then
+                    -- Negative values are deficits
+                    deficits[attrName] = (deficits[attrName] or 0) + math.abs(value)
+                end
             end
         end
     end
     
-    return factoryCounts
+    return deficits
 end
 
--- Calculate total resource requirements based on factory counts
-function M.getFactoryResourceRequirements()
-    local requirements = {}
-    local factoryCounts = M.getAllFactoryCounts()
-    
-    for factoryType, count in pairs(factoryCounts) do
-        local factoryReqs = Config.FactoryRequirements[factoryType]
-        if factoryReqs then
-            for _, req in ipairs(factoryReqs) do
-                local resourceName = req.resource
-                local amountPerFactory = req.amount
-                requirements[resourceName] = (requirements[resourceName] or 0) + (count * amountPerFactory)
-            end
-        else
-            -- Log unknown factory types to help identify missing config entries
-            print(string.format("[Helpers] Unknown factory type: %s (count: %d) - not in FactoryRequirements config", factoryType, count))
-        end
-    end
-    
-    return requirements
-end
-
--- Get required amount for a specific resource based on factories
-function M.getRequiredResourceAmount(resourceGameName)
-    local requirements = M.getFactoryResourceRequirements()
-    return requirements[resourceGameName] or 0
-end
-
--- Check if we need to buy a resource based on factory requirements
--- Returns: needed amount (positive if we need to buy, 0 or negative if we have enough)
+-- Check if we need to buy a resource based on city resource deficits
+-- Returns: deficit amount (positive if we need to buy, 0 if no deficit)
 function M.getResourceDeficit(resourceGameName)
-    local requiredAmount = M.getRequiredResourceAmount(resourceGameName)
-    if requiredAmount <= 0 then
-        return 0 -- No factories need this resource
-    end
-    
-    -- Get current resource flow (production)
-    local res = M.getResourceFolder(M.myCountry, resourceGameName)
-    if not res then return requiredAmount end -- No resource folder, need full amount
-    
-    local flowObj = res:FindFirstChild("Flow")
-    local currentFlow = flowObj and flowObj.Value or 0
-    
-    -- Deficit = what factories need minus what we're producing
-    -- Positive means we need more, negative means we have surplus
-    return requiredAmount - currentFlow
+    return M.getTotalCityResourceDeficit(resourceGameName)
 end
 
 return M
