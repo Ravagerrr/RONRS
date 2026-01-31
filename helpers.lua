@@ -199,16 +199,14 @@ function M.getCountryResourceData(country, resource)
 end
 
 function M.getPriceTier(revenue)
-    if revenue >= 1000000 then return 1.0
-    elseif revenue >= 500000 then return 0.7
-    elseif revenue >= 200000 then return 0.5
-    else return 0.3 end
+    -- Start all countries at 1.0x (full price) to maximize revenue
+    return 1.0
 end
 
 function M.getNextPriceTier(current)
-    if current >= 1.0 then return 0.7
-    elseif current >= 0.7 then return 0.5
-    elseif current >= 0.5 then return 0.3
+    -- Retry sequence: 1.0 -> 0.5 -> 0.1 -> nil
+    if current >= 1.0 then return 0.5
+    elseif current >= 0.5 then return 0.1
     else return nil end
 end
 

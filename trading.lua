@@ -161,6 +161,33 @@ function M.run()
     
     local totalCountries = #countries
     
+    -- DEBUG: Log detailed info for an example country to understand acceptance/rejection
+    if Config.DebugLogging and #countries > 0 then
+        local debugCountry = countries[1]  -- First country (highest revenue)
+        UI.log("=== DEBUG: Example Country ===", "info")
+        UI.log(string.format("Country: %s", debugCountry.Name), "info")
+        
+        for _, res in ipairs(Helpers.getEnabledResources()) do
+            local data = Helpers.getCountryResourceData(debugCountry, res)
+            if data.valid then
+                local priceTier = Helpers.getPriceTier(data.revenue)
+                local actualPricePerUnit = res.buyPrice * priceTier
+                local maxAffordable = 0
+                if actualPricePerUnit > 0 then
+                    maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+                end
+                
+                UI.log(string.format("  %s:", res.gameName), "info")
+                UI.log(string.format("    Revenue: $%.0f | Balance: $%.0f", data.revenue, data.balance), "info")
+                UI.log(string.format("    Flow: %.2f | BuyAmount: %.2f | HasSell: %s", data.flow, data.buyAmount, tostring(data.hasSell)), "info")
+                UI.log(string.format("    PriceTier: %.1fx | PricePerUnit: $%.0f", priceTier, actualPricePerUnit), "info")
+                UI.log(string.format("    MaxSpend: $%.0f (%.0f%% of rev) | MaxAffordable: %.2f", 
+                    data.revenue * Config.MaxRevenueSpendingPercent, Config.MaxRevenueSpendingPercent * 100, maxAffordable), "info")
+            end
+        end
+        UI.log("=== END DEBUG ===", "info")
+    end
+    
     for i, country in ipairs(countries) do
         if not State.isRunning then 
             UI.log("STOPPED by user", "warning")
