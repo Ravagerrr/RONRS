@@ -117,15 +117,17 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     -- Calculate affordable based on ACTUAL price they pay
     local affordable
     if resource.hasCap then
-        -- Electronics: cap at capAmount (5), but also check what they can afford at this price
+        -- Electronics: cap at capAmount (5), use 100% of revenue
         local canAfford = data.revenue / actualPricePerUnit
         affordable = math.min(resource.capAmount, canAfford)
-        UI.log(string.format("  Capped Resource: Can afford %.2f, cap is %d, using %.2f", 
-            canAfford, resource.capAmount, affordable), "info")
+        UI.log(string.format("  Capped Resource (Electronics): Can afford %.2f (100%% rev: $%.0f / $%.2f), cap is %d, using %.2f", 
+            canAfford, data.revenue, actualPricePerUnit, resource.capAmount, affordable), "info")
     else
-        -- Consumer Goods: NO CAP, only limited by what they can afford at this price
-        affordable = data.revenue / actualPricePerUnit
-        UI.log(string.format("  Uncapped Resource: Can afford %.2f", affordable), "info")
+        -- Consumer Goods: NO CAP, only use 80% of revenue to leave room for other expenses
+        local usableRevenue = data.revenue * 0.8
+        affordable = usableRevenue / actualPricePerUnit
+        UI.log(string.format("  Uncapped Resource (Consumer Goods): Can afford %.2f (80%% of rev: $%.0f / $%.2f)", 
+            affordable, usableRevenue, actualPricePerUnit), "info")
     end
     
     if affordable < Config.MinAmount then 
