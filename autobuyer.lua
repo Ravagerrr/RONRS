@@ -1,5 +1,5 @@
 --[[
-    AUTOBUYER MODULE v1.2
+    AUTOBUYER MODULE v1.3
     Auto-buy Monitor for Resource Flow Protection
     
     Checks factory consumption and falls back to flow-based check.
