@@ -1,7 +1,12 @@
 --[[
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
-    Automatically buys resources when your country's flow goes negative
+    
+    v4.2.010: Now checks factory counts in controlled cities to determine actual
+    resource requirements. This is more reliable than flow values which can be
+    misleading. Falls back to flow-based check if no factories need the resource.
+    
+    Path checked: workspace.Baseplate.Cities.[CountryName].[CityName].Buildings.[FactoryType]
 ]]
 
 local M = {}
@@ -127,27 +132,51 @@ local function checkAndBuyResource(resource)
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
     local targetFlow = Config.AutoBuyTargetSurplus
     
-    -- If flow is already at or above target, no need to buy
-    if flowBefore >= targetFlow then
-        print(string.format("[AutoBuy] %s flow %.2f >= target %.2f, skipping", resource.gameName, flowBefore, targetFlow))
-        return false, "Flow OK"
+    -- NEW: Check factory requirements to determine actual need
+    -- This is more reliable than flow which can be tricked by the game
+    local requiredByFactories = Helpers.getRequiredResourceAmount(resource.gameName)
+    local factoryDeficit = Helpers.getResourceDeficit(resource.gameName)
+    
+    -- If we have factories that need this resource and we have a deficit, we need to buy
+    -- Otherwise fall back to flow-based check
+    local neededAmount = 0
+    
+    if requiredByFactories > 0 then
+        -- Factory-based calculation: buy if factories need more than we produce
+        -- Add target surplus to ensure we're not running at exactly 0
+        neededAmount = factoryDeficit + targetFlow
+        
+        print(string.format("[AutoBuy] %s - Factory-based check: Required=%.2f, Deficit=%.2f, Needed=%.2f", 
+            resource.gameName, requiredByFactories, factoryDeficit, neededAmount))
+    else
+        -- Fallback to flow-based check if no factories need this resource
+        if flowBefore >= targetFlow then
+            print(string.format("[AutoBuy] %s flow %.2f >= target %.2f, skipping", resource.gameName, flowBefore, targetFlow))
+            return false, "Flow OK"
+        end
+        neededAmount = targetFlow - flowBefore
     end
     
-    -- Calculate how much we need to reach the target surplus
-    -- e.g., if flow is -0.5 and target is 0.1, we need 0.6
-    -- NOTE: flowBefore already includes the effect of all active buy/sell trades,
-    -- so we don't need to subtract currentBuying - that would double-count
-    local neededAmount = targetFlow - flowBefore
+    if neededAmount <= 0 then
+        print(string.format("[AutoBuy] %s - No deficit (factories fulfilled), skipping", resource.gameName))
+        return false, "Factories OK"
+    end
     
     if neededAmount < Config.MinAmount then
         print(string.format("[AutoBuy] %s already at target (flow: %.2f, needed: %.2f)", resource.gameName, flowBefore, neededAmount))
         return false, "Already Buying"
     end
     
-    -- Print flow before buying
-    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, target: %.2f, neededAmount: %.2f", 
-        resource.gameName, flowBefore, targetFlow, neededAmount))
-    UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
+    -- Print status before buying
+    if requiredByFactories > 0 then
+        print(string.format("[AutoBuy] %s - Factory need: %.2f, Current flow: %.2f, Deficit: %.2f", 
+            resource.gameName, requiredByFactories, flowBefore, factoryDeficit))
+        UI.log(string.format("[AutoBuy] %s factory need: %.2f, deficit: %.2f", resource.gameName, requiredByFactories, factoryDeficit), "info")
+    else
+        print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, target: %.2f, neededAmount: %.2f", 
+            resource.gameName, flowBefore, targetFlow, neededAmount))
+        UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
+    end
     
     -- Find AI NPC countries selling this resource
     local sellers = findSellingCountries(resource.gameName)

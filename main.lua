@@ -1,8 +1,9 @@
 --[[
-    Trade Hub v4.2.009 - Multi-Resource
+    Trade Hub v4.2.010 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.010 - Auto-Buy now checks factory counts instead of flow (fixes game trickling flow values)
     v4.2.009 - Faster check intervals (0.5s default) for real-time detection
     v4.2.008 - Auto-Buy targets +0.1 surplus flow, only buys when not in debt
     v4.2.007 - Added Auto-Buy feature for resource flow protection
@@ -37,7 +38,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.009")
+print("  Trade Hub v4.2.010")
 print("══════════════════════════")
 
 local Config = loadModule("config")

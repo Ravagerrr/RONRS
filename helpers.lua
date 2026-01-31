@@ -222,4 +222,109 @@ function M.isInDebt()
     return M.getMyBalance() < 0
 end
 
+-- Get all cities controlled by the player's country
+function M.getControlledCities()
+    local cities = {}
+    if not M.myCountryName then return cities end
+    
+    local baseplate = workspace:FindFirstChild("Baseplate")
+    if not baseplate then return cities end
+    
+    local citiesFolder = baseplate:FindFirstChild("Cities")
+    if not citiesFolder then return cities end
+    
+    local countryFolder = citiesFolder:FindFirstChild(M.myCountryName)
+    if not countryFolder then return cities end
+    
+    for _, city in ipairs(countryFolder:GetChildren()) do
+        table.insert(cities, city)
+    end
+    
+    return cities
+end
+
+-- Count factories of a specific type across all controlled cities
+function M.countFactories(factoryType)
+    local count = 0
+    local cities = M.getControlledCities()
+    
+    for _, city in ipairs(cities) do
+        local buildings = city:FindFirstChild("Buildings")
+        if buildings then
+            local factory = buildings:FindFirstChild(factoryType)
+            if factory then
+                count = count + 1
+            end
+        end
+    end
+    
+    return count
+end
+
+-- Get all factory counts across controlled cities
+function M.getAllFactoryCounts()
+    local factoryCounts = {}
+    local cities = M.getControlledCities()
+    
+    for _, city in ipairs(cities) do
+        local buildings = city:FindFirstChild("Buildings")
+        if buildings then
+            for _, building in ipairs(buildings:GetChildren()) do
+                local name = building.Name
+                factoryCounts[name] = (factoryCounts[name] or 0) + 1
+            end
+        end
+    end
+    
+    return factoryCounts
+end
+
+-- Calculate total resource requirements based on factory counts
+function M.getFactoryResourceRequirements()
+    local requirements = {}
+    local factoryCounts = M.getAllFactoryCounts()
+    
+    for factoryType, count in pairs(factoryCounts) do
+        local factoryReqs = Config.FactoryRequirements[factoryType]
+        if factoryReqs then
+            for _, req in ipairs(factoryReqs) do
+                local resourceName = req.resource
+                local amountPerFactory = req.amount
+                requirements[resourceName] = (requirements[resourceName] or 0) + (count * amountPerFactory)
+            end
+        else
+            -- Log unknown factory types to help identify missing config entries
+            print(string.format("[Helpers] Unknown factory type: %s (count: %d) - not in FactoryRequirements config", factoryType, count))
+        end
+    end
+    
+    return requirements
+end
+
+-- Get required amount for a specific resource based on factories
+function M.getRequiredResourceAmount(resourceGameName)
+    local requirements = M.getFactoryResourceRequirements()
+    return requirements[resourceGameName] or 0
+end
+
+-- Check if we need to buy a resource based on factory requirements
+-- Returns: needed amount (positive if we need to buy, 0 or negative if we have enough)
+function M.getResourceDeficit(resourceGameName)
+    local requiredAmount = M.getRequiredResourceAmount(resourceGameName)
+    if requiredAmount <= 0 then
+        return 0 -- No factories need this resource
+    end
+    
+    -- Get current resource flow (production)
+    local res = M.getResourceFolder(M.myCountry, resourceGameName)
+    if not res then return requiredAmount end -- No resource folder, need full amount
+    
+    local flowObj = res:FindFirstChild("Flow")
+    local currentFlow = flowObj and flowObj.Value or 0
+    
+    -- Deficit = what factories need minus what we're producing
+    -- Positive means we need more, negative means we have surplus
+    return requiredAmount - currentFlow
+end
+
 return M
