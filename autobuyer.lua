@@ -45,10 +45,13 @@ local function getCurrentBuyAmount(resourceGameName)
     return buyAmount
 end
 
--- Find countries that are selling a resource (positive flow producers)
+-- Find AI NPC countries that can sell a resource (positive flow producers)
+-- AI NPCs don't have selling restrictions - can buy as much as needed, even put them in deficit
 local function findSellingCountries(resourceGameName)
     local sellers = {}
     local CountryData = workspace:WaitForChild("CountryData")
+    
+    print(string.format("[AutoBuy] Searching for %s sellers...", resourceGameName))
     
     for _, country in ipairs(CountryData:GetChildren()) do
         if country == Helpers.myCountry then continue end
@@ -68,25 +71,21 @@ local function findSellingCountries(resourceGameName)
         
         -- Check if they're already selling to us
         local alreadySellingToUs = false
-        local totalSelling = 0
         for _, obj in ipairs(trade:GetChildren()) do
             if obj:IsA("Vector3Value") then
-                if obj.Value.X < -0.01 then
-                    totalSelling = totalSelling + math.abs(obj.Value.X)
-                    if obj.Name == Helpers.myCountryName then
-                        alreadySellingToUs = true
-                    end
+                if obj.Value.X < -0.01 and obj.Name == Helpers.myCountryName then
+                    alreadySellingToUs = true
+                    break
                 end
             end
         end
         
-        if alreadySellingToUs then continue end
+        if alreadySellingToUs then 
+            print(string.format("[AutoBuy] %s already selling %s to us, skipping", country.Name, resourceGameName))
+            continue 
+        end
         
-        -- Calculate available to sell (flow minus what they're already selling)
-        local availableToSell = math.max(0, flow - totalSelling)
-        if availableToSell < Config.MinAmount then continue end
-        
-        -- Get country revenue for price calculation
+        -- Get country revenue for reference (not used for price - AI NPCs always use 1.0x)
         local eco = country:FindFirstChild("Economy")
         local revenue = 0
         if eco then
@@ -96,17 +95,22 @@ local function findSellingCountries(resourceGameName)
             end
         end
         
+        -- AI NPCs can sell as much as their flow allows - no restrictions
+        -- Can even put them in deficit if needed
+        print(string.format("[AutoBuy] Found seller: %s (flow: %.2f, revenue: $%.0f)", country.Name, flow, revenue))
+        
         table.insert(sellers, {
             country = country,
             name = country.Name,
             flow = flow,
-            availableToSell = availableToSell,
             revenue = revenue
         })
     end
     
-    -- Sort by available amount (highest first)
-    table.sort(sellers, function(a, b) return a.availableToSell > b.availableToSell end)
+    -- Sort by flow (highest first) - prefer countries with most production
+    table.sort(sellers, function(a, b) return a.flow > b.flow end)
+    
+    print(string.format("[AutoBuy] Found %d potential sellers for %s", #sellers, resourceGameName))
     
     return sellers
 end
@@ -142,6 +146,7 @@ local function checkAndBuyResource(resource)
     
     -- If flow is already at or above target, no need to buy
     if flowBefore >= targetFlow then
+        print(string.format("[AutoBuy] %s flow %.2f >= target %.2f, skipping", resource.gameName, flowBefore, targetFlow))
         return false, "Flow OK"
     end
     
@@ -153,16 +158,19 @@ local function checkAndBuyResource(resource)
     -- Calculate how much more we need to buy
     local neededAmount = deficit - currentBuying
     if neededAmount < Config.MinAmount then
+        print(string.format("[AutoBuy] %s already buying enough (current: %.2f, needed: %.2f)", resource.gameName, currentBuying, neededAmount))
         return false, "Already Buying"
     end
     
     -- Print flow before buying
-    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f", resource.gameName, flowBefore))
+    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, deficit: %.2f, currentBuying: %.2f, neededAmount: %.2f", 
+        resource.gameName, flowBefore, deficit, currentBuying, neededAmount))
     UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     
-    -- Find countries selling this resource
+    -- Find AI NPC countries selling this resource
     local sellers = findSellingCountries(resource.gameName)
     if #sellers == 0 then
+        print(string.format("[AutoBuy] No AI NPC sellers found for %s", resource.gameName))
         UI.log(string.format("[AutoBuy] No sellers for %s", resource.gameName), "warning")
         return false, "No Sellers"
     end
@@ -170,50 +178,49 @@ local function checkAndBuyResource(resource)
     local boughtTotal = 0
     
     for _, seller in ipairs(sellers) do
-        if neededAmount <= 0 then break end
+        if neededAmount <= 0 then 
+            print(string.format("[AutoBuy] Needed amount fulfilled (%.2f), stopping search", neededAmount))
+            break 
+        end
         
-        local buyAmount = math.min(neededAmount, seller.availableToSell)
-        if buyAmount < Config.MinAmount then continue end
+        -- AI NPCs can sell as much as needed - buy what we need up to their flow
+        -- Can even put them in deficit if needed
+        local buyAmount = math.min(neededAmount, seller.flow)
+        if buyAmount < Config.MinAmount then 
+            print(string.format("[AutoBuy] %s has insufficient flow (%.2f), skipping", seller.name, seller.flow))
+            continue 
+        end
         
-        -- Calculate price tier based on their revenue
-        local price = Helpers.getPriceTier(seller.revenue)
+        -- AI NPCs ALWAYS use 1.0x price - they don't accept discounts when selling
+        local price = 1.0
         
+        print(string.format("[AutoBuy] Attempting to buy %.2f %s from %s @ %.1fx (AI NPC - no discount)", 
+            buyAmount, resource.gameName, seller.name, price))
         UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx", 
             buyAmount, resource.gameName, seller.name, price), "info")
         
         if attemptBuy(seller, resource.gameName, buyAmount, price) then
             local flowAfter = getAutoBuyResourceFlow(resource.gameName)
-            print(string.format("[AutoBuy] BOUGHT %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
+            print(string.format("[AutoBuy] SUCCESS: Bought %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
                 buyAmount, resource.gameName, seller.name, price, flowBefore, flowAfter))
             UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
             boughtTotal = boughtTotal + buyAmount
             neededAmount = neededAmount - buyAmount
             M.purchases = M.purchases + 1
         else
-            -- Try lower price tiers
-            local nextPrice = Helpers.getNextPriceTier(price)
-            while nextPrice do
-                UI.log(string.format("[AutoBuy] Retry %s from %s @ %.1fx", resource.gameName, seller.name, nextPrice), "info")
-                if attemptBuy(seller, resource.gameName, buyAmount, nextPrice) then
-                    local flowAfter = getAutoBuyResourceFlow(resource.gameName)
-                    print(string.format("[AutoBuy] BOUGHT %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
-                        buyAmount, resource.gameName, seller.name, nextPrice, flowBefore, flowAfter))
-                    UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
-                    boughtTotal = boughtTotal + buyAmount
-                    neededAmount = neededAmount - buyAmount
-                    M.purchases = M.purchases + 1
-                    break
-                end
-                nextPrice = Helpers.getNextPriceTier(nextPrice)
-            end
+            -- AI NPCs don't accept flexibility - if 1.0x fails, move to next seller
+            print(string.format("[AutoBuy] FAILED: %s rejected purchase @ %.1fx, trying next seller", seller.name, price))
+            UI.log(string.format("[AutoBuy] Failed %s from %s, trying next", resource.gameName, seller.name), "warning")
         end
         
         task.wait(Config.ResourceDelay)
     end
     
     if boughtTotal > 0 then
+        print(string.format("[AutoBuy] Total bought for %s: %.2f", resource.gameName, boughtTotal))
         return true, string.format("Bought %.2f", boughtTotal)
     end
+    print(string.format("[AutoBuy] No purchases made for %s", resource.gameName))
     return false, "Failed"
 end
 
