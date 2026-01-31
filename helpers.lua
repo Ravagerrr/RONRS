@@ -114,6 +114,21 @@ function M.getBuyers(resource)
     return buyers
 end
 
+-- Check if we are currently selling a resource to a specific country
+-- Returns the amount being sold, or 0 if no trade exists
+function M.getSellingAmountTo(resourceGameName, countryName)
+    local res = M.getResourceFolder(M.myCountry, resourceGameName)
+    if not res then return 0 end
+    local t = res:FindFirstChild("Trade")
+    if not t then return 0 end
+    
+    local tradeEntry = t:FindFirstChild(countryName)
+    if tradeEntry and tradeEntry:IsA("Vector3Value") and tradeEntry.Value.X < -0.01 then
+        return math.abs(tradeEntry.Value.X)
+    end
+    return 0
+end
+
 -- Get total selling for specific resource
 function M.getTotalSelling(resource)
     local total = 0
