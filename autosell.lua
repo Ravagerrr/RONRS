@@ -61,7 +61,7 @@ function M.start()
                     while State.isRunning do 
                         -- Check auto-sell state even while trade is running
                         if not Config.AutoSellEnabled then
-                            State.isRunning = false
+                            Trading.stop()  -- Use Trading module's stop function
                             M.isMonitoring = false
                             UI.log("🤖 Auto-Sell disabled - stopping trade", "warning")
                             break
