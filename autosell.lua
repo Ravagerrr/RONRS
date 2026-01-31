@@ -52,7 +52,7 @@ function M.start()
                         end
                     end
                     
-                    UI.log(string.format("TRIGGERED: %s", table.concat(triggered, " | ")), "success")
+                    UI.log(string.format("TRIGGERED: %s", table.concat(triggered, " ")), "success")
                     M.triggers = M.triggers + 1
                     
                     task.spawn(Trading.run)

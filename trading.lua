@@ -90,9 +90,6 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
-    -- Final check right before trade attempt - use configResource which we know is current
-    if not configResource.enabled then return false, false, "Disabled" end
-    
     local totalCost = amount * actualPricePerUnit
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Rev:$%.0f Cost:$%.0f", 
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.revenue, totalCost), "info")
