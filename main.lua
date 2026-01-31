@@ -1,26 +1,6 @@
 --[[
     Trade Hub v1.0 - Multi-Resource
     Auto-start, simplified controls
-    
-    VERSION HISTORY:
-    v4.2.017 - Fixed factory detection: parseOperationalReason now handles decimals (e.g., 3.5)
-             - Removed fallback to hardcoded consumption table (was causing ghost factory buying)
-             - Now only buys resources when factory has Operational_Reason attribute
-    v4.2.016 - Auto-Buy now only checks factory consumption + negative flow (removed city deficit logic)
-             - Added Gold to Electronics Factory, Tungsten to Motor Factory
-             - Added Fertilizer Factory (Phosphate), Motor Factory, Steel Manufactory
-    v4.2.015 - Auto-Buy now detects factory consumption (Electronics Factory, etc.) and buys required materials
-    v4.2.014 - Trade verification now uses retry polling (5 attempts x 0.2s) for reliable detection
-    v4.2.013 - Auto-Buy no longer buys when no city deficit and flow >= 0 (fixes random Titanium buying)
-    v4.2.012 - Auto-Buy now correctly subtracts current flow from city deficit before buying
-    v4.2.011 - Auto-Buy reads city Resources attributes for deficits (e.g., Iron = -4)
-    v4.2.010 - Auto-Buy now checks factory counts instead of flow (fixes game trickling flow values)
-    v4.2.009 - Faster check intervals (0.5s default) for real-time detection
-    v4.2.008 - Auto-Buy targets +0.1 surplus flow, only buys when not in debt
-    v4.2.007 - Added Auto-Buy feature for resource flow protection
-    v4.2.006 - Added MaxRevenueSpendingPercent to prevent trade rejections
-    
-    REMINDER: Update version number in main.lua and ui.lua for each change
 ]]
 
 local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
