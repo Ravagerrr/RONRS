@@ -1,8 +1,11 @@
 --[[
-    Trade Hub v4.2.015 - Multi-Resource
+    Trade Hub v4.2.016 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.016 - Auto-Buy now only checks factory consumption + negative flow (removed city deficit logic)
+             - Added Gold to Electronics Factory, Tungsten to Motor Factory
+             - Added Fertilizer Factory (Phosphate), Motor Factory, Steel Manufactory
     v4.2.015 - Auto-Buy now detects factory consumption (Electronics Factory, etc.) and buys required materials
     v4.2.014 - Trade verification now uses retry polling (5 attempts x 0.2s) for reliable detection
     v4.2.013 - Auto-Buy no longer buys when no city deficit and flow >= 0 (fixes random Titanium buying)
@@ -43,7 +46,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.014")
+print("  Trade Hub v4.2.016")
 print("══════════════════════════")
 
 local Config = loadModule("config")

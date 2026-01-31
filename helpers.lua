@@ -317,21 +317,18 @@ M.FactoryConsumption = {
     ["Electronics Factory"] = {
         ["Titanium"] = 1,
         ["Copper"] = 1,
+        ["Gold"] = 1,
     },
-    ["Consumer Goods Factory"] = {
-        ["Iron"] = 1,
-        ["Copper"] = 1,
-    },
-    ["Steel Mill"] = {
+    ["Steel Manufactory"] = {
         ["Iron"] = 2,
     },
-    ["Ammunition Factory"] = {
+    ["Fertilizer Factory"] = {
+        ["Phosphate"] = 1,
+    },
+    ["Motor Factory"] = {
         ["Iron"] = 1,
         ["Copper"] = 1,
-    },
-    ["Weapons Factory"] = {
-        ["Iron"] = 2,
-        ["Titanium"] = 1,
+        ["Tungsten"] = 1,
     },
 }
 
