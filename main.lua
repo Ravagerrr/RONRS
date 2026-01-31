@@ -1,8 +1,9 @@
 --[[
-    Trade Hub v4.2.013 - Multi-Resource
+    Trade Hub v4.2.014 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.014 - Trade verification now uses retry polling (5 attempts x 0.2s) for reliable detection
     v4.2.013 - Auto-Buy no longer buys when no city deficit and flow >= 0 (fixes random Titanium buying)
     v4.2.012 - Auto-Buy now correctly subtracts current flow from city deficit before buying
     v4.2.011 - Auto-Buy reads city Resources attributes for deficits (e.g., Iron = -4)
@@ -41,7 +42,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.013")
+print("  Trade Hub v4.2.014")
 print("══════════════════════════")
 
 local Config = loadModule("config")

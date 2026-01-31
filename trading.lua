@@ -1,7 +1,7 @@
 --[[
     TRADING MODULE
     Multi-Resource with Priority System
-    FIXED: Calculate amount based on actual price tier
+    FIXED: Trade verification uses retry polling for reliable detection
 ]]
 
 local M = {}
@@ -24,11 +24,21 @@ local function attemptTrade(country, resource, amount, price)
         ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
-    task.wait(Config.WaitTime)
+    -- Poll multiple times to verify trade was registered (server may take time to update)
+    local maxAttempts = 5
+    local pollInterval = 0.2
     
-    -- Verify by checking if our selling amount to this country increased
-    local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
-    return afterAmount > beforeAmount
+    for attempt = 1, maxAttempts do
+        task.wait(pollInterval)
+        
+        local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
+        if afterAmount > beforeAmount then
+            return true
+        end
+    end
+    
+    -- Trade not verified after all attempts
+    return false
 end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
