@@ -19,12 +19,26 @@ end
 local function attemptTrade(country, resource, amount, price)
     local before = Helpers.getTradeCount(country, resource.gameName)
     
+    UI.log(string.format("    → Sending trade request to server..."), "info")
+    UI.log(string.format("    → Trade count before: %d", before), "info")
+    
     pcall(function()
         ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
     task.wait(Config.WaitTime)
-    return Helpers.getTradeCount(country, resource.gameName) > before
+    
+    local after = Helpers.getTradeCount(country, resource.gameName)
+    UI.log(string.format("    → Trade count after: %d", after), "info")
+    
+    local success = after > before
+    if success then
+        UI.log(string.format("    ✓ Trade confirmed! (count increased by %d)", after - before), "success")
+    else
+        UI.log(string.format("    ✗ Trade not confirmed (count unchanged)"), "warning")
+    end
+    
+    return success
 end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
@@ -36,33 +50,69 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local isRetry = retryState and retryState[resName]
     local icon = resName == "ConsumerGoods" and "CG" or "EL"
     
+    -- DEBUG: Initial check
+    UI.log(string.format("━━━ [%d/%d] %s %s ━━━", i, total, icon, name), "info")
+    
     local avail = Helpers.getAvailableFlow(resource)
+    UI.log(string.format("  Available Flow: %.2f (Min: %.2f)", avail, Config.MinAmount), "info")
     if Config.SmartSell and avail < Config.MinAmount then
+        UI.log(string.format("  ✗ SKIP: Not enough flow available", "warning"))
         return false, false, "No Flow"
     end
     
-    if Config.SkipOwnCountry and country == Helpers.myCountry then return false, false, "Own" end
-    if Helpers.isPlayerCountry(name) then return false, false, "Player" end
+    if Config.SkipOwnCountry and country == Helpers.myCountry then 
+        UI.log("  ✗ SKIP: Own country", "warning")
+        return false, false, "Own" 
+    end
+    if Helpers.isPlayerCountry(name) then 
+        UI.log("  ✗ SKIP: Player country", "warning")
+        return false, false, "Player" 
+    end
     
     local resourceBuyers = buyers[resName] or {}
-    if Config.SkipExistingBuyers and resourceBuyers[name] then return false, false, "Buyer" end
+    if Config.SkipExistingBuyers and resourceBuyers[name] then 
+        UI.log("  ✗ SKIP: Already a buyer", "warning")
+        return false, false, "Buyer" 
+    end
     
     local data = Helpers.getCountryResourceData(country, resource)
-    if not data.valid then return false, false, "Invalid" end
-    if data.revenue <= 0 or data.balance <= 0 then return false, false, "No Revenue" end
-    if data.hasSell then return false, false, "Already Selling" end
-    if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
+    UI.log(string.format("  Revenue: $%.0f | Balance: $%.0f | Flow: %.2f | Buying: %.2f", 
+        data.revenue, data.balance, data.flow, data.buyAmount), "info")
+    
+    if not data.valid then 
+        UI.log("  ✗ SKIP: Invalid data", "warning")
+        return false, false, "Invalid" 
+    end
+    if data.revenue <= 0 or data.balance <= 0 then 
+        UI.log("  ✗ SKIP: No revenue or balance", "warning")
+        return false, false, "No Revenue" 
+    end
+    if data.hasSell then 
+        UI.log("  ✗ SKIP: Already has sell order", "warning")
+        return false, false, "Already Selling" 
+    end
+    if Config.SkipProducingCountries and data.flow > 0 then 
+        UI.log("  ✗ SKIP: Producing this resource", "warning")
+        return false, false, "Producing" 
+    end
     
     -- Get price tier FIRST
     local price = Helpers.getPriceTier(data.revenue)
+    UI.log(string.format("  Price Tier: %.1fx (based on revenue $%.0f)", price, data.revenue), "info")
     
     if isRetry and retryState[resName .. "_price"] then
         price = Helpers.getNextPriceTier(retryState[resName .. "_price"])
-        if not price then return false, false, "No Buyers" end
+        if not price then 
+            UI.log("  ✗ FAIL: No more price tiers to try", "warning")
+            return false, false, "No Buyers" 
+        end
+        UI.log(string.format("  RETRY with new price tier: %.1fx", price), "info")
     end
     
     -- Calculate ACTUAL price per unit at this tier
     local actualPricePerUnit = resource.buyPrice * price
+    UI.log(string.format("  Actual Price/Unit: $%.2f (base: $%.0f × tier: %.1fx)", 
+        actualPricePerUnit, resource.buyPrice, price), "info")
     
     -- Calculate affordable based on ACTUAL price they pay
     local affordable
@@ -70,34 +120,55 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         -- Electronics: cap at capAmount (5), but also check what they can afford at this price
         local canAfford = data.revenue / actualPricePerUnit
         affordable = math.min(resource.capAmount, canAfford)
+        UI.log(string.format("  Capped Resource: Can afford %.2f, cap is %d, using %.2f", 
+            canAfford, resource.capAmount, affordable), "info")
     else
         -- Consumer Goods: NO CAP, only limited by what they can afford at this price
         affordable = data.revenue / actualPricePerUnit
+        UI.log(string.format("  Uncapped Resource: Can afford %.2f", affordable), "info")
     end
     
-    if affordable < Config.MinAmount then return false, false, "Insufficient" end
+    if affordable < Config.MinAmount then 
+        UI.log(string.format("  ✗ SKIP: Affordable amount %.2f < minimum %.2f", affordable, Config.MinAmount), "warning")
+        return false, false, "Insufficient" 
+    end
     
     -- Subtract what they're already buying
     local remaining = affordable - data.buyAmount
-    if remaining < Config.MinAmount then return false, false, "Max Capacity" end
+    UI.log(string.format("  Remaining capacity: %.2f (affordable: %.2f - already buying: %.2f)", 
+        remaining, affordable, data.buyAmount), "info")
+    if remaining < Config.MinAmount then 
+        UI.log(string.format("  ✗ SKIP: Remaining %.2f < minimum %.2f", remaining, Config.MinAmount), "warning")
+        return false, false, "Max Capacity" 
+    end
     
     -- Cap to available flow
     local amount = math.min(remaining, avail)
-    if amount < Config.MinAmount then return false, false, "Flow Protection" end
+    UI.log(string.format("  Final amount: %.2f (min of remaining: %.2f, available: %.2f)", 
+        amount, remaining, avail), "info")
+    if amount < Config.MinAmount then 
+        UI.log(string.format("  ✗ SKIP: Final amount %.2f < minimum %.2f (flow protection)", amount, Config.MinAmount), "warning")
+        return false, false, "Flow Protection" 
+    end
     
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
-    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u)", i, total, icon, name, amount, price, actualPricePerUnit), "info")
+    UI.log(string.format("  ✓ ATTEMPTING TRADE: %.2f units @ %.1fx ($%.2f/u) = $%.2f total", 
+        amount, price, actualPricePerUnit, amount * actualPricePerUnit), "success")
     
     if attemptTrade(country, resource, amount, price) then
-        UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
+        UI.log(string.format("  ✓✓ TRADE SUCCESS! %s bought %.2f %s @ %.1fx", 
+            name, amount, resName, price), "success")
         return true, false, nil
     else
+        UI.log(string.format("  ✗✗ TRADE FAILED - No buyers at %.1fx", price), "warning")
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
+            UI.log(string.format("  → Will retry at next tier: %.1fx", nextPrice), "info")
             return false, true, "Queued"
         end
+        UI.log("  No retry available", "warning")
         return false, false, "No Buyers"
     end
 end
