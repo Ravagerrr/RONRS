@@ -307,13 +307,12 @@ function M.getResourceDeficit(resourceGameName)
     return M.getTotalCityResourceDeficit(resourceGameName)
 end
 
--- Factory consumption rates per factory type
+-- Factory consumption rates per factory type (FALLBACK ONLY)
 -- Maps factory type names to resources they consume and the rate per factory
 -- 
--- NOTE: These are estimated baseline rates based on typical Rise of Nations factory mechanics.
--- The actual consumption rates may vary depending on the game version or server configuration.
--- If rates don't match the game, adjust the values below to match actual in-game consumption.
--- Rate values represent resources consumed per factory per tick/cycle.
+-- NOTE: These are fallback rates used ONLY if factory doesn't have Operational_Reason attribute.
+-- The preferred method reads actual demands from factory's Operational_Reason attribute.
+-- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]"
 M.FactoryConsumption = {
     ["Electronics Factory"] = {
         ["Titanium"] = 1,
@@ -336,78 +335,92 @@ M.FactoryConsumption = {
     },
 }
 
+-- Parse factory Operational_Reason attribute to extract resource demands
+-- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]", "Titanium [Need: 5]"
+-- Returns: table mapping resourceName to amount needed, or nil if not parseable
+function M.parseOperationalReason(operationalReason)
+    if not operationalReason or type(operationalReason) ~= "string" then
+        return nil
+    end
+    
+    -- Pattern: "ResourceName [Need: X]"
+    -- Use non-greedy (.-) to capture resource name up to the bracket
+    local resourceName, amount = string.match(operationalReason, "^(.-)%s*%[Need:%s*(%d+)%]")
+    
+    if resourceName and amount and resourceName ~= "" then
+        return {
+            [resourceName] = tonumber(amount)
+        }
+    end
+    
+    return nil
+end
+
+-- Get resource demands from a factory's attributes
+-- Reads Operational_Reason attribute to get actual demand
+-- Falls back to hardcoded FactoryConsumption if attribute not found
+function M.getFactoryDemands(factory)
+    if not factory.instance then
+        return M.FactoryConsumption[factory.name] or {}
+    end
+    
+    -- Try to read Operational_Reason attribute
+    local operationalReason = factory.instance:GetAttribute("Operational_Reason")
+    local parsedDemands = M.parseOperationalReason(operationalReason)
+    
+    if parsedDemands then
+        return parsedDemands
+    end
+    
+    -- Fallback to hardcoded consumption rates
+    return M.FactoryConsumption[factory.name] or {}
+end
+
 -- Get all factories owned by the player's country
--- Searches in workspace.Baseplate.Buildings.[CountryName] and other common locations
+-- Searches in workspace.Baseplate.Cities.[Country].[City].Buildings for each controlled city
+-- This function dynamically scans all cities each time it's called to detect newly built factories
 function M.getFactories()
     local factories = {}
     if not M.myCountryName then return factories end
     
-    -- Try multiple common factory storage locations
-    local searchPaths = {}
+    -- Get all controlled cities and check each city's Buildings folder
+    -- Path: workspace.Baseplate.Cities.[Country].[City].Buildings
+    local cities = M.getControlledCities()
     
-    local baseplate = workspace:FindFirstChild("Baseplate")
-    if baseplate then
-        -- Try Buildings folder
-        local buildings = baseplate:FindFirstChild("Buildings")
-        if buildings then
-            local countryBuildings = buildings:FindFirstChild(M.myCountryName)
-            if countryBuildings then
-                table.insert(searchPaths, countryBuildings)
-            end
-        end
-        
-        -- Try Factories folder
-        local factoriesFolder = baseplate:FindFirstChild("Factories")
-        if factoriesFolder then
-            local countryFactories = factoriesFolder:FindFirstChild(M.myCountryName)
-            if countryFactories then
-                table.insert(searchPaths, countryFactories)
-            end
-        end
-    end
-    
-    -- Also check in CountryData for factory info
-    if M.myCountry then
-        local countryFactories = M.myCountry:FindFirstChild("Factories")
-        if countryFactories then
-            table.insert(searchPaths, countryFactories)
-        end
-        
-        local countryBuildings = M.myCountry:FindFirstChild("Buildings")
-        if countryBuildings then
-            table.insert(searchPaths, countryBuildings)
-        end
-    end
-    
-    -- Search all paths for factories
-    for _, folder in ipairs(searchPaths) do
-        for _, obj in ipairs(folder:GetChildren()) do
-            -- Check if this is a factory we recognize
-            local factoryType = obj.Name
-            -- Also check for FactoryType attribute
-            local typeAttr = obj:GetAttribute("FactoryType") or obj:GetAttribute("Type")
-            if typeAttr then
-                factoryType = typeAttr
-            end
-            
-            if M.FactoryConsumption[factoryType] then
-                table.insert(factories, {
-                    name = factoryType,
-                    instance = obj,
-                })
-            else
-                -- Try partial matching for factory names (e.g., "Electronics Factory 1")
-                -- Use pattern anchoring to match from the start of the string
-                for knownFactory, _ in pairs(M.FactoryConsumption) do
-                    -- Match full factory name at start (e.g., "Electronics Factory" in "Electronics Factory 1")
-                    -- or match factory type without " Factory" suffix (e.g., "Electronics" in "Electronics 1")
-                    local shortName = knownFactory:gsub(" Factory", ""):gsub(" Mill", "")
-                    if string.find(obj.Name, "^" .. knownFactory) or string.find(obj.Name, "^" .. shortName) then
-                        table.insert(factories, {
-                            name = knownFactory,
-                            instance = obj,
-                        })
-                        break
+    for _, city in ipairs(cities) do
+        local buildingsFolder = city:FindFirstChild("Buildings")
+        if buildingsFolder then
+            -- Check each building in the city's Buildings folder
+            for _, obj in ipairs(buildingsFolder:GetChildren()) do
+                -- Check if this is a factory we recognize
+                local factoryType = obj.Name
+                -- Also check for FactoryType attribute
+                local typeAttr = obj:GetAttribute("FactoryType") or obj:GetAttribute("Type")
+                if typeAttr then
+                    factoryType = typeAttr
+                end
+                
+                if M.FactoryConsumption[factoryType] then
+                    table.insert(factories, {
+                        name = factoryType,
+                        instance = obj,
+                        city = city.Name,
+                    })
+                else
+                    -- Try partial matching for factory names (e.g., "Electronics Factory 1")
+                    -- Use pattern anchoring to match from the start of the string
+                    for knownFactory, _ in pairs(M.FactoryConsumption) do
+                        -- Match full factory name at start (e.g., "Electronics Factory" in "Electronics Factory 1")
+                        -- or match factory type without " Factory" suffix (e.g., "Electronics" in "Electronics 1")
+                        local shortName = knownFactory:gsub(" Factory", ""):gsub(" Mill", "")
+                        if string.find(obj.Name, "^" .. knownFactory) or string.find(obj.Name, "^" .. shortName) then
+                            table.insert(factories, {
+                                name = knownFactory,
+                                instance = obj,
+                                city = city.Name,
+                            })
+                            break
+                        end
                     end
                 end
             end
@@ -431,16 +444,16 @@ end
 
 -- Calculate total resource consumption from all factories
 -- Returns: table mapping resourceGameName to consumption amount
+-- Reads actual demands from factory Operational_Reason attributes when available
 function M.getFactoryResourceConsumption()
     local consumption = {}
-    local factoryCounts = M.getFactoryCounts()
+    local factories = M.getFactories()
     
-    for factoryType, count in pairs(factoryCounts) do
-        local resources = M.FactoryConsumption[factoryType]
-        if resources then
-            for resourceName, ratePerFactory in pairs(resources) do
-                consumption[resourceName] = (consumption[resourceName] or 0) + (count * ratePerFactory)
-            end
+    -- Check each factory individually to read its actual demands
+    for _, factory in ipairs(factories) do
+        local demands = M.getFactoryDemands(factory)
+        for resourceName, amount in pairs(demands) do
+            consumption[resourceName] = (consumption[resourceName] or 0) + amount
         end
     end
     
