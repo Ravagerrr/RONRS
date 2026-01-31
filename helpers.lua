@@ -222,4 +222,76 @@ function M.isInDebt()
     return M.getMyBalance() < 0
 end
 
+-- Get all cities controlled by the player's country
+function M.getControlledCities()
+    local cities = {}
+    if not M.myCountryName then return cities end
+    
+    local baseplate = workspace:FindFirstChild("Baseplate")
+    if not baseplate then return cities end
+    
+    local citiesFolder = baseplate:FindFirstChild("Cities")
+    if not citiesFolder then return cities end
+    
+    local countryFolder = citiesFolder:FindFirstChild(M.myCountryName)
+    if not countryFolder then return cities end
+    
+    for _, city in ipairs(countryFolder:GetChildren()) do
+        table.insert(cities, city)
+    end
+    
+    return cities
+end
+
+-- Get total resource deficit across all controlled cities
+-- Reads from workspace.Baseplate.Cities.[Country].[City].Resources attributes
+-- The game stores deficits directly as attributes (e.g., Iron = -4 means we need 4 more Iron)
+function M.getTotalCityResourceDeficit(resourceGameName)
+    local totalDeficit = 0
+    local cities = M.getControlledCities()
+    
+    for _, city in ipairs(cities) do
+        local resources = city:FindFirstChild("Resources")
+        if resources then
+            -- The game stores the deficit as an attribute on the Resources folder
+            -- Negative values mean we need that resource (deficit)
+            local deficit = resources:GetAttribute(resourceGameName)
+            if deficit and deficit < 0 then
+                -- Deficit is negative in the game, so we convert to positive "need" amount
+                totalDeficit = totalDeficit + math.abs(deficit)
+            end
+        end
+    end
+    
+    return totalDeficit
+end
+
+-- Get all resource deficits across all controlled cities
+function M.getAllCityResourceDeficits()
+    local deficits = {}
+    local cities = M.getControlledCities()
+    
+    for _, city in ipairs(cities) do
+        local resources = city:FindFirstChild("Resources")
+        if resources then
+            -- Get all attributes from the Resources folder
+            -- GetAttributes() returns a dictionary {name = value}, use pairs() to iterate
+            for attrName, value in pairs(resources:GetAttributes()) do
+                if value and type(value) == "number" and value < 0 then
+                    -- Negative values are deficits
+                    deficits[attrName] = (deficits[attrName] or 0) + math.abs(value)
+                end
+            end
+        end
+    end
+    
+    return deficits
+end
+
+-- Check if we need to buy a resource based on city resource deficits
+-- Returns: deficit amount (positive if we need to buy, 0 if no deficit)
+function M.getResourceDeficit(resourceGameName)
+    return M.getTotalCityResourceDeficit(resourceGameName)
+end
+
 return M
