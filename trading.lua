@@ -20,7 +20,7 @@ local function attemptTrade(country, resource, amount, price)
     local before = Helpers.getTradeCount(country, resource.gameName)
     
     pcall(function()
-        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
+        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Buy", amount, price, "Trade"})
     end)
     
     task.wait(Config.WaitTime)
