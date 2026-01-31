@@ -52,11 +52,6 @@ function M.start()
                         end
                     end
                     
-                    -- Only trigger trade if at least one resource is enabled and has available flow
-                    if #triggered == 0 then
-                        continue
-                    end
-                    
                     UI.log(string.format("TRIGGERED: %s", table.concat(triggered, " ")), "success")
                     M.triggers = M.triggers + 1
                     
