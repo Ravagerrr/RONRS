@@ -137,11 +137,17 @@ end
 local function checkAndBuyResource(resource)
     local flow = getAutoBuyResourceFlow(resource.gameName)
     
-    if flow >= 0 then
+    -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
+    local targetFlow = Config.AutoBuyTargetSurplus
+    
+    -- If flow is already at or above target, no need to buy
+    if flow >= targetFlow then
         return false, "Flow OK"
     end
     
-    local deficit = math.abs(flow)
+    -- Calculate how much we need to reach the target surplus
+    -- e.g., if flow is -0.5 and target is 0.1, we need 0.6
+    local deficit = targetFlow - flow
     local currentBuying = getCurrentBuyAmount(resource.gameName)
     
     -- Calculate how much more we need to buy
@@ -150,7 +156,7 @@ local function checkAndBuyResource(resource)
         return false, "Already Buying"
     end
     
-    UI.log(string.format("[AutoBuy] %s flow: %.2f, need: %.2f", resource.gameName, flow, neededAmount), "info")
+    UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flow, targetFlow, neededAmount), "info")
     
     -- Find countries selling this resource
     local sellers = findSellingCountries(resource.gameName)
@@ -216,6 +222,12 @@ end
 
 -- Run auto-buy check for all resources
 function M.runCheck()
+    -- Check if we're in debt and debt restriction is enabled
+    if Config.AutoBuyRequireNoDebt and Helpers.isInDebt() then
+        -- Skip auto-buy when in debt
+        return
+    end
+    
     local enabledResources = M.getEnabledResources()
     
     for _, resource in ipairs(enabledResources) do

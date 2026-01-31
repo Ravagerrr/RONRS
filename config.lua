@@ -60,6 +60,8 @@ return {
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
     AutoBuyCheckInterval = 3,
+    AutoBuyTargetSurplus = 0.1,  -- Target flow surplus (buys to +0.1 instead of 0)
+    AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyResources = {
         {name = "Tungsten", gameName = "Tungsten", enabled = true},
         {name = "Titanium", gameName = "Titanium", enabled = true},

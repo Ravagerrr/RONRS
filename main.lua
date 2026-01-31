@@ -1,8 +1,9 @@
 --[[
-    Trade Hub v4.2.007 - Multi-Resource
+    Trade Hub v4.2.008 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.008 - Auto-Buy targets +0.1 surplus flow, only buys when not in debt
     v4.2.007 - Added Auto-Buy feature for resource flow protection
     v4.2.006 - Added MaxRevenueSpendingPercent to prevent trade rejections
     
@@ -35,7 +36,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.007")
+print("  Trade Hub v4.2.008")
 print("══════════════════════════")
 
 local Config = loadModule("config")
