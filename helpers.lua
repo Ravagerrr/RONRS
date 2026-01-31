@@ -18,9 +18,19 @@ local cacheTime = 0
 -- Your country (initialized dynamically)
 M.myCountryName = nil
 M.myCountry = nil
+local countryCacheTime = 0
+local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redundant lookups
 
 -- Refresh the player's country (call when country might have changed)
+-- Uses caching to avoid excessive GetAttribute calls
 function M.refreshMyCountry()
+    local now = tick()
+    -- Only refresh if cache is stale (TTL expired)
+    if now - countryCacheTime < COUNTRY_CACHE_TTL then
+        return false -- No change, using cached value
+    end
+    countryCacheTime = now
+    
     local newCountryName = LocalPlayer:GetAttribute("Country")
     if newCountryName ~= M.myCountryName then
         M.myCountryName = newCountryName
@@ -43,7 +53,8 @@ end
 
 function M.init(cfg)
     Config = cfg
-    -- Initialize country on startup
+    -- Initialize country on startup (force refresh by resetting cache)
+    countryCacheTime = 0
     M.refreshMyCountry()
 end
 

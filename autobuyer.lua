@@ -186,7 +186,7 @@ local function checkAndBuyResource(resource)
     
     if neededAmount < Config.MinAmount then
         print(string.format("[AutoBuy] %s | Need %.2f < MinAmount %.3f, SKIPPING", resource.gameName, neededAmount, Config.MinAmount))
-        return false, "Below Minimum"
+        return false, "Needed amount too small"
     end
     
     -- Print status before buying
