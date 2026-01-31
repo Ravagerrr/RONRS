@@ -138,6 +138,15 @@ local function checkAndBuyResource(resource)
     local flowBefore = getAutoBuyResourceFlow(resource.gameName)
     print(string.format("[AutoBuy] %s | Current Flow: %.2f", resource.gameName, flowBefore))
     
+    -- Stop auto-buying if flow is already at or above the positive threshold
+    -- This prevents buying when we're already in a positive flow state
+    -- Fallback to 1 as safety measure if config is not properly loaded
+    local stopThreshold = Config.AutoBuyStopAtPositiveFlow or 1
+    if flowBefore >= stopThreshold then
+        print(string.format("[AutoBuy] %s | Flow %.2f >= stop threshold %.2f, SKIPPING (positive flow reached)", resource.gameName, flowBefore, stopThreshold))
+        return false, "Positive Flow"
+    end
+    
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
     local targetFlow = Config.AutoBuyTargetSurplus
     print(string.format("[AutoBuy] %s | Target Surplus: %.2f", resource.gameName, targetFlow))
