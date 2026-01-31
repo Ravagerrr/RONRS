@@ -55,7 +55,7 @@ local function getValueString(instance)
     return ""
 end
 
-local function printInstance(instance, depth, prefix)
+local function printInstance(instance, depth)
     local indent = string.rep("| ", depth)
     local className = instance.ClassName
     local name = instance.Name
@@ -202,7 +202,7 @@ if myCountryName then
                 print("[OK] Buildings folder in CountryData")
                 for _, building in ipairs(Buildings:GetChildren()) do
                     local buildingType = building:GetAttribute("Type") or building.Name
-                    print(string.format("     Building: %s", building.Name))
+                    print(string.format("     Building: %s (Type: %s)", building.Name, buildingType))
                 end
             else
                 print("[INFO] No Buildings folder in your CountryData")
