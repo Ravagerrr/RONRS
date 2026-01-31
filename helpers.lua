@@ -325,6 +325,9 @@ M.FactoryConsumption = {
     ["Steel Mill"] = {
         ["Iron"] = 2,
     },
+    ["Steel Manufactory"] = {
+        ["Iron"] = 2,
+    },
     ["Ammunition Factory"] = {
         ["Iron"] = 1,
         ["Copper"] = 1,
@@ -336,13 +339,9 @@ M.FactoryConsumption = {
     ["Fertilizer Factory"] = {
         ["Phosphate"] = 1,
     },
-    ["Advanced Electronics Factory"] = {
-        ["Tungsten"] = 1,
-        ["Copper"] = 1,
-    },
-    ["Military Equipment Factory"] = {
-        ["Tungsten"] = 1,
+    ["Motor Factory"] = {
         ["Iron"] = 1,
+        ["Copper"] = 1,
     },
 }
 
