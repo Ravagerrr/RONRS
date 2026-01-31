@@ -43,7 +43,12 @@ end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
     if not State.isRunning then return false, false, "Stopped" end
-    if not resource.enabled then return false, false, "Disabled" end
+    
+    -- DEBUG: Check if resource is enabled
+    if not resource.enabled then 
+        UI.log(string.format("!!! BLOCKED: %s is disabled (resource.enabled = %s)", resource.gameName, tostring(resource.enabled)), "warning")
+        return false, false, "Disabled" 
+    end
     
     local name = country.Name
     local resName = resource.name
@@ -232,8 +237,6 @@ function M.run()
             end
             
             if not resource.enabled then 
-                -- Debug: Log when skipping disabled resource
-                UI.log(string.format("  ⊗ Skipping %s - disabled via toggle (will resume if re-enabled)", resource.gameName), "info")
                 continue 
             end
             
@@ -291,7 +294,6 @@ function M.run()
             for idx, item in ipairs(queue) do
                 if not State.isRunning then break end
                 if not item.resource.enabled then 
-                    UI.log(string.format("  ⊗ RETRY Skip: %s - disabled via toggle", item.resource.gameName), "info")
                     continue 
                 end
                 
