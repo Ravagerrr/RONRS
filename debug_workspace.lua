@@ -1,5 +1,5 @@
 --[[
-    DEBUG WORKSPACE SCRIPT (Lightweight Version)
+    DEBUG WORKSPACE SCRIPT (Lightweight Version with UI)
     Prints key game structures relevant to auto-buy debugging
     
     FIXED: Previous version froze game - now only explores relevant paths
@@ -11,11 +11,53 @@
     - Baseplate (for cities, buildings, factories)
     
     It does NOT explore player characters, terrain, or other irrelevant objects.
+    
+    OUTPUT: Displays results in a Rayfield UI window for easy viewing.
 ]]
+
+-- Load Rayfield UI
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Create debug window
+local Window = Rayfield:CreateWindow({
+    Name = "Debug Workspace",
+    LoadingTitle = "Loading Debug...",
+    ConfigurationSaving = {Enabled = false}
+})
+
+local DebugTab = Window:CreateTab("Debug Output", 4483362458)
+DebugTab:CreateSection("Status")
+
+-- Log storage
+local debugLogs = {}
+local logParagraph = nil
+
+-- Create log paragraph
+logParagraph = DebugTab:CreateParagraph({
+    Title = "Debug Output",
+    Content = "Starting debug..."
+})
+
+-- Function to add log and update UI
+local function debugLog(msg)
+    table.insert(debugLogs, msg)
+    -- Keep only last 50 lines to prevent UI from getting too long
+    while #debugLogs > 50 do
+        table.remove(debugLogs, 1)
+    end
+    -- Update UI
+    local content = table.concat(debugLogs, "\n")
+    pcall(function()
+        logParagraph:Set({Title = "Debug Output", Content = content})
+    end)
+    -- Also print to console
+    print(msg)
+    task.wait() -- Yield after each log to keep UI responsive
+end
 
 -- Yield counter to prevent freezing
 local yieldCounter = 0
-local YIELD_EVERY = 50  -- Yield every N items
+local YIELD_EVERY = 20  -- Yield every N items (more frequent for UI updates)
 
 local function maybeYield()
     yieldCounter = yieldCounter + 1
@@ -78,7 +120,7 @@ local function printInstance(instance, depth)
     local attrs = getAttributesString(instance)
     local valueStr = getValueString(instance)
     
-    print(string.format("%s[%d] %s \"%s\"%s%s", indent, depth, className, name, valueStr, attrs))
+    debugLog(string.format("%s[%d] %s \"%s\"%s%s", indent, depth, className, name, valueStr, attrs))
 end
 
 local function exploreRecursive(instance, depth, maxDepth)
@@ -86,7 +128,7 @@ local function exploreRecursive(instance, depth, maxDepth)
         local childCount = #instance:GetChildren()
         if childCount > 0 then
             local indent = string.rep("| ", depth)
-            print(string.format("%s... (%d more children, max depth reached)", indent, childCount))
+            debugLog(string.format("%s... (%d more children, max depth reached)", indent, childCount))
         end
         return
     end
@@ -108,96 +150,95 @@ local function exploreRelevantPath(path, maxDepth)
         if part ~= "workspace" then
             current = current:FindFirstChild(part)
             if not current then
-                print(string.format("[NOT FOUND] %s (stopped at %s)", path, part))
+                debugLog(string.format("[NOT FOUND] %s (stopped at %s)", path, part))
                 return
             end
         end
     end
     
-    print(string.format("\n=== %s ===", path))
+    debugLog(string.format("\n=== %s ===", path))
     exploreRecursive(current, 0, maxDepth)
     task.wait() -- Yield after each section
 end
 
 -- Main execution
-print("═══════════════════════════════════════════════════════════════")
-print("  DEBUG WORKSPACE - Lightweight Version")
-print("  (Only explores game-relevant paths to prevent freezing)")
-print("═══════════════════════════════════════════════════════════════")
-print("")
+debugLog("═══════════════════════════════════")
+debugLog("  DEBUG WORKSPACE")
+debugLog("═══════════════════════════════════")
+debugLog("")
 
 -- Also specifically look for key paths relevant to auto-buying
-print("")
-print("=== KEY PATHS FOR AUTO-BUY DEBUGGING ===")
-print("")
+debugLog("")
+debugLog("=== KEY PATHS FOR AUTO-BUY ===")
+debugLog("")
 task.wait()
 
 -- Check CountryData
 local CountryData = workspace:FindFirstChild("CountryData")
 if CountryData then
-    print("[OK] workspace.CountryData exists")
-    print(string.format("     Children: %d countries", #CountryData:GetChildren()))
+    debugLog("[OK] workspace.CountryData exists")
+    debugLog(string.format("     %d countries", #CountryData:GetChildren()))
 else
-    print("[MISSING] workspace.CountryData NOT FOUND")
+    debugLog("[MISSING] workspace.CountryData NOT FOUND")
 end
 task.wait()
 
 -- Check GameManager
 local GameManager = workspace:FindFirstChild("GameManager")
 if GameManager then
-    print("[OK] workspace.GameManager exists")
+    debugLog("[OK] workspace.GameManager exists")
     local ManageAlliance = GameManager:FindFirstChild("ManageAlliance")
     if ManageAlliance then
-        print("[OK] workspace.GameManager.ManageAlliance exists")
+        debugLog("[OK] ManageAlliance exists")
     else
-        print("[MISSING] workspace.GameManager.ManageAlliance NOT FOUND")
+        debugLog("[MISSING] ManageAlliance NOT FOUND")
     end
 else
-    print("[MISSING] workspace.GameManager NOT FOUND")
+    debugLog("[MISSING] workspace.GameManager NOT FOUND")
 end
 task.wait()
 
 -- Check Baseplate structure (for cities and factories)
 local Baseplate = workspace:FindFirstChild("Baseplate")
 if Baseplate then
-    print("[OK] workspace.Baseplate exists")
+    debugLog("[OK] workspace.Baseplate exists")
     
     local Cities = Baseplate:FindFirstChild("Cities")
     if Cities then
-        print("[OK] workspace.Baseplate.Cities exists")
+        debugLog("[OK] Baseplate.Cities exists")
         for _, country in ipairs(Cities:GetChildren()) do
             maybeYield()
-            print(string.format("     Country folder: %s (%d cities)", country.Name, #country:GetChildren()))
+            debugLog(string.format("  %s (%d cities)", country.Name, #country:GetChildren()))
         end
     else
-        print("[MISSING] workspace.Baseplate.Cities NOT FOUND")
+        debugLog("[MISSING] Baseplate.Cities NOT FOUND")
     end
     task.wait()
     
     local Buildings = Baseplate:FindFirstChild("Buildings")
     if Buildings then
-        print("[OK] workspace.Baseplate.Buildings exists")
+        debugLog("[OK] Baseplate.Buildings exists")
         for _, country in ipairs(Buildings:GetChildren()) do
             maybeYield()
-            print(string.format("     Country buildings: %s (%d buildings)", country.Name, #country:GetChildren()))
+            debugLog(string.format("  %s (%d buildings)", country.Name, #country:GetChildren()))
         end
     else
-        print("[INFO] workspace.Baseplate.Buildings not found (factories may be elsewhere)")
+        debugLog("[INFO] Baseplate.Buildings not found")
     end
     task.wait()
     
     local Factories = Baseplate:FindFirstChild("Factories")
     if Factories then
-        print("[OK] workspace.Baseplate.Factories exists")
+        debugLog("[OK] Baseplate.Factories exists")
         for _, country in ipairs(Factories:GetChildren()) do
             maybeYield()
-            print(string.format("     Country factories: %s (%d factories)", country.Name, #country:GetChildren()))
+            debugLog(string.format("  %s (%d factories)", country.Name, #country:GetChildren()))
         end
     else
-        print("[INFO] workspace.Baseplate.Factories not found (factories may be elsewhere)")
+        debugLog("[INFO] Baseplate.Factories not found")
     end
 else
-    print("[MISSING] workspace.Baseplate NOT FOUND")
+    debugLog("[MISSING] workspace.Baseplate NOT FOUND")
 end
 task.wait()
 
@@ -207,55 +248,55 @@ local LocalPlayer = Players.LocalPlayer
 local myCountryName = LocalPlayer and LocalPlayer:GetAttribute("Country")
 
 if myCountryName then
-    print("")
-    print(string.format("=== YOUR COUNTRY: %s ===", myCountryName))
+    debugLog("")
+    debugLog(string.format("=== YOUR COUNTRY: %s ===", myCountryName))
     task.wait()
     
     if CountryData then
         local myCountry = CountryData:FindFirstChild(myCountryName)
         if myCountry then
-            print("[OK] Your country data found")
+            debugLog("[OK] Your country data found")
             
             -- Check for factories in country data
             local Factories = myCountry:FindFirstChild("Factories")
             if Factories then
-                print("[OK] Factories folder in CountryData")
+                debugLog("[OK] Factories in CountryData:")
                 for _, factory in ipairs(Factories:GetChildren()) do
                     maybeYield()
                     local factoryType = factory:GetAttribute("FactoryType") or factory:GetAttribute("Type") or factory.Name
-                    print(string.format("     Factory: %s (Type: %s)", factory.Name, factoryType))
+                    debugLog(string.format("  %s (Type: %s)", factory.Name, factoryType))
                 end
             else
-                print("[INFO] No Factories folder in your CountryData")
+                debugLog("[INFO] No Factories folder in CountryData")
             end
             task.wait()
             
             local Buildings = myCountry:FindFirstChild("Buildings")
             if Buildings then
-                print("[OK] Buildings folder in CountryData")
+                debugLog("[OK] Buildings in CountryData:")
                 for _, building in ipairs(Buildings:GetChildren()) do
                     maybeYield()
                     local buildingType = building:GetAttribute("Type") or building.Name
-                    print(string.format("     Building: %s (Type: %s)", building.Name, buildingType))
+                    debugLog(string.format("  %s (Type: %s)", building.Name, buildingType))
                 end
             else
-                print("[INFO] No Buildings folder in your CountryData")
+                debugLog("[INFO] No Buildings folder in CountryData")
             end
             task.wait()
             
             -- Check resources
             local Resources = myCountry:FindFirstChild("Resources")
             if Resources then
-                print("[OK] Resources folder found")
+                debugLog("[OK] Resources:")
                 for _, res in ipairs(Resources:GetChildren()) do
                     maybeYield()
                     local flow = res:FindFirstChild("Flow")
                     local flowVal = flow and flow.Value or 0
-                    print(string.format("     Resource: %s (Flow: %.2f)", res.Name, flowVal))
+                    debugLog(string.format("  %s (Flow: %.2f)", res.Name, flowVal))
                 end
             end
         else
-            print("[MISSING] Your country not found in CountryData")
+            debugLog("[MISSING] Your country not in CountryData")
         end
     end
     task.wait()
@@ -266,14 +307,14 @@ if myCountryName then
         if Buildings then
             local myBuildings = Buildings:FindFirstChild(myCountryName)
             if myBuildings then
-                print("")
-                print(string.format("[OK] Your buildings in Baseplate.Buildings.%s:", myCountryName))
+                debugLog("")
+                debugLog(string.format("[OK] Baseplate Buildings for %s:", myCountryName))
                 for _, building in ipairs(myBuildings:GetChildren()) do
                     maybeYield()
-                    print(string.format("     Building: \"%s\" (Class: %s)", building.Name, building.ClassName))
+                    debugLog(string.format("  \"%s\" (%s)", building.Name, building.ClassName))
                     local attrs = building:GetAttributes()
                     for attrName, attrVal in pairs(attrs) do
-                        print(string.format("       Attr: %s = %s", attrName, tostring(attrVal)))
+                        debugLog(string.format("    %s=%s", attrName, tostring(attrVal)))
                     end
                 end
             end
@@ -284,24 +325,24 @@ if myCountryName then
         if Factories then
             local myFactories = Factories:FindFirstChild(myCountryName)
             if myFactories then
-                print("")
-                print(string.format("[OK] Your factories in Baseplate.Factories.%s:", myCountryName))
+                debugLog("")
+                debugLog(string.format("[OK] Baseplate Factories for %s:", myCountryName))
                 for _, factory in ipairs(myFactories:GetChildren()) do
                     maybeYield()
-                    print(string.format("     Factory: \"%s\" (Class: %s)", factory.Name, factory.ClassName))
+                    debugLog(string.format("  \"%s\" (%s)", factory.Name, factory.ClassName))
                     local attrs = factory:GetAttributes()
                     for attrName, attrVal in pairs(attrs) do
-                        print(string.format("       Attr: %s = %s", attrName, tostring(attrVal)))
+                        debugLog(string.format("    %s=%s", attrName, tostring(attrVal)))
                     end
                 end
             end
         end
     end
 else
-    print("[WARNING] No country assigned to player yet")
+    debugLog("[WARNING] No country assigned yet")
 end
 
-print("")
-print("═══════════════════════════════════════════════════════════════")
-print("  DEBUG COMPLETE - COPY OUTPUT ABOVE FOR DEBUGGING")
-print("═══════════════════════════════════════════════════════════════")
+debugLog("")
+debugLog("═══════════════════════════════════")
+debugLog("  DEBUG COMPLETE")
+debugLog("═══════════════════════════════════")
