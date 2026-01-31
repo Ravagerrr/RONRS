@@ -250,4 +250,7 @@ function M.createWindow()
     return Window
 end
 
+-- Expose UI module globally for debug scripts
+_G.TradeHubUI = M
+
 return M
