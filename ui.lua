@@ -234,6 +234,19 @@ function M.createWindow()
     
     Rayfield:LoadConfiguration()
     
+    -- Auto-start features AFTER loading saved configuration
+    -- This ensures user's saved preferences are respected
+    task.spawn(function()
+        -- Brief delay to allow UI to fully initialize before starting background tasks
+        task.wait(1)
+        if Config.AutoSellEnabled and AutoSell then
+            AutoSell.start()
+        end
+        if Config.AutoBuyEnabled and AutoBuyer then
+            AutoBuyer.start()
+        end
+    end)
+    
     return Window
 end
 

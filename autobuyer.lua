@@ -209,6 +209,12 @@ local function checkAndBuyResource(resource)
     print(string.format("[AutoBuy] %s | Starting purchase loop, need %.2f", resource.gameName, remainingNeed))
     
     for idx, seller in ipairs(sellers) do
+        -- Check if auto-buy was disabled mid-operation
+        if not M.isMonitoring or not Config.AutoBuyEnabled then
+            print(string.format("[AutoBuy] %s | Auto-buy disabled, stopping", resource.gameName))
+            break
+        end
+        
         if remainingNeed <= 0 then 
             print(string.format("[AutoBuy] %s | Remaining need %.2f <= 0, DONE", resource.gameName, remainingNeed))
             break 
