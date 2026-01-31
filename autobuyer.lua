@@ -139,7 +139,7 @@ local function checkAndBuyResource(resource)
     end
     
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
-    local targetFlow = Config.AutoBuyTargetSurplus
+    local targetFlow = Config.AutoBuyTargetSurplus or 0.1
     print(string.format("[AutoBuy] %s | Target Surplus: %.2f", resource.gameName, targetFlow))
     
     -- Check factory resource consumption - detects factories that consume resources
@@ -186,7 +186,7 @@ local function checkAndBuyResource(resource)
     
     if neededAmount < Config.MinAmount then
         print(string.format("[AutoBuy] %s | Need %.2f < MinAmount %.3f, SKIPPING", resource.gameName, neededAmount, Config.MinAmount))
-        return false, "Already Buying"
+        return false, "Below Minimum"
     end
     
     -- Print status before buying
@@ -282,6 +282,14 @@ end
 
 -- Run auto-buy check for all resources
 function M.runCheck()
+    -- Refresh country in case player switched or just selected one
+    Helpers.refreshMyCountry()
+    
+    -- Skip if no country selected
+    if not Helpers.hasCountry() then
+        return
+    end
+    
     -- Check if we're in debt and debt restriction is enabled
     if Config.AutoBuyRequireNoDebt and Helpers.isInDebt() then
         -- Skip auto-buy when in debt

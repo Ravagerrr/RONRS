@@ -38,6 +38,15 @@ function M.start()
             UI.updateAutoSell()
             
             if not State.isRunning then
+                -- Refresh country in case player switched or just selected one
+                Helpers.refreshMyCountry()
+                
+                -- Skip if no country selected
+                if not Helpers.hasCountry() then
+                    task.wait(Config.AutoSellCheckInterval)
+                    continue
+                end
+                
                 local totalAvail = Helpers.getTotalAvailableFlow()
                 
                 if totalAvail >= Config.AutoSellThreshold then

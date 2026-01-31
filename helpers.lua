@@ -15,12 +15,36 @@ local LocalPlayer = Players.LocalPlayer
 local playerCache = {}
 local cacheTime = 0
 
--- Your country
-M.myCountryName = LocalPlayer:GetAttribute("Country")
-M.myCountry = M.myCountryName and CountryData:FindFirstChild(M.myCountryName)
+-- Your country (initialized dynamically)
+M.myCountryName = nil
+M.myCountry = nil
+
+-- Refresh the player's country (call when country might have changed)
+function M.refreshMyCountry()
+    local newCountryName = LocalPlayer:GetAttribute("Country")
+    if newCountryName ~= M.myCountryName then
+        M.myCountryName = newCountryName
+        M.myCountry = newCountryName and CountryData:FindFirstChild(newCountryName)
+        if newCountryName then
+            print("[Helpers] Country updated: " .. newCountryName)
+        else
+            print("[Helpers] No country selected")
+        end
+        return true -- Country changed
+    end
+    return false -- No change
+end
+
+-- Check if player has a country selected
+function M.hasCountry()
+    M.refreshMyCountry()
+    return M.myCountryName ~= nil and M.myCountry ~= nil
+end
 
 function M.init(cfg)
     Config = cfg
+    -- Initialize country on startup
+    M.refreshMyCountry()
 end
 
 -- Get enabled resources sorted by priority
