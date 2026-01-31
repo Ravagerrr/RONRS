@@ -188,6 +188,10 @@ function M.run()
     local startTime = tick()
     
     UI.log("=== Trade Started ===", "info")
+    UI.log(string.format("Enabled Resources Check:"), "info")
+    for _, res in ipairs(Config.Resources) do
+        UI.log(string.format("  %s: enabled=%s", res.gameName, tostring(res.enabled)), "info")
+    end
     for _, res in ipairs(Helpers.getEnabledResources()) do
         local icon = res.name == "ConsumerGoods" and "CG" or "EL"
         local capInfo = res.hasCap and string.format("Cap: %d", res.capAmount) or "No Cap"

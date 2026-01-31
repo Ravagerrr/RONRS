@@ -121,8 +121,10 @@ function M.createWindow()
             Name = string.format("%s %s [%s]", icon, res.gameName, cap),
             CurrentValue = res.enabled,
             Callback = function(v) 
-                Config.Resources[i].enabled = v 
-                M.log(string.format("%s: %s", res.gameName, v and "ON" or "OFF"), "info")
+                Config.Resources[i].enabled = v
+                M.log(string.format("%s: %s (Config.Resources[%d].enabled = %s)", 
+                    res.gameName, v and "ON" or "OFF", i, tostring(Config.Resources[i].enabled)), "info")
+                M.updateStats()
             end
         })
     end
