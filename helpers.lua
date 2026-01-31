@@ -307,13 +307,12 @@ function M.getResourceDeficit(resourceGameName)
     return M.getTotalCityResourceDeficit(resourceGameName)
 end
 
--- Factory consumption rates per factory type
+-- Factory consumption rates per factory type (FALLBACK ONLY)
 -- Maps factory type names to resources they consume and the rate per factory
 -- 
--- NOTE: These are estimated baseline rates based on typical Rise of Nations factory mechanics.
--- The actual consumption rates may vary depending on the game version or server configuration.
--- If rates don't match the game, adjust the values below to match actual in-game consumption.
--- Rate values represent resources consumed per factory per tick/cycle.
+-- NOTE: These are fallback rates used ONLY if factory doesn't have Operational_Reason attribute.
+-- The preferred method reads actual demands from factory's Operational_Reason attribute.
+-- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]"
 M.FactoryConsumption = {
     ["Electronics Factory"] = {
         ["Titanium"] = 1,
@@ -335,6 +334,47 @@ M.FactoryConsumption = {
         ["Titanium"] = 1,
     },
 }
+
+-- Parse factory Operational_Reason attribute to extract resource demands
+-- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]", "Titanium [Need: 5]"
+-- Returns: table mapping resourceName to amount needed, or nil if not parseable
+function M.parseOperationalReason(operationalReason)
+    if not operationalReason or type(operationalReason) ~= "string" then
+        return nil
+    end
+    
+    -- Pattern: "ResourceName [Need: X]"
+    -- Use non-greedy (.-) to capture resource name up to the bracket
+    local resourceName, amount = string.match(operationalReason, "^(.-)%s*%[Need:%s*(%d+)%]")
+    
+    if resourceName and amount and resourceName ~= "" then
+        return {
+            [resourceName] = tonumber(amount)
+        }
+    end
+    
+    return nil
+end
+
+-- Get resource demands from a factory's attributes
+-- Reads Operational_Reason attribute to get actual demand
+-- Falls back to hardcoded FactoryConsumption if attribute not found
+function M.getFactoryDemands(factory)
+    if not factory.instance then
+        return M.FactoryConsumption[factory.name] or {}
+    end
+    
+    -- Try to read Operational_Reason attribute
+    local operationalReason = factory.instance:GetAttribute("Operational_Reason")
+    local parsedDemands = M.parseOperationalReason(operationalReason)
+    
+    if parsedDemands then
+        return parsedDemands
+    end
+    
+    -- Fallback to hardcoded consumption rates
+    return M.FactoryConsumption[factory.name] or {}
+end
 
 -- Get all factories owned by the player's country
 -- Searches in workspace.Baseplate.Cities.[Country].[City].Buildings for each controlled city
@@ -404,16 +444,16 @@ end
 
 -- Calculate total resource consumption from all factories
 -- Returns: table mapping resourceGameName to consumption amount
+-- Reads actual demands from factory Operational_Reason attributes when available
 function M.getFactoryResourceConsumption()
     local consumption = {}
-    local factoryCounts = M.getFactoryCounts()
+    local factories = M.getFactories()
     
-    for factoryType, count in pairs(factoryCounts) do
-        local resources = M.FactoryConsumption[factoryType]
-        if resources then
-            for resourceName, ratePerFactory in pairs(resources) do
-                consumption[resourceName] = (consumption[resourceName] or 0) + (count * ratePerFactory)
-            end
+    -- Check each factory individually to read its actual demands
+    for _, factory in ipairs(factories) do
+        local demands = M.getFactoryDemands(factory)
+        for resourceName, amount in pairs(demands) do
+            consumption[resourceName] = (consumption[resourceName] or 0) + amount
         end
     end
     
