@@ -103,7 +103,7 @@ end
 
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v4.2.014",
+        Name = "Trade Hub v4.2.015",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v4"}
     })

@@ -2,6 +2,7 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.015: Added more frequent disable checks throughout all functions to stop immediately when toggled off.
     v4.2.014: Fixed auto-buy still sending trade requests when disabled - added checks at all critical points.
     v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
     v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
@@ -41,11 +42,22 @@ end
 -- AI NPCs don't have selling restrictions - can buy as much as needed, even put them in deficit
 local function findSellingCountries(resourceGameName)
     local sellers = {}
+    
+    -- Early exit if disabled
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return sellers
+    end
+    
     local CountryData = workspace:WaitForChild("CountryData")
     
     print(string.format("[AutoBuy] Searching for %s sellers...", resourceGameName))
     
     for _, country in ipairs(CountryData:GetChildren()) do
+        -- Check if disabled during iteration
+        if not M.isMonitoring or not Config.AutoBuyEnabled then
+            return sellers
+        end
+        
         if country == Helpers.myCountry then continue end
         if Helpers.isPlayerCountry(country.Name) then continue end
         
@@ -192,6 +204,11 @@ local function checkAndBuyResource(resource)
         return false, "Already Buying"
     end
     
+    -- Check again before logging - user may have disabled during calculations
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return false, "Disabled"
+    end
+    
     -- Print status before buying
     print(string.format("[AutoBuy] %s | >>> WILL BUY: Need %.2f units <<<", resource.gameName, neededAmount))
     if cityDeficit > 0 then
@@ -200,8 +217,19 @@ local function checkAndBuyResource(resource)
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
     
+    -- Check again before expensive seller search
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return false, "Disabled"
+    end
+    
     -- Find AI NPC countries selling this resource
     local sellers = findSellingCountries(resource.gameName)
+    
+    -- Check again after seller search - user may have disabled while searching
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return false, "Disabled"
+    end
+    
     print(string.format("[AutoBuy] %s | Found %d potential sellers", resource.gameName, #sellers))
     if #sellers == 0 then
         print(string.format("[AutoBuy] %s | No sellers found, ABORTING", resource.gameName))
