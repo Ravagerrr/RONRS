@@ -17,14 +17,18 @@ function M.init(cfg, state, helpers, ui)
 end
 
 local function attemptTrade(country, resource, amount, price)
-    local before = Helpers.getTradeCount(country, resource.gameName)
+    -- Check our trade folder for existing sales to this country BEFORE the trade
+    local beforeAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
     
     pcall(function()
         ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
     task.wait(Config.WaitTime)
-    return Helpers.getTradeCount(country, resource.gameName) > before
+    
+    -- Verify by checking if our selling amount to this country increased
+    local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
+    return afterAmount > beforeAmount
 end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
