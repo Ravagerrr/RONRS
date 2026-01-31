@@ -199,14 +199,14 @@ function M.getCountryResourceData(country, resource)
 end
 
 function M.getPriceTier(revenue)
-    -- Start at 0.5x for all countries, allowing retries to go lower (0.2x, 0.1x)
-    return 0.5
+    -- Start all countries at 1.0x (full price) to maximize revenue
+    return 1.0
 end
 
 function M.getNextPriceTier(current)
-    -- Retry sequence: 0.5 -> 0.2 -> 0.1 -> nil
-    if current == 0.5 then return 0.2
-    elseif current == 0.2 then return 0.1
+    -- Retry sequence: 1.0 -> 0.5 -> 0.1 -> nil
+    if current >= 1.0 then return 0.5
+    elseif current >= 0.5 then return 0.1
     else return nil end
 end
 
