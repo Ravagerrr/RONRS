@@ -103,7 +103,7 @@ end
 
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v1.3",
+        Name = "Trade Hub v1.4",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v4"}
     })
@@ -214,7 +214,7 @@ function M.createWindow()
     end})
     Logs:CreateButton({Name = "Clear", Callback = function() M.Logs = {} M.updateLogs() end})
     
-    M.log("=== Trade Hub v1.3 ===", "info")
+    M.log("=== Trade Hub v1.4 ===", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else
