@@ -1,6 +1,9 @@
 --[[
-    DEBUG WORKSPACE SCRIPT (Lightweight Version with UI)
+    DEBUG WORKSPACE SCRIPT (Simple UI - No Rayfield)
     Prints key game structures relevant to auto-buy debugging
+    
+    This version does NOT use Rayfield to avoid conflicts with existing UI.
+    Uses a simple native Roblox ScreenGui instead.
     
     FIXED: Previous version froze game - now only explores relevant paths
     and yields frequently to prevent freezing.
@@ -9,55 +12,138 @@
     - CountryData (for resources and economy)
     - GameManager (for trade functions)  
     - Baseplate (for cities, buildings, factories)
-    
-    It does NOT explore player characters, terrain, or other irrelevant objects.
-    
-    OUTPUT: Displays results in a Rayfield UI window for easy viewing.
 ]]
 
--- Load Rayfield UI
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- Create simple native UI (no Rayfield)
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Create debug window
-local Window = Rayfield:CreateWindow({
-    Name = "Debug Workspace",
-    LoadingTitle = "Loading Debug...",
-    ConfigurationSaving = {Enabled = false}
-})
+-- Remove existing debug UI if any
+local existingGui = PlayerGui:FindFirstChild("DebugWorkspaceUI")
+if existingGui then
+    existingGui:Destroy()
+end
 
-local DebugTab = Window:CreateTab("Debug Output", 4483362458)
-DebugTab:CreateSection("Status")
+-- Create new ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DebugWorkspaceUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- Main frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 400, 0, 500)
+MainFrame.Position = UDim2.new(0, 10, 0.5, -250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- Corner rounding
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = MainFrame
+
+-- Title bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 30)
+TitleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 8)
+TitleCorner.Parent = TitleBar
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -40, 1, 0)
+TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Debug Workspace"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 14
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- Close button
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Name = "CloseBtn"
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -28, 0, 2)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 70, 70)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 12
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = TitleBar
+
+local CloseBtnCorner = Instance.new("UICorner")
+CloseBtnCorner.CornerRadius = UDim.new(0, 4)
+CloseBtnCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Scrolling frame for logs
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Name = "ScrollFrame"
+ScrollFrame.Size = UDim2.new(1, -10, 1, -40)
+ScrollFrame.Position = UDim2.new(0, 5, 0, 35)
+ScrollFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+ScrollFrame.BorderSizePixel = 0
+ScrollFrame.ScrollBarThickness = 6
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ScrollFrame.Parent = MainFrame
+
+local ScrollCorner = Instance.new("UICorner")
+ScrollCorner.CornerRadius = UDim.new(0, 6)
+ScrollCorner.Parent = ScrollFrame
+
+-- Text label for logs
+local LogText = Instance.new("TextLabel")
+LogText.Name = "LogText"
+LogText.Size = UDim2.new(1, -10, 0, 0)
+LogText.Position = UDim2.new(0, 5, 0, 0)
+LogText.BackgroundTransparency = 1
+LogText.Text = ""
+LogText.TextColor3 = Color3.fromRGB(200, 200, 200)
+LogText.TextSize = 11
+LogText.Font = Enum.Font.Code
+LogText.TextXAlignment = Enum.TextXAlignment.Left
+LogText.TextYAlignment = Enum.TextYAlignment.Top
+LogText.TextWrapped = true
+LogText.AutomaticSize = Enum.AutomaticSize.Y
+LogText.RichText = true
+LogText.Parent = ScrollFrame
 
 -- Log storage
 local debugLogs = {}
-local logParagraph = nil
-
--- Create log paragraph
-logParagraph = DebugTab:CreateParagraph({
-    Title = "Debug Output",
-    Content = "Starting debug..."
-})
 
 -- Function to add log and update UI
-local function debugLog(msg)
+local function debugLog(msg, color)
     table.insert(debugLogs, msg)
-    -- Keep only last 50 lines to prevent UI from getting too long
-    while #debugLogs > 50 do
+    -- Keep only last 100 lines
+    while #debugLogs > 100 do
         table.remove(debugLogs, 1)
     end
     -- Update UI
-    local content = table.concat(debugLogs, "\n")
-    pcall(function()
-        logParagraph:Set({Title = "Debug Output", Content = content})
-    end)
+    LogText.Text = table.concat(debugLogs, "\n")
+    -- Auto-scroll to bottom
+    ScrollFrame.CanvasPosition = Vector2.new(0, ScrollFrame.AbsoluteCanvasSize.Y)
     -- Also print to console
     print(msg)
-    task.wait() -- Yield after each log to keep UI responsive
+    task.wait() -- Yield after each log
 end
 
 -- Yield counter to prevent freezing
 local yieldCounter = 0
-local YIELD_EVERY = 20  -- Yield every N items (more frequent for UI updates)
+local YIELD_EVERY = 20
 
 local function maybeYield()
     yieldCounter = yieldCounter + 1
@@ -242,9 +328,7 @@ else
 end
 task.wait()
 
--- Get player's country and check their data
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+-- Get player's country and check their data (LocalPlayer already defined at top)
 local myCountryName = LocalPlayer and LocalPlayer:GetAttribute("Country")
 
 if myCountryName then
