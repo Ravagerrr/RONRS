@@ -20,9 +20,13 @@ end
 function M.start()
     if M.isMonitoring then return end
     M.isMonitoring = true
+    Config.AutoSellEnabled = true  -- Ensure config matches our state
     UI.log("Auto-Sell: ON", "info")
     
     task.spawn(function()
+        -- Small delay to let config stabilize after start (prevents race condition with Rayfield)
+        task.wait(0.2)
+        
         while M.isMonitoring do
             -- Check if auto-sell is still enabled in config (check more frequently)
             if not Config.AutoSellEnabled then
