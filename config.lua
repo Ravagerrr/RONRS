@@ -55,4 +55,17 @@ return {
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
     AutoSellCheckInterval = 3,
+    
+    -- Auto-Buy (Flow Protection)
+    -- Automatically buys resources when your country's flow goes negative
+    AutoBuyEnabled = true,
+    AutoBuyCheckInterval = 3,
+    AutoBuyResources = {
+        {name = "Tungsten", gameName = "Tungsten", enabled = true},
+        {name = "Titanium", gameName = "Titanium", enabled = true},
+        {name = "Phosphate", gameName = "Phosphate", enabled = true},
+        {name = "Iron", gameName = "Iron", enabled = true},
+        {name = "Gold", gameName = "Gold", enabled = true},
+        {name = "Copper", gameName = "Copper", enabled = true},
+    },
 }

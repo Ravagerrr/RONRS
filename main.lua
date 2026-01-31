@@ -1,8 +1,9 @@
 --[[
-    Trade Hub v4.2.006 - Multi-Resource
+    Trade Hub v4.2.007 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.007 - Added Auto-Buy feature for resource flow protection
     v4.2.006 - Added MaxRevenueSpendingPercent to prevent trade rejections
     
     REMINDER: Update version number in main.lua and ui.lua for each change
@@ -34,7 +35,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.006")
+print("  Trade Hub v4.2.007")
 print("══════════════════════════")
 
 local Config = loadModule("config")
@@ -42,8 +43,9 @@ local Helpers = loadModule("helpers")
 local UI = loadModule("ui")
 local Trading = loadModule("trading")
 local AutoSell = loadModule("autosell")
+local AutoBuyer = loadModule("autobuyer")
 
-if not (Config and Helpers and UI and Trading and AutoSell) then
+if not (Config and Helpers and UI and Trading and AutoSell and AutoBuyer) then
     error("Module load failed!")
 end
 
@@ -56,9 +58,10 @@ local State = {
 
 -- Initialize
 Helpers.init(Config)
-UI.init(Config, State, Helpers, Trading, AutoSell)
+UI.init(Config, State, Helpers, Trading, AutoSell, AutoBuyer)
 Trading.init(Config, State, Helpers, UI)
 AutoSell.init(Config, State, Helpers, Trading, UI)
+AutoBuyer.init(Config, State, Helpers, UI)
 
 -- Create UI
 UI.createWindow()
@@ -67,6 +70,12 @@ UI.createWindow()
 if Config.AutoSellEnabled then
     task.wait(1)
     AutoSell.start()
+end
+
+-- Auto-start auto-buy if enabled
+if Config.AutoBuyEnabled then
+    task.wait(1)
+    AutoBuyer.start()
 end
 
 print("[Ready]")
