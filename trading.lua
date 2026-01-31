@@ -66,23 +66,29 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     -- Calculate ACTUAL price per unit at this tier
     local actualPricePerUnit = resource.buyPrice * price
     
+    -- Safety check for division by zero
+    if actualPricePerUnit <= 0 then
+        return false, false, "Invalid Price"
+    end
+    
     -- Calculate affordable based on ACTUAL price they pay
+    -- Apply revenue spending limit to prevent rejection (countries won't spend 100% of revenue)
+    local maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+    
     local affordable
     if resource.hasCap then
         -- Electronics: cap at capAmount (5), but also check what they can afford at this price
-        local canAfford = data.revenue / actualPricePerUnit
-        affordable = math.min(resource.capAmount, canAfford)
+        affordable = math.min(resource.capAmount, maxAffordable)
     else
         -- Consumer Goods: Limited by negative flow (demand) AND what they can afford
-        local canAfford = data.revenue / actualPricePerUnit
         -- If country has negative flow (consuming), that's their max demand
         -- Use absolute value of flow as the max they want to buy
         if data.flow < 0 then
             local maxDemand = math.abs(data.flow)
-            affordable = math.min(canAfford, maxDemand)
+            affordable = math.min(maxAffordable, maxDemand)
         else
             -- If flow is positive or zero, just use what they can afford
-            affordable = canAfford
+            affordable = maxAffordable
         end
     end
     

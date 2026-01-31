@@ -45,6 +45,12 @@ return {
     SmartSell = true,
     SmartSellReserve = 1,
     
+    -- Revenue Spending Limit
+    -- Countries won't spend more than this percentage of their revenue on a single trade
+    -- 0.6 means 60% - prevents rejection when cost is too close to total revenue
+    -- Valid range: 0.0 to 1.0 (0% to 100%). Recommended: 0.5-0.7 for better acceptance rates
+    MaxRevenueSpendingPercent = 0.6,
+    
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
