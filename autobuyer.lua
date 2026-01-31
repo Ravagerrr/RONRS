@@ -2,19 +2,18 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
-    v4.2.016: Added Fertilizer Factory (Phosphate), Motor Factory, Steel Manufactory
-              to support auto-buying resources when factories need them.
-    v4.2.015: Added factory detection - now detects Electronics Factory, Consumer Goods Factory, etc.
-              and auto-buys materials they consume (e.g., Titanium, Copper for Electronics).
+    v4.2.016: Added Fertilizer Factory (Phosphate), Motor Factory (Tungsten), 
+              Electronics Factory (Gold). Removed city deficit logic - now only
+              checks factory consumption and negative flow.
+    v4.2.015: Added factory detection - now detects Electronics Factory, etc.
+              and auto-buys materials they consume.
     v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
     v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
               Added detailed debug prints throughout the buying process.
     v4.2.011: Reads resource deficits directly from city Resources attributes.
-    The game stores deficits at: workspace.Baseplate.Cities.[Country].[City].Resources
-    where attributes like "Iron = -4" indicate a deficit of 4 Iron.
     
-    Now also checks for factory consumption in addition to city deficits.
-    Falls back to flow-based check if no city deficit or factory consumption exists.
+    Now checks factory consumption and falls back to flow-based check.
+    Only buys if: 1) Factory needs the resource, or 2) Flow is negative.
 ]]
 
 local M = {}
@@ -153,44 +152,35 @@ local function checkAndBuyResource(resource)
     local targetFlow = Config.AutoBuyTargetSurplus
     print(string.format("[AutoBuy] %s | Target Surplus: %.2f", resource.gameName, targetFlow))
     
-    -- Check city resource deficits - reads from workspace.Baseplate.Cities.[Country].[City].Resources
-    -- This is more reliable than flow which can be tricked by the game
-    local cityDeficit = Helpers.getResourceDeficit(resource.gameName)
-    print(string.format("[AutoBuy] %s | Raw City Deficit: %.2f", resource.gameName, cityDeficit))
-    
     -- Check factory resource consumption - detects factories that consume resources
-    -- e.g., Electronics Factory consumes Titanium and Copper
+    -- e.g., Electronics Factory consumes Titanium, Copper, and Gold
     local factoryConsumption = Helpers.getFactoryConsumption(resource.gameName)
     print(string.format("[AutoBuy] %s | Factory Consumption: %.2f", resource.gameName, factoryConsumption))
     
-    -- Total need = city deficit + factory consumption
-    local totalNeed = cityDeficit + factoryConsumption
-    print(string.format("[AutoBuy] %s | Total Need (City + Factory): %.2f", resource.gameName, totalNeed))
-    
-    -- If cities or factories need this resource, we need to buy
+    -- If factories need this resource, we need to buy
     -- Otherwise fall back to flow-based check
     local neededAmount = 0
     
-    if totalNeed > 0 then
-        -- Combined deficit: what cities and factories need minus our current production
-        -- If we have positive flow (production), it offsets the total need
+    if factoryConsumption > 0 then
+        -- Factory consumption: what factories need minus our current production
+        -- If we have positive flow (production), it offsets the factory need
         -- Only buy the difference that isn't covered by our own production
         local positiveFlow = math.max(0, flowBefore)
-        -- Subtract our production from total needs: e.g., factories need 100, we produce 50, so we only need to buy 50
-        local actualDeficit = math.max(0, totalNeed - positiveFlow)
+        -- Subtract our production from factory needs: e.g., factories need 100, we produce 50, so we only need to buy 50
+        local actualDeficit = math.max(0, factoryConsumption - positiveFlow)
         neededAmount = actualDeficit + targetFlow
         
-        print(string.format("[AutoBuy] %s | Calculation: TotalNeed(%.2f) - PositiveFlow(%.2f) = ActualDeficit(%.2f)", 
-            resource.gameName, totalNeed, positiveFlow, actualDeficit))
+        print(string.format("[AutoBuy] %s | Calculation: FactoryNeed(%.2f) - PositiveFlow(%.2f) = ActualDeficit(%.2f)", 
+            resource.gameName, factoryConsumption, positiveFlow, actualDeficit))
         print(string.format("[AutoBuy] %s | Final Need: ActualDeficit(%.2f) + TargetSurplus(%.2f) = %.2f", 
             resource.gameName, actualDeficit, targetFlow, neededAmount))
     else
-        -- Fallback to flow-based check if no city deficit or factory consumption exists
+        -- Fallback to flow-based check if no factory consumption exists
         -- Only trigger if flow is NEGATIVE (actively consuming the resource)
-        -- If flow is >= 0 and no need detected, we don't need this resource
-        print(string.format("[AutoBuy] %s | No city/factory need detected, checking flow", resource.gameName))
+        -- If flow is >= 0 and no factory need detected, we don't need this resource
+        print(string.format("[AutoBuy] %s | No factory need detected, checking flow", resource.gameName))
         if flowBefore >= 0 then
-            print(string.format("[AutoBuy] %s | Flow %.2f >= 0 and no city/factory need, SKIPPING", resource.gameName, flowBefore))
+            print(string.format("[AutoBuy] %s | Flow %.2f >= 0 and no factory need, SKIPPING", resource.gameName, flowBefore))
             return false, "No Need"
         end
         -- Flow is negative - we're consuming more than producing
@@ -211,9 +201,9 @@ local function checkAndBuyResource(resource)
     
     -- Print status before buying
     print(string.format("[AutoBuy] %s | >>> WILL BUY: Need %.2f units <<<", resource.gameName, neededAmount))
-    if totalNeed > 0 then
-        UI.log(string.format("[AutoBuy] %s need: %.2f (city: %.2f, factory: %.2f, flow: %.2f)", 
-            resource.gameName, neededAmount, cityDeficit, factoryConsumption, flowBefore), "info")
+    if factoryConsumption > 0 then
+        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f)", 
+            resource.gameName, neededAmount, factoryConsumption, flowBefore), "info")
     else
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
