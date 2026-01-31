@@ -180,9 +180,11 @@ function M.run()
     State.isRunning = true
     State.retryQueue = {}
     State.Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
+    State.ProcessedCountries = {}  -- Track which countries we've processed for each resource
     
     for _, res in ipairs(Helpers.getEnabledResources()) do
         State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
+        State.ProcessedCountries[res.name] = {}  -- Initialize tracking for this resource
     end
     
     local startTime = tick()
@@ -215,14 +217,31 @@ function M.run()
         local countryRetryState = {}
         local tradedThisCountry = false
         
-        local enabledResources = Helpers.getEnabledResources()
-        
-        for _, resource in ipairs(enabledResources) do
+        -- Check enabled resources in REAL-TIME for each country
+        for _, resource in ipairs(Config.Resources) do
             if not State.isRunning then break end
-            if not resource.enabled then continue end
+            
+            -- Initialize tracking for this resource if it doesn't exist
+            if not State.ProcessedCountries[resource.name] then
+                State.ProcessedCountries[resource.name] = {}
+            end
+            
+            -- Skip if already processed this country for this resource
+            if State.ProcessedCountries[resource.name][country.Name] then
+                continue
+            end
+            
+            if not resource.enabled then 
+                -- Debug: Log when skipping disabled resource
+                UI.log(string.format("  ⊗ Skipping %s - disabled via toggle (will resume if re-enabled)", resource.gameName), "info")
+                continue 
+            end
             
             local avail = Helpers.getAvailableFlow(resource)
             if avail < Config.MinAmount then continue end
+            
+            -- Mark this country as processed for this resource BEFORE attempting trade
+            State.ProcessedCountries[resource.name][country.Name] = true
             
             local ok, err = pcall(function()
                 local success, retry, reason = M.processCountryResource(
@@ -271,7 +290,10 @@ function M.run()
             
             for idx, item in ipairs(queue) do
                 if not State.isRunning then break end
-                if not item.resource.enabled then continue end
+                if not item.resource.enabled then 
+                    UI.log(string.format("  ⊗ RETRY Skip: %s - disabled via toggle", item.resource.gameName), "info")
+                    continue 
+                end
                 
                 local avail = Helpers.getAvailableFlow(item.resource)
                 if avail < Config.MinAmount then
