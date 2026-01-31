@@ -135,19 +135,19 @@ end
 
 -- Check and buy for a single resource
 local function checkAndBuyResource(resource)
-    local flow = getAutoBuyResourceFlow(resource.gameName)
+    local flowBefore = getAutoBuyResourceFlow(resource.gameName)
     
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
     local targetFlow = Config.AutoBuyTargetSurplus
     
     -- If flow is already at or above target, no need to buy
-    if flow >= targetFlow then
+    if flowBefore >= targetFlow then
         return false, "Flow OK"
     end
     
     -- Calculate how much we need to reach the target surplus
     -- e.g., if flow is -0.5 and target is 0.1, we need 0.6
-    local deficit = targetFlow - flow
+    local deficit = targetFlow - flowBefore
     local currentBuying = getCurrentBuyAmount(resource.gameName)
     
     -- Calculate how much more we need to buy
@@ -156,7 +156,9 @@ local function checkAndBuyResource(resource)
         return false, "Already Buying"
     end
     
-    UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flow, targetFlow, neededAmount), "info")
+    -- Print flow before buying
+    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f", resource.gameName, flowBefore))
+    UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     
     -- Find countries selling this resource
     local sellers = findSellingCountries(resource.gameName)
@@ -180,6 +182,9 @@ local function checkAndBuyResource(resource)
             buyAmount, resource.gameName, seller.name, price), "info")
         
         if attemptBuy(seller, resource.gameName, buyAmount, price) then
+            local flowAfter = getAutoBuyResourceFlow(resource.gameName)
+            print(string.format("[AutoBuy] BOUGHT %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
+                buyAmount, resource.gameName, seller.name, price, flowBefore, flowAfter))
             UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
             boughtTotal = boughtTotal + buyAmount
             neededAmount = neededAmount - buyAmount
@@ -190,6 +195,9 @@ local function checkAndBuyResource(resource)
             while nextPrice do
                 UI.log(string.format("[AutoBuy] Retry %s from %s @ %.1fx", resource.gameName, seller.name, nextPrice), "info")
                 if attemptBuy(seller, resource.gameName, buyAmount, nextPrice) then
+                    local flowAfter = getAutoBuyResourceFlow(resource.gameName)
+                    print(string.format("[AutoBuy] BOUGHT %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
+                        buyAmount, resource.gameName, seller.name, nextPrice, flowBefore, flowAfter))
                     UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
                     boughtTotal = boughtTotal + buyAmount
                     neededAmount = neededAmount - buyAmount
