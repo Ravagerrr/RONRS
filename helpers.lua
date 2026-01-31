@@ -207,4 +207,19 @@ function M.getCountries()
     return countries
 end
 
+-- Get my country's balance (for debt check)
+function M.getMyBalance()
+    if not M.myCountry then return 0 end
+    local eco = M.myCountry:FindFirstChild("Economy")
+    if not eco then return 0 end
+    local bal = eco:FindFirstChild("Balance")
+    if not bal then return 0 end
+    return bal.Value or 0
+end
+
+-- Check if player is in debt
+function M.isInDebt()
+    return M.getMyBalance() < 0
+end
+
 return M

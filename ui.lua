@@ -4,7 +4,7 @@
 ]]
 
 local M = {}
-local Config, State, Helpers, Trading, AutoSell
+local Config, State, Helpers, Trading, AutoSell, AutoBuyer
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -13,12 +13,13 @@ M.Logs = {}
 M.Rayfield = Rayfield
 M.lastLogUpdate = 0  -- Track last UI update time
 
-function M.init(cfg, state, helpers, trading, autosell)
+function M.init(cfg, state, helpers, trading, autosell, autobuyer)
     Config = cfg
     State = state
     Helpers = helpers
     Trading = trading
     AutoSell = autosell
+    AutoBuyer = autobuyer
 end
 
 function M.log(msg, msgType)
@@ -89,9 +90,20 @@ function M.updateAutoSell()
     end)
 end
 
+function M.updateAutoBuy()
+    if not M.Elements.AutoBuyStatus then return end
+    pcall(function()
+        if AutoBuyer and AutoBuyer.isMonitoring then
+            M.Elements.AutoBuyStatus:Set(string.format("AutoBuy ON | Purchases: %d", AutoBuyer.purchases))
+        else
+            M.Elements.AutoBuyStatus:Set("AutoBuy OFF")
+        end
+    end)
+end
+
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v4.2.006",
+        Name = "Trade Hub v4.2.009",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v4"}
     })
@@ -103,6 +115,7 @@ function M.createWindow()
     M.Elements.ProgressLabel = Home:CreateLabel("Progress: 0/0")
     M.Elements.StatsLabel = Home:CreateLabel("OK:0 Skip:0 Fail:0")
     M.Elements.AutoSellStatus = Home:CreateLabel("AutoSell OFF")
+    M.Elements.AutoBuyStatus = Home:CreateLabel("AutoBuy OFF")
     
     Home:CreateSection("Resources")
     for _, res in ipairs(Config.Resources) do
@@ -115,6 +128,7 @@ function M.createWindow()
         Callback = function()
             State.isRunning = false
             AutoSell.stop()
+            if AutoBuyer then AutoBuyer.stop() end
             M.log("EMERGENCY STOP", "warning")
         end
     })
@@ -146,8 +160,34 @@ function M.createWindow()
     })
     Settings:CreateSlider({Name = "Threshold", Range = {1, 20}, Increment = 0.5, CurrentValue = Config.AutoSellThreshold,
         Callback = function(v) Config.AutoSellThreshold = v end})
-    Settings:CreateSlider({Name = "Check Interval", Range = {1, 10}, Increment = 1, CurrentValue = Config.AutoSellCheckInterval,
+    Settings:CreateSlider({Name = "Check Interval", Range = {0.2, 5}, Increment = 0.1, CurrentValue = Config.AutoSellCheckInterval,
         Callback = function(v) Config.AutoSellCheckInterval = v end})
+    
+    Settings:CreateSection("Auto-Buy (Flow Protection)")
+    Settings:CreateToggle({
+        Name = "Enable Auto-Buy",
+        CurrentValue = Config.AutoBuyEnabled,
+        Callback = function(v) 
+            Config.AutoBuyEnabled = v
+            if AutoBuyer then
+                if v then AutoBuyer.start() else AutoBuyer.stop() end
+            end
+        end
+    })
+    Settings:CreateSlider({Name = "Buy Check Interval", Range = {0.2, 5}, Increment = 0.1, CurrentValue = Config.AutoBuyCheckInterval,
+        Callback = function(v) Config.AutoBuyCheckInterval = v end})
+    
+    -- Auto-Buy resource toggles
+    for i, res in ipairs(Config.AutoBuyResources) do
+        Settings:CreateToggle({
+            Name = string.format("Buy %s", res.gameName),
+            CurrentValue = res.enabled,
+            Callback = function(v) 
+                Config.AutoBuyResources[i].enabled = v 
+                M.log(string.format("AutoBuy %s: %s", res.gameName, v and "ON" or "OFF"), "info")
+            end
+        })
+    end
     
     Settings:CreateSection("Flow")
     Settings:CreateToggle({Name = "Smart Sell", CurrentValue = Config.SmartSell,
@@ -174,7 +214,7 @@ function M.createWindow()
     end})
     Logs:CreateButton({Name = "Clear", Callback = function() M.Logs = {} M.updateLogs() end})
     
-    M.log("=== Trade Hub v4.2.006 ===", "info")
+    M.log("=== Trade Hub v4.2.009 ===", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else
@@ -188,6 +228,7 @@ function M.createWindow()
             task.wait(1)
             M.updateStats()
             M.updateAutoSell()
+            M.updateAutoBuy()
         end
     end)
     
