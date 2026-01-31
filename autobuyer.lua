@@ -2,6 +2,7 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.014: Fixed auto-buy still sending trade requests when disabled - added checks at all critical points.
     v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
     v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
               Added detailed debug prints throughout the buying process.
@@ -130,6 +131,11 @@ end
 
 -- Check and buy for a single resource
 local function checkAndBuyResource(resource)
+    -- Immediate check: abort if auto-buy has been disabled
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return false, "Disabled"
+    end
+    
     print(string.format("[AutoBuy] ========== Checking %s ==========", resource.gameName))
     
     local flowBefore = getAutoBuyResourceFlow(resource.gameName)
@@ -209,6 +215,12 @@ local function checkAndBuyResource(resource)
     print(string.format("[AutoBuy] %s | Starting purchase loop, need %.2f", resource.gameName, remainingNeed))
     
     for idx, seller in ipairs(sellers) do
+        -- Check if auto-buy has been disabled during the loop
+        if not M.isMonitoring or not Config.AutoBuyEnabled then
+            print(string.format("[AutoBuy] %s | Auto-buy disabled, stopping purchases", resource.gameName))
+            break
+        end
+        
         if remainingNeed <= 0 then 
             print(string.format("[AutoBuy] %s | Remaining need %.2f <= 0, DONE", resource.gameName, remainingNeed))
             break 
@@ -272,6 +284,11 @@ end
 
 -- Run auto-buy check for all resources
 function M.runCheck()
+    -- Double-check that auto-buy is still enabled before doing anything
+    if not M.isMonitoring or not Config.AutoBuyEnabled then
+        return
+    end
+    
     -- Check if we're in debt and debt restriction is enabled
     if Config.AutoBuyRequireNoDebt and Helpers.isInDebt() then
         -- Skip auto-buy when in debt
@@ -281,7 +298,8 @@ function M.runCheck()
     local enabledResources = M.getEnabledResources()
     
     for _, resource in ipairs(enabledResources) do
-        if not M.isMonitoring then break end
+        -- Check before each resource to respond quickly to disable
+        if not M.isMonitoring or not Config.AutoBuyEnabled then break end
         
         local success, reason = checkAndBuyResource(resource)
         if success then
@@ -296,23 +314,19 @@ function M.start()
     UI.log("Auto-Buy: ON", "info")
     
     task.spawn(function()
-        while M.isMonitoring do
-            if not Config.AutoBuyEnabled then
-                M.isMonitoring = false
-                UI.log("Auto-Buy: OFF", "warning")
-                break
-            end
-            
+        while M.isMonitoring and Config.AutoBuyEnabled do
             UI.updateAutoBuy()
             
-            -- Only run if we're not currently in a sell cycle
-            if not State.isRunning then
+            -- Double-check state before running check
+            if M.isMonitoring and Config.AutoBuyEnabled and not State.isRunning then
                 M.runCheck()
             end
             
             task.wait(Config.AutoBuyCheckInterval)
         end
         
+        -- Loop exited - mark as not monitoring and update UI
+        M.isMonitoring = false
         UI.log("Auto-Buy: OFF", "warning")
         UI.updateAutoBuy()
     end)
