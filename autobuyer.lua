@@ -1,23 +1,8 @@
 --[[
-    AUTOBUYER MODULE
+    AUTOBUYER MODULE v1.1
     Auto-buy Monitor for Resource Flow Protection
     
-    v4.2.017: Fixed factory detection reliability:
-              - Fixed parseOperationalReason to handle decimal needs (e.g., "Phosphate [Need: 3.5]")
-              - Removed fallback to hardcoded consumption table (was causing ghost factory buying)
-              - Now only buys resources when factory has Operational_Reason attribute
-              - Added debug logging to trace factory detection
-    v4.2.016: Added Fertilizer Factory (Phosphate), Motor Factory (Tungsten), 
-              Electronics Factory (Gold). Removed city deficit logic - now only
-              checks factory consumption and negative flow.
-    v4.2.015: Added factory detection - now detects Electronics Factory, etc.
-              and auto-buys materials they consume.
-    v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
-    v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
-              Added detailed debug prints throughout the buying process.
-    v4.2.011: Reads resource deficits directly from city Resources attributes.
-    
-    Now checks factory consumption and falls back to flow-based check.
+    Checks factory consumption and falls back to flow-based check.
     Only buys if: 1) Factory needs the resource, or 2) Flow is negative.
 ]]
 
