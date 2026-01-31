@@ -66,6 +66,11 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     -- Calculate ACTUAL price per unit at this tier
     local actualPricePerUnit = resource.buyPrice * price
     
+    -- Safety check for division by zero
+    if actualPricePerUnit <= 0 then
+        return false, false, "Invalid Price"
+    end
+    
     -- Calculate affordable based on ACTUAL price they pay
     -- Apply revenue spending limit to prevent rejection (countries won't spend 100% of revenue)
     local maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
