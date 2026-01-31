@@ -54,12 +54,12 @@ return {
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
-    AutoSellCheckInterval = 3,
+    AutoSellCheckInterval = 0.5,  -- Fast real-time detection
     
     -- Auto-Buy (Flow Protection)
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
-    AutoBuyCheckInterval = 3,
+    AutoBuyCheckInterval = 0.5,  -- Fast real-time detection
     AutoBuyTargetSurplus = 0.1,  -- Target flow surplus (buys to +0.1 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyResources = {

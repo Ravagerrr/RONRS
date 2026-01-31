@@ -103,7 +103,7 @@ end
 
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v4.2.008",
+        Name = "Trade Hub v4.2.009",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v4"}
     })
@@ -160,7 +160,7 @@ function M.createWindow()
     })
     Settings:CreateSlider({Name = "Threshold", Range = {1, 20}, Increment = 0.5, CurrentValue = Config.AutoSellThreshold,
         Callback = function(v) Config.AutoSellThreshold = v end})
-    Settings:CreateSlider({Name = "Check Interval", Range = {1, 10}, Increment = 1, CurrentValue = Config.AutoSellCheckInterval,
+    Settings:CreateSlider({Name = "Check Interval", Range = {0.2, 5}, Increment = 0.1, CurrentValue = Config.AutoSellCheckInterval,
         Callback = function(v) Config.AutoSellCheckInterval = v end})
     
     Settings:CreateSection("Auto-Buy (Flow Protection)")
@@ -174,7 +174,7 @@ function M.createWindow()
             end
         end
     })
-    Settings:CreateSlider({Name = "Buy Check Interval", Range = {1, 10}, Increment = 1, CurrentValue = Config.AutoBuyCheckInterval,
+    Settings:CreateSlider({Name = "Buy Check Interval", Range = {0.2, 5}, Increment = 0.1, CurrentValue = Config.AutoBuyCheckInterval,
         Callback = function(v) Config.AutoBuyCheckInterval = v end})
     
     -- Auto-Buy resource toggles
@@ -214,7 +214,7 @@ function M.createWindow()
     end})
     Logs:CreateButton({Name = "Clear", Callback = function() M.Logs = {} M.updateLogs() end})
     
-    M.log("=== Trade Hub v4.2.008 ===", "info")
+    M.log("=== Trade Hub v4.2.009 ===", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else
