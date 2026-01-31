@@ -56,8 +56,7 @@ function M.updateStats()
                 local avail = Helpers.getAvailableFlow(res)
                 local selling = Helpers.getTotalSelling(res)
                 local buyers = Helpers.getBuyerCount(res)
-                local icon = res.name == "ConsumerGoods" and "CG" or "EL"
-                label:Set(string.format("%s %.1f avail | Selling %.1f to %d", icon, avail, selling, buyers))
+                label:Set(string.format("%s %.1f avail | Selling %.1f to %d", res.gameName, avail, selling, buyers))
             end
         end
         
@@ -107,8 +106,7 @@ function M.createWindow()
     
     Home:CreateSection("Resources")
     for _, res in ipairs(Config.Resources) do
-        local icon = res.name == "ConsumerGoods" and "CG" or "EL"
-        M.Elements[res.name .. "Label"] = Home:CreateLabel(string.format("%s Loading...", icon))
+        M.Elements[res.name .. "Label"] = Home:CreateLabel(string.format("%s Loading...", res.gameName))
     end
     
     Home:CreateSection("Control")
@@ -124,10 +122,9 @@ function M.createWindow()
     local Resources = Window:CreateTab("Resources", 4483362458)
     Resources:CreateSection("Toggle")
     for i, res in ipairs(Config.Resources) do
-        local icon = res.name == "ConsumerGoods" and "CG" or "EL"
         local cap = res.hasCap and string.format("Max %d", res.capAmount) or "No Cap"
         Resources:CreateToggle({
-            Name = string.format("%s %s [%s]", icon, res.gameName, cap),
+            Name = string.format("%s [%s]", res.gameName, cap),
             CurrentValue = res.enabled,
             Callback = function(v) 
                 Config.Resources[i].enabled = v 
