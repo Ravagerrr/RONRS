@@ -29,14 +29,14 @@ end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
     if not State.isRunning then return false, false, "Stopped" end
-    -- Check Config directly to respect real-time toggle changes
-    local configResource = Helpers.getResourceByName(resource.name)
-    if not configResource or not configResource.enabled then return false, false, "Disabled" end
     
     local name = country.Name
     local resName = resource.name
+    
+    -- ALWAYS check Config directly for the latest enabled state
+    local configResource = Helpers.getResourceByName(resName)
+    if not configResource or not configResource.enabled then return false, false, "Disabled" end
     local isRetry = retryState and retryState[resName]
-    local icon = resName == "ConsumerGoods" and "CG" or "EL"
     
     local avail = Helpers.getAvailableFlow(resource)
     if Config.SmartSell and avail < Config.MinAmount then
@@ -92,10 +92,10 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     
     local totalCost = amount * actualPricePerUnit
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Rev:$%.0f Cost:$%.0f", 
-        i, total, icon, name, amount, price, actualPricePerUnit, data.revenue, totalCost), "info")
+        i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.revenue, totalCost), "info")
     
-    if attemptTrade(country, resource, amount, price) then
-        UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
+    if attemptTrade(country, configResource, amount, price) then
+        UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         return true, false, nil
     else
         local nextPrice = Helpers.getNextPriceTier(price)
@@ -120,9 +120,8 @@ function M.run()
     
     UI.log("=== Trade Started ===", "info")
     for _, res in ipairs(Helpers.getEnabledResources()) do
-        local icon = res.name == "ConsumerGoods" and "CG" or "EL"
         local capInfo = res.hasCap and string.format("Cap: %d", res.capAmount) or "No Cap"
-        UI.log(string.format("%s %s: %.2f avail | %s", icon, res.gameName, Helpers.getAvailableFlow(res), capInfo), "info")
+        UI.log(string.format("%s: %.2f avail | %s", res.gameName, Helpers.getAvailableFlow(res), capInfo), "info")
     end
     
     local countries = Helpers.getCountries()
@@ -146,34 +145,37 @@ function M.run()
         
         for _, resource in ipairs(enabledResources) do
             if not State.isRunning then break end
-            -- Check Config directly to respect real-time toggle changes
-            local configResource = Helpers.getResourceByName(resource.name)
-            if not configResource or not configResource.enabled then continue end
             
-            local avail = Helpers.getAvailableFlow(resource)
+            -- CRITICAL: Always get fresh resource from Config, not the snapshot
+            local configResource = Helpers.getResourceByName(resource.name)
+            if not configResource or not configResource.enabled then 
+                continue 
+            end
+            
+            local avail = Helpers.getAvailableFlow(configResource)
             if avail < Config.MinAmount then continue end
             
             local ok, err = pcall(function()
                 local success, retry, reason = M.processCountryResource(
-                    country, resource, i, totalCountries, allBuyers, countryRetryState
+                    country, configResource, i, totalCountries, allBuyers, countryRetryState
                 )
                 
                 if success then
                     State.Stats.Success = State.Stats.Success + 1
-                    State.Stats.ByResource[resource.name].Success = State.Stats.ByResource[resource.name].Success + 1
+                    State.Stats.ByResource[configResource.name].Success = State.Stats.ByResource[configResource.name].Success + 1
                     tradedThisCountry = true
                     
-                    if not allBuyers[resource.name] then allBuyers[resource.name] = {} end
-                    allBuyers[resource.name][country.Name] = true
+                    if not allBuyers[configResource.name] then allBuyers[configResource.name] = {} end
+                    allBuyers[configResource.name][country.Name] = true
                 elseif retry then
                     table.insert(State.retryQueue, {
                         country = country,
-                        resource = resource,
+                        resource = configResource,
                         retryState = countryRetryState
                     })
                 else
                     State.Stats.Skipped = State.Stats.Skipped + 1
-                    State.Stats.ByResource[resource.name].Skipped = State.Stats.ByResource[resource.name].Skipped + 1
+                    State.Stats.ByResource[configResource.name].Skipped = State.Stats.ByResource[configResource.name].Skipped + 1
                 end
                 
                 UI.updateStats()
