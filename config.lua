@@ -32,6 +32,7 @@ return {
     ResourceDelay = 0.3,
     
     -- Retry
+    -- MaxRetryPasses: 2 retries needed for full sequence (0.5 -> 0.2 -> 0.1)
     RetryEnabled = true,
     MaxRetryPasses = 2,
     
@@ -50,6 +51,10 @@ return {
     -- 0.6 means 60% - prevents rejection when cost is too close to total revenue
     -- Valid range: 0.0 to 1.0 (0% to 100%). Recommended: 0.5-0.7 for better acceptance rates
     MaxRevenueSpendingPercent = 0.6,
+    
+    -- Debug
+    -- Enable to log detailed country info at start of each trade run
+    DebugLogging = true,
     
     -- Auto-Sell
     AutoSellEnabled = true,
