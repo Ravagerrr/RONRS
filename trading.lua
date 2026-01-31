@@ -90,7 +90,9 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
-    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u)", i, total, icon, name, amount, price, actualPricePerUnit), "info")
+    local totalCost = amount * actualPricePerUnit
+    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Rev:$%.0f Cost:$%.0f", 
+        i, total, icon, name, amount, price, actualPricePerUnit, data.revenue, totalCost), "info")
     
     if attemptTrade(country, resource, amount, price) then
         UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
