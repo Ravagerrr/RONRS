@@ -2,6 +2,8 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.016: Added Fertilizer Factory, Advanced Electronics Factory, Military Equipment Factory
+              to support auto-buying Phosphate and Tungsten when factories need them.
     v4.2.015: Added factory detection - now detects Electronics Factory, Consumer Goods Factory, etc.
               and auto-buys materials they consume (e.g., Titanium, Copper for Electronics).
     v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
