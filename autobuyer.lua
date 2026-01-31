@@ -2,6 +2,7 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
     v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
               Added detailed debug prints throughout the buying process.
     v4.2.011: Reads resource deficits directly from city Resources attributes.
@@ -162,13 +163,17 @@ local function checkAndBuyResource(resource)
             resource.gameName, actualDeficit, targetFlow, neededAmount))
     else
         -- Fallback to flow-based check if no city deficit exists
-        print(string.format("[AutoBuy] %s | No city deficit, using flow-based check", resource.gameName))
-        if flowBefore >= targetFlow then
-            print(string.format("[AutoBuy] %s | Flow %.2f >= target %.2f, SKIPPING", resource.gameName, flowBefore, targetFlow))
-            return false, "Flow OK"
+        -- Only trigger if flow is NEGATIVE (actively consuming the resource)
+        -- If flow is >= 0 and no city deficit, we don't need this resource
+        print(string.format("[AutoBuy] %s | No city deficit, checking flow", resource.gameName))
+        if flowBefore >= 0 then
+            print(string.format("[AutoBuy] %s | Flow %.2f >= 0 and no city deficit, SKIPPING", resource.gameName, flowBefore))
+            return false, "No Need"
         end
-        neededAmount = targetFlow - flowBefore
-        print(string.format("[AutoBuy] %s | Flow-based need: %.2f - %.2f = %.2f", resource.gameName, targetFlow, flowBefore, neededAmount))
+        -- Flow is negative - we're consuming more than producing
+        -- Buy enough to bring flow to target surplus
+        neededAmount = targetFlow - flowBefore  -- e.g., 0.1 - (-5) = 5.1
+        print(string.format("[AutoBuy] %s | Negative flow %.2f, need: %.2f to reach target %.2f", resource.gameName, flowBefore, neededAmount, targetFlow))
     end
     
     if neededAmount <= 0 then
