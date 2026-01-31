@@ -1,5 +1,5 @@
 --[[
-    AUTOBUYER MODULE v1.1
+    AUTOBUYER MODULE v1.2
     Auto-buy Monitor for Resource Flow Protection
     
     Checks factory consumption and falls back to flow-based check.
@@ -303,9 +303,13 @@ end
 function M.start()
     if M.isMonitoring then return end
     M.isMonitoring = true
+    Config.AutoBuyEnabled = true  -- Ensure config matches our state
     UI.log("Auto-Buy: ON", "info")
     
     task.spawn(function()
+        -- Small delay to let config stabilize after start (prevents race condition with Rayfield)
+        task.wait(0.2)
+        
         while M.isMonitoring do
             if not Config.AutoBuyEnabled then
                 M.isMonitoring = false
