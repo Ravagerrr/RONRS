@@ -139,18 +139,26 @@ end
 
 function M.run()
     if State.isRunning then return end
+    
+    -- Early exit if no resources are enabled
+    local enabledResources = Helpers.getEnabledResources()
+    if #enabledResources == 0 then
+        UI.log("No resources enabled, skipping trade run", "warning")
+        return
+    end
+    
     State.isRunning = true
     State.retryQueue = {}
     State.Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
     
-    for _, res in ipairs(Helpers.getEnabledResources()) do
+    for _, res in ipairs(enabledResources) do
         State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
     end
     
     local startTime = tick()
     
     UI.log("=== Trade Started ===", "info")
-    for _, res in ipairs(Helpers.getEnabledResources()) do
+    for _, res in ipairs(enabledResources) do
         local capInfo = res.hasCap and string.format("Cap: %d", res.capAmount) or "No Cap"
         UI.log(string.format("%s: %.2f avail | %s", res.gameName, Helpers.getAvailableFlow(res), capInfo), "info")
     end
