@@ -214,6 +214,56 @@ function M.createWindow()
     end})
     Logs:CreateButton({Name = "Clear", Callback = function() M.Logs = {} M.updateLogs() end})
     
+    -- DEBUG: Dump all workspace paths to logs
+    Logs:CreateButton({Name = "Debug: Dump Workspace Paths", Callback = function()
+        M.log("=== DUMPING WORKSPACE PATHS ===", "info")
+        
+        local allPaths = {}
+        local yieldCounter = 0
+        
+        -- Build full path string
+        local function getFullPath(instance)
+            local parts = {}
+            local current = instance
+            while current and current ~= game do
+                table.insert(parts, 1, current.Name)
+                current = current.Parent
+            end
+            return table.concat(parts, ".")
+        end
+        
+        -- Recursively collect paths
+        local function collectPaths(instance, maxDepth, depth)
+            if depth > maxDepth then return end
+            yieldCounter = yieldCounter + 1
+            if yieldCounter % 100 == 0 then task.wait() end
+            
+            table.insert(allPaths, getFullPath(instance))
+            for _, child in ipairs(instance:GetChildren()) do
+                collectPaths(child, maxDepth, depth + 1)
+            end
+        end
+        
+        -- Collect with depth limit of 6
+        collectPaths(workspace, 6, 0)
+        
+        M.log("Found " .. #allPaths .. " paths", "info")
+        
+        -- Log each path
+        for i, path in ipairs(allPaths) do
+            if i % 50 == 0 then task.wait() end
+            M.log(path, "info")
+        end
+        
+        M.log("=== DUMP COMPLETE ===", "info")
+        
+        -- Auto-copy to clipboard
+        if setclipboard then
+            setclipboard(table.concat(allPaths, "\n"))
+            M.log("[COPIED TO CLIPBOARD]", "success")
+        end
+    end})
+    
     M.log("=== Trade Hub v4.2.015 ===", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
@@ -249,5 +299,8 @@ function M.createWindow()
     
     return Window
 end
+
+-- Expose UI module globally for debug scripts
+_G.TradeHubUI = M
 
 return M
