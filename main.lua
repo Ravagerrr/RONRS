@@ -70,19 +70,7 @@ Trading.init(Config, State, Helpers, UI)
 AutoSell.init(Config, State, Helpers, Trading, UI)
 AutoBuyer.init(Config, State, Helpers, UI)
 
--- Create UI
+-- Create UI (auto-start is handled in UI after config is loaded)
 UI.createWindow()
-
--- Auto-start if enabled
-if Config.AutoSellEnabled then
-    task.wait(1)
-    AutoSell.start()
-end
-
--- Auto-start auto-buy if enabled
-if Config.AutoBuyEnabled then
-    task.wait(1)
-    AutoBuyer.start()
-end
 
 print("[Ready]")
