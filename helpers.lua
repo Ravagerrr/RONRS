@@ -307,4 +307,159 @@ function M.getResourceDeficit(resourceGameName)
     return M.getTotalCityResourceDeficit(resourceGameName)
 end
 
+-- Factory consumption rates per factory type
+-- Maps factory type names to resources they consume and the rate per factory
+-- 
+-- NOTE: These are estimated baseline rates based on typical Rise of Nations factory mechanics.
+-- The actual consumption rates may vary depending on the game version or server configuration.
+-- If rates don't match the game, adjust the values below to match actual in-game consumption.
+-- Rate values represent resources consumed per factory per tick/cycle.
+M.FactoryConsumption = {
+    ["Electronics Factory"] = {
+        ["Titanium"] = 1,
+        ["Copper"] = 1,
+    },
+    ["Consumer Goods Factory"] = {
+        ["Iron"] = 1,
+        ["Copper"] = 1,
+    },
+    ["Steel Mill"] = {
+        ["Iron"] = 2,
+    },
+    ["Ammunition Factory"] = {
+        ["Iron"] = 1,
+        ["Copper"] = 1,
+    },
+    ["Weapons Factory"] = {
+        ["Iron"] = 2,
+        ["Titanium"] = 1,
+    },
+}
+
+-- Get all factories owned by the player's country
+-- Searches in workspace.Baseplate.Buildings.[CountryName] and other common locations
+function M.getFactories()
+    local factories = {}
+    if not M.myCountryName then return factories end
+    
+    -- Try multiple common factory storage locations
+    local searchPaths = {}
+    
+    local baseplate = workspace:FindFirstChild("Baseplate")
+    if baseplate then
+        -- Try Buildings folder
+        local buildings = baseplate:FindFirstChild("Buildings")
+        if buildings then
+            local countryBuildings = buildings:FindFirstChild(M.myCountryName)
+            if countryBuildings then
+                table.insert(searchPaths, countryBuildings)
+            end
+        end
+        
+        -- Try Factories folder
+        local factoriesFolder = baseplate:FindFirstChild("Factories")
+        if factoriesFolder then
+            local countryFactories = factoriesFolder:FindFirstChild(M.myCountryName)
+            if countryFactories then
+                table.insert(searchPaths, countryFactories)
+            end
+        end
+    end
+    
+    -- Also check in CountryData for factory info
+    if M.myCountry then
+        local countryFactories = M.myCountry:FindFirstChild("Factories")
+        if countryFactories then
+            table.insert(searchPaths, countryFactories)
+        end
+        
+        local countryBuildings = M.myCountry:FindFirstChild("Buildings")
+        if countryBuildings then
+            table.insert(searchPaths, countryBuildings)
+        end
+    end
+    
+    -- Search all paths for factories
+    for _, folder in ipairs(searchPaths) do
+        for _, obj in ipairs(folder:GetChildren()) do
+            -- Check if this is a factory we recognize
+            local factoryType = obj.Name
+            -- Also check for FactoryType attribute
+            local typeAttr = obj:GetAttribute("FactoryType") or obj:GetAttribute("Type")
+            if typeAttr then
+                factoryType = typeAttr
+            end
+            
+            if M.FactoryConsumption[factoryType] then
+                table.insert(factories, {
+                    name = factoryType,
+                    instance = obj,
+                })
+            else
+                -- Try partial matching for factory names (e.g., "Electronics Factory 1")
+                -- Use pattern anchoring to match from the start of the string
+                for knownFactory, _ in pairs(M.FactoryConsumption) do
+                    -- Match full factory name at start (e.g., "Electronics Factory" in "Electronics Factory 1")
+                    -- or match factory type without " Factory" suffix (e.g., "Electronics" in "Electronics 1")
+                    local shortName = knownFactory:gsub(" Factory", ""):gsub(" Mill", "")
+                    if string.find(obj.Name, "^" .. knownFactory) or string.find(obj.Name, "^" .. shortName) then
+                        table.insert(factories, {
+                            name = knownFactory,
+                            instance = obj,
+                        })
+                        break
+                    end
+                end
+            end
+        end
+    end
+    
+    return factories
+end
+
+-- Count factories by type
+function M.getFactoryCounts()
+    local counts = {}
+    local factories = M.getFactories()
+    
+    for _, factory in ipairs(factories) do
+        counts[factory.name] = (counts[factory.name] or 0) + 1
+    end
+    
+    return counts
+end
+
+-- Calculate total resource consumption from all factories
+-- Returns: table mapping resourceGameName to consumption amount
+function M.getFactoryResourceConsumption()
+    local consumption = {}
+    local factoryCounts = M.getFactoryCounts()
+    
+    for factoryType, count in pairs(factoryCounts) do
+        local resources = M.FactoryConsumption[factoryType]
+        if resources then
+            for resourceName, ratePerFactory in pairs(resources) do
+                consumption[resourceName] = (consumption[resourceName] or 0) + (count * ratePerFactory)
+            end
+        end
+    end
+    
+    return consumption
+end
+
+-- Get factory consumption for a specific resource
+-- Returns: consumption amount (positive number, represents how much is consumed)
+function M.getFactoryConsumption(resourceGameName)
+    local consumption = M.getFactoryResourceConsumption()
+    return consumption[resourceGameName] or 0
+end
+
+-- Get total deficit including both city deficits AND factory consumption
+-- This is the complete picture of what resources we need
+function M.getTotalResourceNeed(resourceGameName)
+    local cityDeficit = M.getTotalCityResourceDeficit(resourceGameName)
+    local factoryConsumption = M.getFactoryConsumption(resourceGameName)
+    return cityDeficit + factoryConsumption
+end
+
 return M
