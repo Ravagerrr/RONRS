@@ -333,21 +333,25 @@ M.FactoryConsumption = {
 }
 
 -- Parse factory Operational_Reason attribute to extract resource demands
--- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]", "Titanium [Need: 5]"
+-- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]", "Titanium [Need: 5]", "Phosphate [Need: 3.5]"
 -- Returns: table mapping resourceName to amount needed, or nil if not parseable
 function M.parseOperationalReason(operationalReason)
     if not operationalReason or type(operationalReason) ~= "string" then
         return nil
     end
     
-    -- Pattern: "ResourceName [Need: X]"
+    -- Pattern: "ResourceName [Need: X]" where X can be integer or decimal (e.g., 3.5)
     -- Use non-greedy (.-) to capture resource name up to the bracket
-    local resourceName, amount = string.match(operationalReason, "^(.-)%s*%[Need:%s*(%d+)%]")
+    -- Match valid decimal numbers: integer part required, optional decimal point with fractional part
+    local resourceName, amount = string.match(operationalReason, "^(.-)%s*%[Need:%s*(%d+%.?%d*)%]")
     
     if resourceName and amount and resourceName ~= "" then
-        return {
-            [resourceName] = tonumber(amount)
-        }
+        local numAmount = tonumber(amount)
+        if numAmount then
+            return {
+                [resourceName] = numAmount
+            }
+        end
     end
     
     return nil
@@ -355,22 +359,37 @@ end
 
 -- Get resource demands from a factory's attributes
 -- Reads Operational_Reason attribute to get actual demand
--- Falls back to hardcoded FactoryConsumption if attribute not found
+-- Only returns demands if factory has Operational_Reason attribute (factory is non-operational)
+-- If factory is operational (no Operational_Reason), returns empty table (no needs)
 function M.getFactoryDemands(factory)
     if not factory.instance then
-        return M.FactoryConsumption[factory.name] or {}
+        -- No instance = can't verify factory exists, return empty (don't assume needs)
+        return {}
     end
     
-    -- Try to read Operational_Reason attribute
+    -- Check if factory is operational (Operational attribute exists and is true/checked)
+    local operational = factory.instance:GetAttribute("Operational")
+    
+    -- Try to read Operational_Reason attribute - this tells us what resource is needed
     local operationalReason = factory.instance:GetAttribute("Operational_Reason")
-    local parsedDemands = M.parseOperationalReason(operationalReason)
     
-    if parsedDemands then
-        return parsedDemands
+    -- If factory has Operational_Reason, parse it to get the actual demand
+    if operationalReason and type(operationalReason) == "string" and operationalReason ~= "" then
+        local parsedDemands = M.parseOperationalReason(operationalReason)
+        if parsedDemands then
+            return parsedDemands
+        end
     end
     
-    -- Fallback to hardcoded consumption rates
-    return M.FactoryConsumption[factory.name] or {}
+    -- If factory is operational (no resource shortage), return empty table
+    -- Only non-operational factories with Operational_Reason should trigger buying
+    if operational == true then
+        return {}
+    end
+    
+    -- If we can't determine operational status and no Operational_Reason found,
+    -- assume factory doesn't need resources right now (safer than over-buying)
+    return {}
 end
 
 -- Get all factories owned by the player's country
@@ -446,11 +465,20 @@ function M.getFactoryResourceConsumption()
     local consumption = {}
     local factories = M.getFactories()
     
+    print(string.format("[Helpers] Found %d factories", #factories))
+    
     -- Check each factory individually to read its actual demands
     for _, factory in ipairs(factories) do
         local demands = M.getFactoryDemands(factory)
+        local demandParts = {}
         for resourceName, amount in pairs(demands) do
             consumption[resourceName] = (consumption[resourceName] or 0) + amount
+            table.insert(demandParts, string.format("%s=%.2f", resourceName, amount))
+        end
+        if #demandParts > 0 then
+            print(string.format("[Helpers] Factory %s in %s needs: %s", factory.name, factory.city, table.concat(demandParts, " ")))
+        else
+            print(string.format("[Helpers] Factory %s in %s: no demands (operational or no shortage)", factory.name, factory.city))
         end
     end
     

@@ -2,6 +2,11 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.017: Fixed factory detection reliability:
+              - Fixed parseOperationalReason to handle decimal needs (e.g., "Phosphate [Need: 3.5]")
+              - Removed fallback to hardcoded consumption table (was causing ghost factory buying)
+              - Now only buys resources when factory has Operational_Reason attribute
+              - Added debug logging to trace factory detection
     v4.2.016: Added Fertilizer Factory (Phosphate), Motor Factory (Tungsten), 
               Electronics Factory (Gold). Removed city deficit logic - now only
               checks factory consumption and negative flow.

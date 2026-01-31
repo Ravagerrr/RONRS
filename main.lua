@@ -1,8 +1,11 @@
 --[[
-    Trade Hub v4.2.016 - Multi-Resource
+    Trade Hub v4.2.017 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.017 - Fixed factory detection: parseOperationalReason now handles decimals (e.g., 3.5)
+             - Removed fallback to hardcoded consumption table (was causing ghost factory buying)
+             - Now only buys resources when factory has Operational_Reason attribute
     v4.2.016 - Auto-Buy now only checks factory consumption + negative flow (removed city deficit logic)
              - Added Gold to Electronics Factory, Tungsten to Motor Factory
              - Added Fertilizer Factory (Phosphate), Motor Factory, Steel Manufactory
@@ -46,7 +49,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.016")
+print("  Trade Hub v4.2.017")
 print("══════════════════════════")
 
 local Config = loadModule("config")
