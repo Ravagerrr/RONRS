@@ -1,14 +1,29 @@
 --[[
-    DEBUG WORKSPACE SCRIPT
-    Prints everything in workspace recursively
+    DEBUG WORKSPACE SCRIPT (Lightweight Version)
+    Prints key game structures relevant to auto-buy debugging
     
-    Run this script to see the full structure of workspace
-    This helps diagnose issues with factory detection, city resources, etc.
+    FIXED: Previous version froze game - now only explores relevant paths
+    and yields frequently to prevent freezing.
     
-    Output format:
-    - Each line shows: [Depth] ClassName "Name" (attributes if any)
-    - Children are indented with | prefixes
+    This script ONLY explores:
+    - CountryData (for resources and economy)
+    - GameManager (for trade functions)  
+    - Baseplate (for cities, buildings, factories)
+    
+    It does NOT explore player characters, terrain, or other irrelevant objects.
 ]]
+
+-- Yield counter to prevent freezing
+local yieldCounter = 0
+local YIELD_EVERY = 50  -- Yield every N items
+
+local function maybeYield()
+    yieldCounter = yieldCounter + 1
+    if yieldCounter >= YIELD_EVERY then
+        yieldCounter = 0
+        task.wait()
+    end
+end
 
 local function getAttributesString(instance)
     local attrs = instance:GetAttributes()
@@ -56,6 +71,7 @@ local function getValueString(instance)
 end
 
 local function printInstance(instance, depth)
+    maybeYield()
     local indent = string.rep("| ", depth)
     local className = instance.ClassName
     local name = instance.Name
@@ -83,32 +99,38 @@ local function exploreRecursive(instance, depth, maxDepth)
     end
 end
 
+-- Explore only specific paths that matter for auto-buy
+local function exploreRelevantPath(path, maxDepth)
+    local current = workspace
+    local parts = string.split(path, ".")
+    
+    for i, part in ipairs(parts) do
+        if part ~= "workspace" then
+            current = current:FindFirstChild(part)
+            if not current then
+                print(string.format("[NOT FOUND] %s (stopped at %s)", path, part))
+                return
+            end
+        end
+    end
+    
+    print(string.format("\n=== %s ===", path))
+    exploreRecursive(current, 0, maxDepth)
+    task.wait() -- Yield after each section
+end
+
 -- Main execution
 print("═══════════════════════════════════════════════════════════════")
-print("  DEBUG WORKSPACE - Full Structure Dump")
+print("  DEBUG WORKSPACE - Lightweight Version")
+print("  (Only explores game-relevant paths to prevent freezing)")
 print("═══════════════════════════════════════════════════════════════")
 print("")
-
--- Configuration
-local MAX_DEPTH = 10  -- Adjust this to see more or fewer levels
-
-print(string.format("Max Depth: %d", MAX_DEPTH))
-print("Format: [Depth] ClassName \"Name\" Value=... {attributes}")
-print("")
-
--- Start exploration from workspace
-print("=== WORKSPACE ===")
-exploreRecursive(workspace, 0, MAX_DEPTH)
-
-print("")
-print("═══════════════════════════════════════════════════════════════")
-print("  DEBUG COMPLETE")
-print("═══════════════════════════════════════════════════════════════")
 
 -- Also specifically look for key paths relevant to auto-buying
 print("")
 print("=== KEY PATHS FOR AUTO-BUY DEBUGGING ===")
 print("")
+task.wait()
 
 -- Check CountryData
 local CountryData = workspace:FindFirstChild("CountryData")
@@ -118,6 +140,7 @@ if CountryData then
 else
     print("[MISSING] workspace.CountryData NOT FOUND")
 end
+task.wait()
 
 -- Check GameManager
 local GameManager = workspace:FindFirstChild("GameManager")
@@ -132,6 +155,7 @@ if GameManager then
 else
     print("[MISSING] workspace.GameManager NOT FOUND")
 end
+task.wait()
 
 -- Check Baseplate structure (for cities and factories)
 local Baseplate = workspace:FindFirstChild("Baseplate")
@@ -142,26 +166,31 @@ if Baseplate then
     if Cities then
         print("[OK] workspace.Baseplate.Cities exists")
         for _, country in ipairs(Cities:GetChildren()) do
+            maybeYield()
             print(string.format("     Country folder: %s (%d cities)", country.Name, #country:GetChildren()))
         end
     else
         print("[MISSING] workspace.Baseplate.Cities NOT FOUND")
     end
+    task.wait()
     
     local Buildings = Baseplate:FindFirstChild("Buildings")
     if Buildings then
         print("[OK] workspace.Baseplate.Buildings exists")
         for _, country in ipairs(Buildings:GetChildren()) do
+            maybeYield()
             print(string.format("     Country buildings: %s (%d buildings)", country.Name, #country:GetChildren()))
         end
     else
         print("[INFO] workspace.Baseplate.Buildings not found (factories may be elsewhere)")
     end
+    task.wait()
     
     local Factories = Baseplate:FindFirstChild("Factories")
     if Factories then
         print("[OK] workspace.Baseplate.Factories exists")
         for _, country in ipairs(Factories:GetChildren()) do
+            maybeYield()
             print(string.format("     Country factories: %s (%d factories)", country.Name, #country:GetChildren()))
         end
     else
@@ -170,6 +199,7 @@ if Baseplate then
 else
     print("[MISSING] workspace.Baseplate NOT FOUND")
 end
+task.wait()
 
 -- Get player's country and check their data
 local Players = game:GetService("Players")
@@ -179,6 +209,7 @@ local myCountryName = LocalPlayer and LocalPlayer:GetAttribute("Country")
 if myCountryName then
     print("")
     print(string.format("=== YOUR COUNTRY: %s ===", myCountryName))
+    task.wait()
     
     if CountryData then
         local myCountry = CountryData:FindFirstChild(myCountryName)
@@ -190,29 +221,34 @@ if myCountryName then
             if Factories then
                 print("[OK] Factories folder in CountryData")
                 for _, factory in ipairs(Factories:GetChildren()) do
+                    maybeYield()
                     local factoryType = factory:GetAttribute("FactoryType") or factory:GetAttribute("Type") or factory.Name
                     print(string.format("     Factory: %s (Type: %s)", factory.Name, factoryType))
                 end
             else
                 print("[INFO] No Factories folder in your CountryData")
             end
+            task.wait()
             
             local Buildings = myCountry:FindFirstChild("Buildings")
             if Buildings then
                 print("[OK] Buildings folder in CountryData")
                 for _, building in ipairs(Buildings:GetChildren()) do
+                    maybeYield()
                     local buildingType = building:GetAttribute("Type") or building.Name
                     print(string.format("     Building: %s (Type: %s)", building.Name, buildingType))
                 end
             else
                 print("[INFO] No Buildings folder in your CountryData")
             end
+            task.wait()
             
             -- Check resources
             local Resources = myCountry:FindFirstChild("Resources")
             if Resources then
                 print("[OK] Resources folder found")
                 for _, res in ipairs(Resources:GetChildren()) do
+                    maybeYield()
                     local flow = res:FindFirstChild("Flow")
                     local flowVal = flow and flow.Value or 0
                     print(string.format("     Resource: %s (Flow: %.2f)", res.Name, flowVal))
@@ -222,6 +258,7 @@ if myCountryName then
             print("[MISSING] Your country not found in CountryData")
         end
     end
+    task.wait()
     
     -- Check Baseplate for your factories
     if Baseplate then
@@ -232,6 +269,7 @@ if myCountryName then
                 print("")
                 print(string.format("[OK] Your buildings in Baseplate.Buildings.%s:", myCountryName))
                 for _, building in ipairs(myBuildings:GetChildren()) do
+                    maybeYield()
                     print(string.format("     Building: \"%s\" (Class: %s)", building.Name, building.ClassName))
                     local attrs = building:GetAttributes()
                     for attrName, attrVal in pairs(attrs) do
@@ -240,6 +278,7 @@ if myCountryName then
                 end
             end
         end
+        task.wait()
         
         local Factories = Baseplate:FindFirstChild("Factories")
         if Factories then
@@ -248,6 +287,7 @@ if myCountryName then
                 print("")
                 print(string.format("[OK] Your factories in Baseplate.Factories.%s:", myCountryName))
                 for _, factory in ipairs(myFactories:GetChildren()) do
+                    maybeYield()
                     print(string.format("     Factory: \"%s\" (Class: %s)", factory.Name, factory.ClassName))
                     local attrs = factory:GetAttributes()
                     for attrName, attrVal in pairs(attrs) do
@@ -263,5 +303,5 @@ end
 
 print("")
 print("═══════════════════════════════════════════════════════════════")
-print("  COPY THIS OUTPUT AND SHARE IT FOR DEBUGGING")
+print("  DEBUG COMPLETE - COPY OUTPUT ABOVE FOR DEBUGGING")
 print("═══════════════════════════════════════════════════════════════")
