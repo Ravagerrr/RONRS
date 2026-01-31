@@ -73,8 +73,17 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         local canAfford = data.revenue / actualPricePerUnit
         affordable = math.min(resource.capAmount, canAfford)
     else
-        -- Consumer Goods: NO CAP, only limited by what they can afford at this price
-        affordable = data.revenue / actualPricePerUnit
+        -- Consumer Goods: Limited by negative flow (demand) AND what they can afford
+        local canAfford = data.revenue / actualPricePerUnit
+        -- If country has negative flow (consuming), that's their max demand
+        -- Use absolute value of flow as the max they want to buy
+        if data.flow < 0 then
+            local maxDemand = math.abs(data.flow)
+            affordable = math.min(canAfford, maxDemand)
+        else
+            -- If flow is positive or zero, just use what they can afford
+            affordable = canAfford
+        end
     end
     
     if affordable < Config.MinAmount then return false, false, "Insufficient" end
@@ -91,8 +100,8 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     retryState[resName .. "_price"] = price
     
     local totalCost = amount * actualPricePerUnit
-    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Rev:$%.0f Cost:$%.0f", 
-        i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.revenue, totalCost), "info")
+    UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Flow:%.2f Rev:$%.0f Cost:$%.0f", 
+        i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
