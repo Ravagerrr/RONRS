@@ -20,7 +20,7 @@ local function attemptTrade(country, resource, amount, price)
     local before = Helpers.getTradeCount(country, resource.gameName)
     
     pcall(function()
-        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Buy", amount, price, "Trade"})
+        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
     task.wait(Config.WaitTime)
@@ -92,7 +92,7 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u)", i, total, icon, name, amount, price, actualPricePerUnit), "info")
     
-    if attemptTrade(country, resource, amount, actualPricePerUnit) then
+    if attemptTrade(country, resource, amount, price) then
         UI.log(string.format("[%d/%d] %s OK %s", i, total, icon, name), "success")
         return true, false, nil
     else
