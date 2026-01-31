@@ -1,8 +1,9 @@
 --[[
-    Trade Hub v4.2.014 - Multi-Resource
+    Trade Hub v4.2.015 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
+    v4.2.015 - Auto-Buy now detects factory consumption (Electronics Factory, etc.) and buys required materials
     v4.2.014 - Trade verification now uses retry polling (5 attempts x 0.2s) for reliable detection
     v4.2.013 - Auto-Buy no longer buys when no city deficit and flow >= 0 (fixes random Titanium buying)
     v4.2.012 - Auto-Buy now correctly subtracts current flow from city deficit before buying
