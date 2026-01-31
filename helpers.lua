@@ -337,77 +337,50 @@ M.FactoryConsumption = {
 }
 
 -- Get all factories owned by the player's country
--- Searches in workspace.Baseplate.Buildings.[CountryName] and other common locations
+-- Searches in workspace.Baseplate.Cities.[Country].[City].Buildings for each controlled city
+-- This function dynamically scans all cities each time it's called to detect newly built factories
 function M.getFactories()
     local factories = {}
     if not M.myCountryName then return factories end
     
-    -- Try multiple common factory storage locations
-    local searchPaths = {}
+    -- Get all controlled cities and check each city's Buildings folder
+    -- Path: workspace.Baseplate.Cities.[Country].[City].Buildings
+    local cities = M.getControlledCities()
     
-    local baseplate = workspace:FindFirstChild("Baseplate")
-    if baseplate then
-        -- Try Buildings folder
-        local buildings = baseplate:FindFirstChild("Buildings")
-        if buildings then
-            local countryBuildings = buildings:FindFirstChild(M.myCountryName)
-            if countryBuildings then
-                table.insert(searchPaths, countryBuildings)
-            end
-        end
-        
-        -- Try Factories folder
-        local factoriesFolder = baseplate:FindFirstChild("Factories")
-        if factoriesFolder then
-            local countryFactories = factoriesFolder:FindFirstChild(M.myCountryName)
-            if countryFactories then
-                table.insert(searchPaths, countryFactories)
-            end
-        end
-    end
-    
-    -- Also check in CountryData for factory info
-    if M.myCountry then
-        local countryFactories = M.myCountry:FindFirstChild("Factories")
-        if countryFactories then
-            table.insert(searchPaths, countryFactories)
-        end
-        
-        local countryBuildings = M.myCountry:FindFirstChild("Buildings")
-        if countryBuildings then
-            table.insert(searchPaths, countryBuildings)
-        end
-    end
-    
-    -- Search all paths for factories
-    for _, folder in ipairs(searchPaths) do
-        for _, obj in ipairs(folder:GetChildren()) do
-            -- Check if this is a factory we recognize
-            local factoryType = obj.Name
-            -- Also check for FactoryType attribute
-            local typeAttr = obj:GetAttribute("FactoryType") or obj:GetAttribute("Type")
-            if typeAttr then
-                factoryType = typeAttr
-            end
-            
-            if M.FactoryConsumption[factoryType] then
-                table.insert(factories, {
-                    name = factoryType,
-                    instance = obj,
-                })
-            else
-                -- Try partial matching for factory names (e.g., "Electronics Factory 1")
-                -- Use pattern anchoring to match from the start of the string
-                for knownFactory, _ in pairs(M.FactoryConsumption) do
-                    -- Match full factory name at start (e.g., "Electronics Factory" in "Electronics Factory 1")
-                    -- or match factory type without " Factory" suffix (e.g., "Electronics" in "Electronics 1")
-                    local shortName = knownFactory:gsub(" Factory", ""):gsub(" Mill", "")
-                    if string.find(obj.Name, "^" .. knownFactory) or string.find(obj.Name, "^" .. shortName) then
-                        table.insert(factories, {
-                            name = knownFactory,
-                            instance = obj,
-                        })
-                        break
+    for _, city in ipairs(cities) do
+        local buildingsFolder = city:FindFirstChild("Buildings")
+        if buildingsFolder then
+            -- Check each building in the city's Buildings folder
+            for _, obj in ipairs(buildingsFolder:GetChildren()) do
+                -- Check if this is a factory we recognize
+                local factoryType = obj.Name
+                -- Also check for FactoryType attribute
+                local typeAttr = obj:GetAttribute("FactoryType") or obj:GetAttribute("Type")
+                if typeAttr then
+                    factoryType = typeAttr
+                end
+                
+                if M.FactoryConsumption[factoryType] then
+                    table.insert(factories, {
+                        name = factoryType,
+                        instance = obj,
+                        city = city.Name,
+                    })
+                else
+                    -- Try partial matching for factory names (e.g., "Electronics Factory 1")
+                    -- Use pattern anchoring to match from the start of the string
+                    for knownFactory, _ in pairs(M.FactoryConsumption) do
+                        -- Match full factory name at start (e.g., "Electronics Factory" in "Electronics Factory 1")
+                        -- or match factory type without " Factory" suffix (e.g., "Electronics" in "Electronics 1")
+                        local shortName = knownFactory:gsub(" Factory", ""):gsub(" Mill", "")
+                        if string.find(obj.Name, "^" .. knownFactory) or string.find(obj.Name, "^" .. shortName) then
+                            table.insert(factories, {
+                                name = knownFactory,
+                                instance = obj,
+                                city = city.Name,
+                            })
+                            break
+                        end
                     end
                 end
             end
