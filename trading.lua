@@ -164,6 +164,12 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     UI.log(string.format("  ✓ ATTEMPTING TRADE: %.2f units @ %.1fx ($%.2f/u) = $%.2f total", 
         amount, price, actualPricePerUnit, amount * actualPricePerUnit), "success")
     
+    -- FINAL CHECK: Make sure resource is still enabled right before sending trade
+    if not resource.enabled then
+        UI.log(string.format("  !!! ABORTED: %s was disabled during calculation", resource.gameName), "warning")
+        return false, false, "Disabled Mid-Process"
+    end
+    
     if attemptTrade(country, resource, amount, price) then
         UI.log(string.format("  ✓✓ TRADE SUCCESS! %s bought %.2f %s @ %.1fx", 
             name, amount, resName, price), "success")
