@@ -69,8 +69,11 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
-    -- Get price tier FIRST
-    local price = Helpers.getPriceTier(data.revenue)
+    -- Get optimal price tier based on what country can afford (smart pricing)
+    local price = Helpers.getPriceTier(data.revenue, resource, data)
+    
+    -- If smart pricing returned nil, country can't afford at any tier
+    if not price then return false, false, "Cannot Afford" end
     
     if isRetry and retryState[resName .. "_price"] then
         price = Helpers.getNextPriceTier(retryState[resName .. "_price"])
@@ -178,8 +181,9 @@ function M.run()
         for _, res in ipairs(Helpers.getEnabledResources()) do
             local data = Helpers.getCountryResourceData(debugCountry, res)
             if data.valid then
-                local priceTier = Helpers.getPriceTier(data.revenue)
-                local actualPricePerUnit = res.buyPrice * priceTier
+                local priceTier = Helpers.getPriceTier(data.revenue, res, data)
+                local tierStr = priceTier and string.format("%.1fx", priceTier) or "N/A (cannot afford)"
+                local actualPricePerUnit = priceTier and res.buyPrice * priceTier or 0
                 local maxAffordable = 0
                 if actualPricePerUnit > 0 then
                     maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
@@ -188,7 +192,7 @@ function M.run()
                 UI.log(string.format("  %s:", res.gameName), "info")
                 UI.log(string.format("    Revenue: $%.0f | Balance: $%.0f", data.revenue, data.balance), "info")
                 UI.log(string.format("    Flow: %.2f | BuyAmount: %.2f | HasSell: %s", data.flow, data.buyAmount, tostring(data.hasSell)), "info")
-                UI.log(string.format("    PriceTier: %.1fx | PricePerUnit: $%.0f", priceTier, actualPricePerUnit), "info")
+                UI.log(string.format("    PriceTier: %s | PricePerUnit: $%.0f", tierStr, actualPricePerUnit), "info")
                 UI.log(string.format("    MaxSpend: $%.0f (%.0f%% of rev) | MaxAffordable: %.2f", 
                     data.revenue * Config.MaxRevenueSpendingPercent, Config.MaxRevenueSpendingPercent * 100, maxAffordable), "info")
             end

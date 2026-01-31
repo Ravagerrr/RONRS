@@ -1,5 +1,5 @@
 --[[
-    Trade Hub v4.2.017 - Multi-Resource
+    Trade Hub v1.0 - Multi-Resource
     Auto-start, simplified controls
     
     VERSION HISTORY:
@@ -49,7 +49,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v4.2.017")
+print("  Trade Hub v1.0")
 print("══════════════════════════")
 
 local Config = loadModule("config")

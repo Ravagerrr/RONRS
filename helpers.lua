@@ -198,9 +198,54 @@ function M.getCountryResourceData(country, resource)
     return data
 end
 
-function M.getPriceTier(revenue)
-    -- Start all countries at 1.0x (full price) to maximize revenue
-    return 1.0
+function M.getPriceTier(revenue, resource, countryData)
+    -- Smart pricing: Calculate optimal price tier based on what country can afford
+    -- This maximizes revenue by charging full price to countries that can afford it,
+    -- while automatically discounting for countries that can't
+    
+    if not resource or not countryData then
+        -- Fallback to full price if no resource info provided
+        return 1.0
+    end
+    
+    local priceTiers = {1.0, 0.5, 0.1}
+    
+    for _, tier in ipairs(priceTiers) do
+        local actualPricePerUnit = resource.buyPrice * tier
+        if actualPricePerUnit <= 0 then
+            continue
+        end
+        
+        -- Calculate what they can afford at this price tier
+        local maxAffordable = (revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+        
+        -- Determine minimum amount needed for a successful trade
+        local minNeeded
+        if resource.hasCap then
+            -- Electronics: Must afford at least MinAmount up to capAmount
+            minNeeded = Config.MinAmount
+        else
+            -- Consumer Goods: Must afford at least MinAmount, but also check demand
+            if countryData.flow < 0 then
+                local maxDemand = math.abs(countryData.flow)
+                -- They need to afford at least the minimum of their demand or MinAmount
+                minNeeded = math.min(maxDemand, Config.MinAmount)
+            else
+                minNeeded = Config.MinAmount
+            end
+        end
+        
+        -- Also need to account for what they're already buying
+        local remaining = maxAffordable - countryData.buyAmount
+        
+        -- If they can afford at least the minimum at this tier, use this tier
+        if remaining >= minNeeded then
+            return tier
+        end
+    end
+    
+    -- Can't afford at any tier
+    return nil
 end
 
 function M.getNextPriceTier(current)
