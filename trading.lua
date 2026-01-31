@@ -115,8 +115,10 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     else
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
+            UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")
             return false, true, "Queued"
         end
+        UI.log(string.format("[%d/%d] FAIL %s %s", i, total, resource.gameName, name), "warning")
         return false, false, "No Buyers"
     end
 end

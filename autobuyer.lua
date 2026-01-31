@@ -2,6 +2,9 @@
     AUTOBUYER MODULE
     Auto-buy Monitor for Resource Flow Protection
     
+    v4.2.013: Fixed random buying when no city deficit exists - now only buys if flow is negative.
+    v4.2.012: Fixed deficit calculation to subtract current flow from city deficit.
+              Added detailed debug prints throughout the buying process.
     v4.2.011: Reads resource deficits directly from city Resources attributes.
     The game stores deficits at: workspace.Baseplate.Cities.[Country].[City].Resources
     where attributes like "Iron = -4" indicate a deficit of 4 Iron.
@@ -127,110 +130,132 @@ end
 
 -- Check and buy for a single resource
 local function checkAndBuyResource(resource)
+    print(string.format("[AutoBuy] ========== Checking %s ==========", resource.gameName))
+    
     local flowBefore = getAutoBuyResourceFlow(resource.gameName)
+    print(string.format("[AutoBuy] %s | Current Flow: %.2f", resource.gameName, flowBefore))
     
     -- Calculate target: we want flow to be at least AutoBuyTargetSurplus (e.g., 0.1)
     local targetFlow = Config.AutoBuyTargetSurplus
+    print(string.format("[AutoBuy] %s | Target Surplus: %.2f", resource.gameName, targetFlow))
     
     -- Check city resource deficits - reads from workspace.Baseplate.Cities.[Country].[City].Resources
     -- This is more reliable than flow which can be tricked by the game
     local cityDeficit = Helpers.getResourceDeficit(resource.gameName)
+    print(string.format("[AutoBuy] %s | Raw City Deficit: %.2f", resource.gameName, cityDeficit))
     
     -- If cities show a deficit for this resource, we need to buy
     -- Otherwise fall back to flow-based check
     local neededAmount = 0
     
     if cityDeficit > 0 then
-        -- City-based deficit: the game already calculated what we're missing
-        -- Add target surplus to ensure we're not running at exactly 0
-        neededAmount = cityDeficit + targetFlow
+        -- City-based deficit: what cities need minus our current production
+        -- If we have positive flow (production), it offsets the city deficit
+        -- Only buy the difference that isn't covered by our own production
+        local positiveFlow = math.max(0, flowBefore)
+        -- Subtract our production from city needs: e.g., cities need 100, we produce 50, so we only need to buy 50
+        local actualDeficit = math.max(0, cityDeficit - positiveFlow)
+        neededAmount = actualDeficit + targetFlow
         
-        print(string.format("[AutoBuy] %s - City deficit check: Deficit=%.2f, Needed=%.2f", 
-            resource.gameName, cityDeficit, neededAmount))
+        print(string.format("[AutoBuy] %s | Calculation: CityDeficit(%.2f) - PositiveFlow(%.2f) = ActualDeficit(%.2f)", 
+            resource.gameName, cityDeficit, positiveFlow, actualDeficit))
+        print(string.format("[AutoBuy] %s | Final Need: ActualDeficit(%.2f) + TargetSurplus(%.2f) = %.2f", 
+            resource.gameName, actualDeficit, targetFlow, neededAmount))
     else
         -- Fallback to flow-based check if no city deficit exists
-        if flowBefore >= targetFlow then
-            print(string.format("[AutoBuy] %s flow %.2f >= target %.2f, skipping", resource.gameName, flowBefore, targetFlow))
-            return false, "Flow OK"
+        -- Only trigger if flow is NEGATIVE (actively consuming the resource)
+        -- If flow is >= 0 and no city deficit, we don't need this resource
+        print(string.format("[AutoBuy] %s | No city deficit, checking flow", resource.gameName))
+        if flowBefore >= 0 then
+            print(string.format("[AutoBuy] %s | Flow %.2f >= 0 and no city deficit, SKIPPING", resource.gameName, flowBefore))
+            return false, "No Need"
         end
-        neededAmount = targetFlow - flowBefore
+        -- Flow is negative - we're consuming more than producing
+        -- Buy enough to bring flow to target surplus
+        neededAmount = targetFlow - flowBefore  -- e.g., 0.1 - (-5) = 5.1
+        print(string.format("[AutoBuy] %s | Negative flow %.2f, need: %.2f to reach target %.2f", resource.gameName, flowBefore, neededAmount, targetFlow))
     end
     
     if neededAmount <= 0 then
-        print(string.format("[AutoBuy] %s - No deficit, skipping", resource.gameName))
+        print(string.format("[AutoBuy] %s | Needed amount %.2f <= 0, SKIPPING", resource.gameName, neededAmount))
         return false, "No Deficit"
     end
     
     if neededAmount < Config.MinAmount then
-        print(string.format("[AutoBuy] %s already at target (flow: %.2f, needed: %.2f)", resource.gameName, flowBefore, neededAmount))
+        print(string.format("[AutoBuy] %s | Need %.2f < MinAmount %.3f, SKIPPING", resource.gameName, neededAmount, Config.MinAmount))
         return false, "Already Buying"
     end
     
     -- Print status before buying
+    print(string.format("[AutoBuy] %s | >>> WILL BUY: Need %.2f units <<<", resource.gameName, neededAmount))
     if cityDeficit > 0 then
-        print(string.format("[AutoBuy] %s - City deficit: %.2f, Current flow: %.2f", 
-            resource.gameName, cityDeficit, flowBefore))
-        UI.log(string.format("[AutoBuy] %s city deficit: %.2f", resource.gameName, cityDeficit), "info")
+        UI.log(string.format("[AutoBuy] %s need: %.2f (flow: %.2f)", resource.gameName, neededAmount, flowBefore), "info")
     else
-        print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, target: %.2f, neededAmount: %.2f", 
-            resource.gameName, flowBefore, targetFlow, neededAmount))
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
     
     -- Find AI NPC countries selling this resource
     local sellers = findSellingCountries(resource.gameName)
+    print(string.format("[AutoBuy] %s | Found %d potential sellers", resource.gameName, #sellers))
     if #sellers == 0 then
-        print(string.format("[AutoBuy] No AI NPC sellers found for %s", resource.gameName))
+        print(string.format("[AutoBuy] %s | No sellers found, ABORTING", resource.gameName))
         UI.log(string.format("[AutoBuy] No sellers for %s", resource.gameName), "warning")
         return false, "No Sellers"
     end
     
     local boughtTotal = 0
+    local remainingNeed = neededAmount  -- Track remaining need during loop (neededAmount preserved for final summary)
     
-    for _, seller in ipairs(sellers) do
-        if neededAmount <= 0 then 
-            print(string.format("[AutoBuy] Needed amount fulfilled (%.2f), stopping search", neededAmount))
+    print(string.format("[AutoBuy] %s | Starting purchase loop, need %.2f", resource.gameName, remainingNeed))
+    
+    for idx, seller in ipairs(sellers) do
+        if remainingNeed <= 0 then 
+            print(string.format("[AutoBuy] %s | Remaining need %.2f <= 0, DONE", resource.gameName, remainingNeed))
             break 
         end
         
         -- AI NPCs can sell as much as needed - buy what we need up to their flow
         -- Can even put them in deficit if needed
-        local buyAmount = math.min(neededAmount, seller.flow)
+        local buyAmount = math.min(remainingNeed, seller.flow)
+        print(string.format("[AutoBuy] %s | Seller #%d: %s | SellerFlow=%.2f, RemainingNeed=%.2f, BuyAmount=%.2f", 
+            resource.gameName, idx, seller.name, seller.flow, remainingNeed, buyAmount))
+        
         if buyAmount < Config.MinAmount then 
-            print(string.format("[AutoBuy] %s has insufficient flow (%.2f), skipping", seller.name, seller.flow))
+            print(string.format("[AutoBuy] %s | %s buyAmount %.2f < MinAmount, skipping seller", resource.gameName, seller.name, buyAmount))
             continue 
         end
         
         -- AI NPCs ALWAYS use 1.0x price - they don't accept discounts when selling
         local price = 1.0
         
-        print(string.format("[AutoBuy] Attempting to buy %.2f %s from %s @ %.1fx (AI NPC - no discount)", 
-            buyAmount, resource.gameName, seller.name, price))
+        print(string.format("[AutoBuy] %s | Attempting: %.2f from %s @ %.1fx", resource.gameName, buyAmount, seller.name, price))
         UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx", 
             buyAmount, resource.gameName, seller.name, price), "info")
         
         if attemptBuy(seller, resource.gameName, buyAmount, price) then
             local flowAfter = getAutoBuyResourceFlow(resource.gameName)
-            print(string.format("[AutoBuy] SUCCESS: Bought %.2f %s from %s @ %.1fx | Flow: %.2f -> %.2f", 
-                buyAmount, resource.gameName, seller.name, price, flowBefore, flowAfter))
-            UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
             boughtTotal = boughtTotal + buyAmount
-            neededAmount = neededAmount - buyAmount
+            remainingNeed = remainingNeed - buyAmount
             M.purchases = M.purchases + 1
+            
+            print(string.format("[AutoBuy] %s | SUCCESS from %s: +%.2f | Total bought: %.2f | Remaining: %.2f | Flow: %.2f -> %.2f", 
+                resource.gameName, seller.name, buyAmount, boughtTotal, remainingNeed, flowBefore, flowAfter))
+            UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
         else
             -- AI NPCs don't accept flexibility - if 1.0x fails, move to next seller
-            print(string.format("[AutoBuy] FAILED: %s rejected purchase @ %.1fx, trying next seller", seller.name, price))
+            print(string.format("[AutoBuy] %s | FAILED from %s @ %.1fx, trying next", resource.gameName, seller.name, price))
             UI.log(string.format("[AutoBuy] Failed %s from %s, trying next", resource.gameName, seller.name), "warning")
         end
         
         task.wait(Config.ResourceDelay)
     end
     
+    print(string.format("[AutoBuy] %s | ========== COMPLETE: Bought %.2f / Needed %.2f ==========", resource.gameName, boughtTotal, neededAmount))
+    
     if boughtTotal > 0 then
-        print(string.format("[AutoBuy] Total bought for %s: %.2f", resource.gameName, boughtTotal))
         return true, string.format("Bought %.2f", boughtTotal)
     end
-    print(string.format("[AutoBuy] No purchases made for %s", resource.gameName))
+    print(string.format("[AutoBuy] %s | No purchases completed", resource.gameName))
     return false, "Failed"
 end
 
