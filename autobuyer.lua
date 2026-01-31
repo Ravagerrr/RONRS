@@ -28,23 +28,6 @@ local function getAutoBuyResourceFlow(resourceGameName)
     return f and f.Value or 0
 end
 
--- Get how much we're already buying of this resource
-local function getCurrentBuyAmount(resourceGameName)
-    if not Helpers.myCountry then return 0 end
-    local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
-    if not res then return 0 end
-    local trade = res:FindFirstChild("Trade")
-    if not trade then return 0 end
-    
-    local buyAmount = 0
-    for _, obj in ipairs(trade:GetChildren()) do
-        if obj:IsA("Vector3Value") and obj.Value.X > 0.01 then
-            buyAmount = buyAmount + obj.Value.X
-        end
-    end
-    return buyAmount
-end
-
 -- Find AI NPC countries that can sell a resource (positive flow producers)
 -- AI NPCs don't have selling restrictions - can buy as much as needed, even put them in deficit
 local function findSellingCountries(resourceGameName)
@@ -152,19 +135,18 @@ local function checkAndBuyResource(resource)
     
     -- Calculate how much we need to reach the target surplus
     -- e.g., if flow is -0.5 and target is 0.1, we need 0.6
-    local deficit = targetFlow - flowBefore
-    local currentBuying = getCurrentBuyAmount(resource.gameName)
+    -- NOTE: flowBefore already includes the effect of all active buy/sell trades,
+    -- so we don't need to subtract currentBuying - that would double-count
+    local neededAmount = targetFlow - flowBefore
     
-    -- Calculate how much more we need to buy
-    local neededAmount = deficit - currentBuying
     if neededAmount < Config.MinAmount then
-        print(string.format("[AutoBuy] %s already buying enough (current: %.2f, needed: %.2f)", resource.gameName, currentBuying, neededAmount))
+        print(string.format("[AutoBuy] %s already at target (flow: %.2f, needed: %.2f)", resource.gameName, flowBefore, neededAmount))
         return false, "Already Buying"
     end
     
     -- Print flow before buying
-    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, deficit: %.2f, currentBuying: %.2f, neededAmount: %.2f", 
-        resource.gameName, flowBefore, deficit, currentBuying, neededAmount))
+    print(string.format("[AutoBuy] %s - Flow BEFORE: %.2f, target: %.2f, neededAmount: %.2f", 
+        resource.gameName, flowBefore, targetFlow, neededAmount))
     UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     
     -- Find AI NPC countries selling this resource
