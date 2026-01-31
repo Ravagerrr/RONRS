@@ -25,9 +25,11 @@ function M.log(msg, msgType)
     local entry = string.format("[%s] %s", os.date("%H:%M:%S"), msg)
     table.insert(M.Logs, 1, entry)
     if #M.Logs > 100 then table.remove(M.Logs) end
+    
+    -- Always print to console, never skip
     warn(entry)
     
-    -- Only update UI if enough time has passed (throttle to 10 updates per second max)
+    -- Only throttle UI updates, not console printing
     local now = tick()
     if now - M.lastLogUpdate > 0.1 then
         M.lastLogUpdate = now

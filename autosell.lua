@@ -24,9 +24,10 @@ function M.start()
     
     task.spawn(function()
         while M.isMonitoring do
-            -- Check if auto-sell is still enabled in config
+            -- Check if auto-sell is still enabled in config (check more frequently)
             if not Config.AutoSellEnabled then
                 M.isMonitoring = false
+                UI.log("🤖 Auto-Sell: OFF", "warning")
                 break
             end
             
@@ -36,6 +37,13 @@ function M.start()
                 local totalAvail = Helpers.getTotalAvailableFlow()
                 
                 if totalAvail >= Config.AutoSellThreshold then
+                    -- Check again right before starting trade
+                    if not Config.AutoSellEnabled then
+                        M.isMonitoring = false
+                        UI.log("🤖 Auto-Sell: OFF", "warning")
+                        break
+                    end
+                    
                     local triggered = {}
                     for _, res in ipairs(Helpers.getEnabledResources()) do
                         local avail = Helpers.getAvailableFlow(res)
@@ -50,7 +58,16 @@ function M.start()
                     
                     task.spawn(Trading.run)
                     
-                    while State.isRunning do task.wait(0.5) end
+                    while State.isRunning do 
+                        -- Check auto-sell state even while trade is running
+                        if not Config.AutoSellEnabled then
+                            Trading.stop()  -- Use Trading module's stop function
+                            M.isMonitoring = false
+                            UI.log("🤖 Auto-Sell disabled - stopping trade", "warning")
+                            break
+                        end
+                        task.wait(0.5) 
+                    end
                 end
             end
             

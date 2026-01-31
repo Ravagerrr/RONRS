@@ -29,7 +29,9 @@ end
 
 function M.processCountryResource(country, resource, i, total, buyers, retryState)
     if not State.isRunning then return false, false, "Stopped" end
-    if not resource.enabled then return false, false, "Disabled" end
+    -- Check Config directly to respect real-time toggle changes
+    local configResource = Helpers.getResourceByName(resource.name)
+    if not configResource or not configResource.enabled then return false, false, "Disabled" end
     
     local name = country.Name
     local resName = resource.name
@@ -142,7 +144,9 @@ function M.run()
         
         for _, resource in ipairs(enabledResources) do
             if not State.isRunning then break end
-            if not resource.enabled then continue end
+            -- Check Config directly to respect real-time toggle changes
+            local configResource = Helpers.getResourceByName(resource.name)
+            if not configResource or not configResource.enabled then continue end
             
             local avail = Helpers.getAvailableFlow(resource)
             if avail < Config.MinAmount then continue end
@@ -194,7 +198,9 @@ function M.run()
             
             for idx, item in ipairs(queue) do
                 if not State.isRunning then break end
-                if not item.resource.enabled then continue end
+                -- Check Config directly to respect real-time toggle changes
+                local configResource = Helpers.getResourceByName(item.resource.name)
+                if not configResource or not configResource.enabled then continue end
                 
                 local avail = Helpers.getAvailableFlow(item.resource)
                 if avail < Config.MinAmount then
