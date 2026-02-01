@@ -207,7 +207,7 @@ end
 
 -- Get country data for specific resource
 function M.getCountryResourceData(country, resource)
-    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false}
+    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false, tax = 0, population = 0, ranking = 0}
     
     local eco = country:FindFirstChild("Economy")
     if not eco then return data end
@@ -221,8 +221,15 @@ function M.getCountryResourceData(country, resource)
     
     data.valid = true
     data.revenue = rev:GetAttribute("Total") or 0
+    data.tax = rev:GetAttribute("Tax") or 0
     data.balance = bal.Value or 0
     data.flow = res:FindFirstChild("Flow") and res.Flow.Value or 0
+    
+    -- Get population and ranking for algorithm analysis
+    local pop = country:FindFirstChild("Population")
+    data.population = pop and pop.Value or 0
+    local rank = country:FindFirstChild("Ranking")
+    data.ranking = rank and rank.Value or 0
     
     for _, obj in ipairs(trade:GetChildren()) do
         if obj:IsA("Vector3Value") then

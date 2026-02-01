@@ -136,13 +136,23 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     retryState[resName .. "_price"] = price
     
     local totalCost = amount * actualPricePerUnit
+    local costPercent = (totalCost / data.revenue) * 100
+    
+    -- Compact debug log for algorithm analysis
+    -- Format: Country|Res|Amt|Price|Cost|Rev|Cost%|Tax|Bal|Pop|Rank|Flow
+    print(string.format("DBG|%s|%s|%.1f|%.1fx|$%.0f|$%.0f|%.1f%%|$%.0f|$%.0f|%.0f|%.0f|%.1f",
+        name, resource.gameName:sub(1,4), amount, price, totalCost, data.revenue, 
+        costPercent, data.tax, data.balance, data.population, data.ranking, data.flow))
+    
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Flow:%.2f Rev:$%.0f Cost:$%.0f", 
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
+        print(string.format("DBG|%s|%s|OK", name, resource.gameName:sub(1,4)))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         return true, false, nil
     else
+        print(string.format("DBG|%s|%s|FAIL", name, resource.gameName:sub(1,4)))
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
             UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")
