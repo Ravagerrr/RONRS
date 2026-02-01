@@ -79,9 +79,17 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 | `config.lua` | Revenue spending tiers, retry settings |
 | `autosell.lua` | Triggers trading when flow exceeds threshold |
 | `autobuyer.lua` | Auto-buys resources when needed |
-| `ui.lua` | Rayfield UI, logging |
+| `ui.lua` | Rayfield UI v2.0 - Dashboard, Resources, Automation, Settings, Logs |
+| `main.lua` | Entry point, module loader |
 | `TRADE_ANALYSIS.md` | Detailed analysis documentation |
 | `CONTEXT.md` | **THIS FILE** - read first, update last |
+
+### UI v2.0 Tab Structure
+1. **Dashboard** - Status overview (country, state, auto-sell/buy), resource flow, emergency stop
+2. **Resources** - Sell resource toggles + Buy resource toggles (all in one place)
+3. **Automation** - Auto-Sell settings + Auto-Buy settings (enable, thresholds, intervals)
+4. **Settings** - Flow protection, timing, trade filters
+5. **Logs** - Activity log with copy/clear buttons
 
 ---
 
@@ -125,6 +133,17 @@ When user pastes TRADE| lines, analyze for:
 ---
 
 ## 📝 Session Log
+
+### Session 2026-02-01 02:54
+- **UI v2.0 Reorganization** - Complete UI overhaul for better navigation:
+  - **Dashboard** - Status overview with combined labels (country, status, auto-sell/buy in one line)
+  - **Resources** - All resource toggles in one place (Sell + Buy resources)
+  - **Automation** - Auto-Sell & Auto-Buy feature settings (clean separation)
+  - **Settings** - Core settings only (Flow Protection, Timing, Filters)
+  - **Logs** - Activity log with copy/clear
+- Reduced redundancy: Combined 6 status labels into 4 cleaner ones
+- Better organization: Resources grouped by function, not scattered across tabs
+- Updated version to v2.0
 
 ### Session 2026-02-01 02:51
 - Added context that Consumer Goods is a 100% aced algo (trades always accepted)
