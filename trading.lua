@@ -143,6 +143,15 @@ end
 function M.run()
     if State.isRunning then return end
     
+    -- Refresh country in case player switched or just selected one
+    Helpers.refreshMyCountry()
+    
+    -- Early exit if no country selected
+    if not Helpers.hasCountry() then
+        UI.log("No country selected, skipping trade run", "warning")
+        return
+    end
+    
     -- Early exit if no resources are enabled
     local enabledResources = Helpers.getEnabledResources()
     if #enabledResources == 0 then

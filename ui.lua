@@ -101,6 +101,19 @@ function M.updateAutoBuy()
     end)
 end
 
+function M.updateCountry()
+    if not M.Elements.CountryLabel then return end
+    pcall(function()
+        -- Refresh country to get latest status
+        Helpers.refreshMyCountry()
+        if Helpers.myCountryName then
+            M.Elements.CountryLabel:Set("Country: " .. Helpers.myCountryName)
+        else
+            M.Elements.CountryLabel:Set("Country: Not Selected")
+        end
+    end)
+end
+
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
         Name = "Trade Hub v1.4",
@@ -111,6 +124,7 @@ function M.createWindow()
     local Home = Window:CreateTab("Home", 4483362458)
     
     Home:CreateSection("Status")
+    M.Elements.CountryLabel = Home:CreateLabel("Country: Loading...")
     M.Elements.StatusLabel = Home:CreateLabel("[IDLE]")
     M.Elements.ProgressLabel = Home:CreateLabel("Progress: 0/0")
     M.Elements.StatsLabel = Home:CreateLabel("OK:0 Skip:0 Fail:0")
@@ -222,6 +236,7 @@ function M.createWindow()
     end
     
     M.updateStats()
+    M.updateCountry()
     
     task.spawn(function()
         while true do
@@ -229,6 +244,7 @@ function M.createWindow()
             M.updateStats()
             M.updateAutoSell()
             M.updateAutoBuy()
+            M.updateCountry()
         end
     end)
     
