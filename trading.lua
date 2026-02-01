@@ -20,32 +20,28 @@ local function attemptTrade(country, resource, amount, price)
     -- Check our trade folder for existing sales to this country BEFORE the trade
     local beforeAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
     
-    -- Game mechanic: trades can fail randomly even with valid parameters
-    -- Solution: Re-fire the trade request multiple times if not accepted
-    -- This keeps the same price tier instead of unnecessarily lowering price
-    local maxTradeAttempts = 3
-    local pollsPerAttempt = 3
+    -- Fire the trade request once
+    -- If it fails, the queue-based retry system handles re-attempting after other countries
+    -- This respects the game's ~10 second cooldown between trades with the same country
+    pcall(function()
+        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
+    end)
+    
+    -- Poll to verify trade was registered
+    local maxPolls = 5
     local pollInterval = 0.2
     
-    for tradeAttempt = 1, maxTradeAttempts do
-        pcall(function()
-            ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
-        end)
+    for poll = 1, maxPolls do
+        task.wait(pollInterval)
         
-        -- Poll to verify trade was registered
-        for poll = 1, pollsPerAttempt do
-            task.wait(pollInterval)
-            
-            local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
-            if afterAmount > beforeAmount then
-                return true
-            end
+        local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
+        if afterAmount > beforeAmount then
+            return true
         end
-        
-        -- Trade not accepted yet, will retry the request
     end
     
-    -- Trade not verified after all attempts
+    -- Trade not verified - will be queued for retry at lower price tier
+    -- The queue processes other countries first, naturally respecting the cooldown
     return false
 end
 
