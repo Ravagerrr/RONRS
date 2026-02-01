@@ -19,6 +19,8 @@ M.Elements = {}
 M.Logs = {}
 M.Rayfield = Rayfield
 M.lastLogUpdate = 0
+M.Window = nil
+M.isRunning = true  -- Controls the background update loop
 
 function M.init(cfg, state, helpers, trading, autosell, autobuyer)
     Config = cfg
@@ -112,6 +114,8 @@ function M.updateCountry()
 end
 
 function M.createWindow()
+    M.isRunning = true  -- Enable background loop for this instance
+    
     local Window = Rayfield:CreateWindow({
         Name = "Trade Hub v2.0",
         LoadingTitle = "Loading...",
@@ -303,7 +307,7 @@ function M.createWindow()
     
     -- Background update loop
     task.spawn(function()
-        while true do
+        while M.isRunning do
             task.wait(1)
             M.updateStats()
             M.updateCountry()
@@ -323,7 +327,26 @@ function M.createWindow()
         end
     end)
     
+    M.Window = Window
     return Window
+end
+
+-- Cleanup function for re-injection
+function M.cleanup()
+    -- Stop background loop
+    M.isRunning = false
+    
+    -- Destroy Rayfield window
+    if Rayfield and Rayfield.Destroy then
+        pcall(function()
+            Rayfield:Destroy()
+        end)
+    end
+    
+    -- Clear references
+    M.Window = nil
+    M.Elements = {}
+    M.Logs = {}
 end
 
 return M
