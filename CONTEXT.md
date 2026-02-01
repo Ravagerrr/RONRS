@@ -134,6 +134,16 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-01 03:38
+- **FIX: Electronics skipping all countries** - Identified root cause and applied fix
+  - **Problem**: MinDemandFlow check (flow >= -0.1) was skipping countries with 0 flow
+  - **Root Cause**: Electronics (and other capped resources) sell to countries regardless of flow
+  - Countries don't naturally "consume" Electronics, so they have 0 flow, causing "No Demand" skip
+  - **Fix**: Added `not resource.hasCap` condition to MinDemandFlow check
+  - Capped resources (Electronics) now bypass the demand flow check
+  - Uncapped resources (Consumer Goods) still require negative flow (actual consumption)
+- Updated trading.lua line 86 with the fix
+
 ### Session 2026-02-01 02:54
 - **UI v2.0 Reorganization** - Complete UI overhaul for better navigation:
   - **Dashboard** - Status overview with combined labels (country, status, auto-sell/buy in one line)
