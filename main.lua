@@ -55,6 +55,7 @@ end
 local State = {
     isRunning = false,
     retryQueue = {},
+    flowQueue = {},  -- Queue for trades limited by flow protection
     Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
 }
 

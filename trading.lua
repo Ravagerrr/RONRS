@@ -138,6 +138,10 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local amount = math.min(remaining, avail)
     if amount < Config.MinAmount then return false, false, "Flow Protection" end
     
+    -- Track if this trade is flow-limited (wanted more than we could sell)
+    local isFlowLimited = remaining > avail and (remaining - amount) >= Config.MinAmount
+    local flowLimitedAmount = remaining - amount  -- Amount we wanted but couldn't sell due to flow
+    
     if not retryState then retryState = {} end
     retryState[resName .. "_price"] = price
     
@@ -158,6 +162,12 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|OK",
             name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
+        
+        -- If trade was flow-limited, queue the remaining amount for later
+        if isFlowLimited and Config.FlowQueueEnabled then
+            M.queueFlowLimitedTrade(country, configResource, flowLimitedAmount, price, data)
+        end
+        
         return true, false, nil
     else
         print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|FAIL",
@@ -170,6 +180,146 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         UI.log(string.format("[%d/%d] FAIL %s %s", i, total, resource.gameName, name), "warning")
         return false, false, "No Buyers"
     end
+end
+
+-- Queue a flow-limited trade for later processing
+-- Called when a trade succeeded but was limited by available flow
+function M.queueFlowLimitedTrade(country, resource, remainingAmount, price, countryData)
+    if not Config.FlowQueueEnabled then return end
+    if remainingAmount < Config.MinAmount then return end
+    
+    local name = country.Name
+    local resName = resource.name
+    
+    -- Create unique key for this country+resource combination
+    local key = name .. "_" .. resName
+    
+    -- Initialize flow queue if needed
+    if not State.flowQueue then State.flowQueue = {} end
+    
+    -- Add or update the queued trade
+    State.flowQueue[key] = {
+        country = country,
+        countryName = name,
+        resource = resource,
+        remainingAmount = remainingAmount,
+        price = price,
+        countryData = countryData,
+        queuedAt = tick(),
+        expiresAt = Config.FlowQueueTimeout > 0 and (tick() + Config.FlowQueueTimeout) or nil
+    }
+    
+    UI.log(string.format("[FLOW Q] Queued %.2f %s to %s (expires in %ds)", 
+        remainingAmount, resource.gameName, name, Config.FlowQueueTimeout), "info")
+    print(string.format("FLOWQ|ADD|%s|%s|%.2f|%.1fx|%ds", 
+        name, resName, remainingAmount, price, Config.FlowQueueTimeout))
+end
+
+-- Process the flow queue - attempt to complete queued trades when flow becomes available
+-- Returns number of successful trades
+function M.processFlowQueue()
+    if not Config.FlowQueueEnabled then return 0 end
+    if not State.flowQueue then State.flowQueue = {} return 0 end
+    
+    local now = tick()
+    local successCount = 0
+    local toRemove = {}
+    
+    for key, item in pairs(State.flowQueue) do
+        -- Check if expired
+        if item.expiresAt and now > item.expiresAt then
+            UI.log(string.format("[FLOW Q] Expired: %s %s", item.resource.gameName, item.countryName), "warning")
+            print(string.format("FLOWQ|EXPIRED|%s|%s|%.2f", item.countryName, item.resource.name, item.remainingAmount))
+            table.insert(toRemove, key)
+            continue
+        end
+        
+        -- Check if we have enough flow now
+        local avail = Helpers.getAvailableFlow(item.resource)
+        if avail < Config.MinAmount then continue end
+        
+        -- Check if country resource config is still enabled
+        local configResource = Helpers.getResourceByName(item.resource.name)
+        if not configResource or not configResource.enabled then
+            table.insert(toRemove, key)
+            continue
+        end
+        
+        -- Calculate how much we can sell now (up to remaining amount)
+        local sellAmount = math.min(item.remainingAmount, avail)
+        if sellAmount < Config.MinAmount then continue end
+        
+        -- Re-check that we're still selling to this country (trade wasn't cancelled)
+        local currentSelling = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
+        if currentSelling <= 0 then
+            -- Original trade was cancelled, remove from queue
+            UI.log(string.format("[FLOW Q] Original trade cancelled: %s %s", item.resource.gameName, item.countryName), "warning")
+            table.insert(toRemove, key)
+            continue
+        end
+        
+        -- Attempt the trade
+        UI.log(string.format("[FLOW Q] Trying %.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "info")
+        
+        local beforeAmount = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
+        
+        pcall(function()
+            local ManageAlliance = workspace:WaitForChild("GameManager"):WaitForChild("ManageAlliance")
+            ManageAlliance:FireServer(item.countryName, "ResourceTrade", {item.resource.gameName, "Sell", sellAmount, item.price, "Trade"})
+        end)
+        
+        -- Poll to verify trade was registered
+        local maxPolls = 5
+        local pollInterval = 0.2
+        local success = false
+        
+        for poll = 1, maxPolls do
+            task.wait(pollInterval)
+            local afterAmount = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
+            if afterAmount > beforeAmount then
+                success = true
+                break
+            end
+        end
+        
+        if success then
+            successCount = successCount + 1
+            item.remainingAmount = item.remainingAmount - sellAmount
+            
+            UI.log(string.format("[FLOW Q] OK +%.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "success")
+            print(string.format("FLOWQ|OK|%s|%s|%.2f|remaining:%.2f", 
+                item.countryName, item.resource.name, sellAmount, item.remainingAmount))
+            
+            -- If fully completed, remove from queue
+            if item.remainingAmount < Config.MinAmount then
+                UI.log(string.format("[FLOW Q] Complete: %s %s", item.resource.gameName, item.countryName), "success")
+                table.insert(toRemove, key)
+            else
+                -- Reset expiry timer since we made progress
+                if Config.FlowQueueTimeout > 0 then
+                    item.expiresAt = tick() + Config.FlowQueueTimeout
+                end
+            end
+        else
+            UI.log(string.format("[FLOW Q] Failed: %s %s", item.resource.gameName, item.countryName), "warning")
+            print(string.format("FLOWQ|FAIL|%s|%s|%.2f", item.countryName, item.resource.name, sellAmount))
+        end
+    end
+    
+    -- Remove completed/expired entries
+    for _, key in ipairs(toRemove) do
+        State.flowQueue[key] = nil
+    end
+    
+    return successCount
+end
+
+-- Get count of items in flow queue
+function M.getFlowQueueCount()
+    if not State.flowQueue then return 0 end
+    local count = 0
+    for _ in pairs(State.flowQueue) do count = count + 1 end
+    return count
 end
 
 function M.run()
