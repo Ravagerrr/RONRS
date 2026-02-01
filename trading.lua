@@ -20,15 +20,18 @@ local function attemptTrade(country, resource, amount, price)
     -- Check our trade folder for existing sales to this country BEFORE the trade
     local beforeAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
     
+    -- Fire the trade request once
+    -- If it fails, the queue-based retry system handles re-attempting after other countries
+    -- This respects the game's ~10 second cooldown between trades with the same country
     pcall(function()
         ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
-    -- Poll multiple times to verify trade was registered (server may take time to update)
-    local maxAttempts = 5
+    -- Poll to verify trade was registered
+    local maxPolls = 5
     local pollInterval = 0.2
     
-    for attempt = 1, maxAttempts do
+    for poll = 1, maxPolls do
         task.wait(pollInterval)
         
         local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
@@ -37,7 +40,8 @@ local function attemptTrade(country, resource, amount, price)
         end
     end
     
-    -- Trade not verified after all attempts
+    -- Trade not verified - will be queued for retry at lower price tier
+    -- The queue processes other countries first, naturally respecting the cooldown
     return false
 end
 
@@ -138,21 +142,24 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local totalCost = amount * actualPricePerUnit
     local costPercent = (totalCost / data.revenue) * 100
     
-    -- Compact debug log for algorithm analysis
-    -- Format: Country|Res|Amt|Price|Cost|Rev|Cost%|Tax|Bal|Pop|Rank|Flow
-    print(string.format("DBG|%s|%s|%.1f|%.1fx|$%.0f|$%.0f|%.1f%%|$%.0f|$%.0f|%.0f|%.0f|%.1f",
-        name, resource.gameName:sub(1,4), amount, price, totalCost, data.revenue, 
-        costPercent, data.tax, data.balance, data.population, data.ranking, data.flow))
+    -- Enhanced debug log for algorithm analysis
+    -- Format: TRADE|Country|Rank|Resource|PriceTier|Amount|Cost%|Revenue|Result
+    -- This format makes it easy to track each country's journey through price tiers
+    -- Example: TRADE|Slovakia|140|Cons|1.0x|1.31|4.85%|$221855|FAIL
+    --          TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
+    -- ^ Shows Slovakia (rank 140) failed 1.0x but succeeded at 0.5x
     
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Flow:%.2f Rev:$%.0f Cost:$%.0f", 
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
-        print(string.format("DBG|%s|%s|OK", name, resource.gameName:sub(1,4)))
+        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|OK",
+            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         return true, false, nil
     else
-        print(string.format("DBG|%s|%s|FAIL", name, resource.gameName:sub(1,4)))
+        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|FAIL",
+            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
             UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")
@@ -216,9 +223,10 @@ function M.run()
                 local priceTier = Helpers.getPriceTier(data.revenue, res, data)
                 local tierStr = priceTier and string.format("%.1fx", priceTier) or "N/A (cannot afford)"
                 local actualPricePerUnit = priceTier and res.buyPrice * priceTier or 0
+                local maxSpendingPercent = Helpers.getMaxSpendingPercent(data.revenue)
                 local maxAffordable = 0
                 if actualPricePerUnit > 0 then
-                    maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+                    maxAffordable = (data.revenue * maxSpendingPercent) / actualPricePerUnit
                 end
                 
                 UI.log(string.format("  %s:", res.gameName), "info")
@@ -226,7 +234,7 @@ function M.run()
                 UI.log(string.format("    Flow: %.2f | BuyAmount: %.2f | HasSell: %s", data.flow, data.buyAmount, tostring(data.hasSell)), "info")
                 UI.log(string.format("    PriceTier: %s | PricePerUnit: $%.0f", tierStr, actualPricePerUnit), "info")
                 UI.log(string.format("    MaxSpend: $%.0f (%.0f%% of rev) | MaxAffordable: %.2f", 
-                    data.revenue * Config.MaxRevenueSpendingPercent, Config.MaxRevenueSpendingPercent * 100, maxAffordable), "info")
+                    data.revenue * maxSpendingPercent, maxSpendingPercent * 100, maxAffordable), "info")
             end
         end
         UI.log("=== END DEBUG ===", "info")

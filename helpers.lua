@@ -241,76 +241,22 @@ function M.getCountryResourceData(country, resource)
 end
 
 function M.getPriceTier(revenue, resource, countryData)
-    -- Smart pricing: Calculate optimal price tier based on what country can afford
-    -- This maximizes revenue by charging full price to countries that can afford it,
-    -- while automatically discounting for countries that can't
-    -- 
-    -- IMPROVED: Now uses dynamic spending limits based on country size
-    -- Bigger countries are more lenient with high cost/revenue ratios
+    -- Strategy: Start at HIGHEST price tier (1.0x) to maximize revenue
+    -- Only drop to lower tiers as a last resort after retries fail
+    -- The attemptTrade function will retry at the same tier multiple times
     
     if not resource or not countryData then
-        -- Fallback to full price if no resource info provided
         return 1.0
     end
     
-    local priceTiers = {1.0, 0.5, 0.1}
-    -- Safety margin: prefer tiers where cost is well below the limit
-    -- This avoids trades that fail because they're exactly at the limit
-    local safetyMargin = 0.90 -- Only use this tier if cost is below 90% of max allowed
-    
-    -- Get dynamic spending limit based on country revenue (bigger = more lenient)
-    local maxSpendingPercent = M.getMaxSpendingPercent(revenue)
-    
-    for _, tier in ipairs(priceTiers) do
-        local actualPricePerUnit = resource.buyPrice * tier
-        if actualPricePerUnit <= 0 then
-            continue
-        end
-        
-        -- Calculate what they can afford at this price tier (using dynamic limit)
-        local maxAffordable = (revenue * maxSpendingPercent) / actualPricePerUnit
-        
-        -- Calculate the ACTUAL trade amount we would attempt
-        local expectedTradeAmount
-        if resource.hasCap then
-            -- Electronics: capped at capAmount
-            expectedTradeAmount = math.min(resource.capAmount, maxAffordable)
-        else
-            -- Consumer Goods: limited by their demand (negative flow) AND what they can afford
-            if countryData.flow < 0 then
-                local demand = math.abs(countryData.flow)
-                expectedTradeAmount = math.min(demand, maxAffordable)
-            else
-                expectedTradeAmount = maxAffordable
-            end
-        end
-        
-        -- Subtract what they're already buying (ensure non-negative)
-        expectedTradeAmount = math.max(0, expectedTradeAmount - countryData.buyAmount)
-        
-        -- Check if we can make a meaningful trade
-        if expectedTradeAmount < Config.MinAmount then
-            continue
-        end
-        
-        -- Calculate expected cost as percentage of revenue
-        local expectedCost = expectedTradeAmount * actualPricePerUnit
-        local spendingPercent = expectedCost / revenue
-        
-        -- Use this tier if spending is well below the limit (with safety margin)
-        -- OR if this is the lowest tier (0.1x) - must try something as fallback
-        if spendingPercent < (maxSpendingPercent * safetyMargin) or tier == 0.1 then
-            return tier
-        end
-        -- If spending is too close to the limit, try the next (lower) tier
-    end
-    
-    -- Can't afford at any tier
-    return nil
+    -- Start with full price (1.0x) - maximum revenue per unit
+    -- The retry mechanism will handle if this tier fails
+    return 1.0
 end
 
 function M.getNextPriceTier(current)
     -- Retry sequence: 1.0 -> 0.5 -> 0.1 -> nil
+    -- Each tier is only tried AFTER the previous tier fails multiple attempts
     if current >= 1.0 then return 0.5
     elseif current >= 0.5 then return 0.1
     else return nil end
