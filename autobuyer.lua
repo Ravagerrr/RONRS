@@ -1,5 +1,5 @@
 --[[
-    AUTOBUYER MODULE v1.4
+    AUTOBUYER MODULE v1.5
     Auto-buy Monitor for Resource Flow Protection
     
     Checks factory consumption and falls back to flow-based check.
@@ -224,9 +224,9 @@ local function checkAndBuyResource(resource)
             break 
         end
         
-        -- AI NPCs can sell as much as needed - buy what we need up to their flow
-        -- Can even put them in deficit if needed
-        local buyAmount = math.min(remainingNeed, seller.flow)
+        -- AI NPCs can sell as much as needed - buy full amount from one seller to minimize trades
+        -- Prioritize larger trades from fewer sellers to save time (AI NPCs can handle deficit)
+        local buyAmount = remainingNeed  -- Buy full needed amount from one seller
         print(string.format("[AutoBuy] %s | Seller #%d: %s | SellerFlow=%.2f, RemainingNeed=%.2f, BuyAmount=%.2f", 
             resource.gameName, idx, seller.name, seller.flow, remainingNeed, buyAmount))
         
@@ -251,6 +251,9 @@ local function checkAndBuyResource(resource)
             print(string.format("[AutoBuy] %s | SUCCESS from %s: +%.2f | Total bought: %.2f | Remaining: %.2f | Flow: %.2f -> %.2f", 
                 resource.gameName, seller.name, buyAmount, boughtTotal, remainingNeed, flowBefore, flowAfter))
             UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
+            
+            -- Exit loop immediately after successful purchase to minimize trades
+            break
         else
             -- AI NPCs don't accept flexibility - if 1.0x fails, move to next seller
             print(string.format("[AutoBuy] %s | FAILED from %s @ %.1fx, trying next", resource.gameName, seller.name, price))
