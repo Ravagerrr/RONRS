@@ -184,6 +184,20 @@ local function checkAndBuyResource(resource)
         return false, "No Deficit"
     end
     
+    -- Subtract existing incoming trades from needed amount
+    -- This prevents buying from new countries when we already have trade agreements covering the need
+    local existingIncoming = Helpers.getTotalIncomingTrade(resource.gameName)
+    if existingIncoming > 0 then
+        print(string.format("[AutoBuy] %s | Existing incoming trades: %.2f", resource.gameName, existingIncoming))
+        neededAmount = neededAmount - existingIncoming
+        print(string.format("[AutoBuy] %s | Adjusted need after incoming trades: %.2f", resource.gameName, neededAmount))
+    end
+    
+    if neededAmount <= 0 then
+        print(string.format("[AutoBuy] %s | Need satisfied by existing trades, SKIPPING", resource.gameName))
+        return false, "Already Covered"
+    end
+    
     if neededAmount < Config.MinAmount then
         print(string.format("[AutoBuy] %s | Need %.2f < MinAmount %.3f, SKIPPING", resource.gameName, neededAmount, Config.MinAmount))
         return false, "Needed amount too small"
@@ -192,8 +206,8 @@ local function checkAndBuyResource(resource)
     -- Print status before buying
     print(string.format("[AutoBuy] %s | >>> WILL BUY: Need %.2f units <<<", resource.gameName, neededAmount))
     if factoryConsumption > 0 then
-        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f)", 
-            resource.gameName, neededAmount, factoryConsumption, flowBefore), "info")
+        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, incoming: %.2f)", 
+            resource.gameName, neededAmount, factoryConsumption, flowBefore, existingIncoming), "info")
     else
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
