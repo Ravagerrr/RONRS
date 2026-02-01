@@ -44,6 +44,11 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
    - Do high-ranked (powerful) countries reject more?
    - Do low-ranked countries accept higher prices?
 
+4. **Consumer Goods is a 100% aced algorithm**
+   - Consumer Goods trades are accepted 100% of the time when price/amount is calculated correctly
+   - The algorithm for Consumer Goods has been perfected and AI countries always accept properly calculated trades
+   - When already trading with all AI countries, the script stops early (no need to print or attempt trades)
+
 ### Current Algorithm
 
 ```
@@ -120,6 +125,12 @@ When user pastes TRADE| lines, analyze for:
 ---
 
 ## 📝 Session Log
+
+### Session 2026-02-01 02:51
+- Added context that Consumer Goods is a 100% aced algo (trades always accepted)
+- Implemented early stopping when already trading with all AI countries for a resource
+- Script now detects when all AI countries are being traded with and skips unnecessary attempts
+- This prevents spam logging and wasted processing cycles
 
 ### Session 2026-02-01 02:00-02:37
 - Analyzed user's trade logs showing inconsistent acceptance

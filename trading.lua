@@ -211,6 +211,42 @@ function M.run()
     
     local totalCountries = #countries
     
+    -- Count AI countries (exclude own country and player countries)
+    -- This is used to detect when we're already trading with ALL AI countries
+    local aiCountryCount = 0
+    for _, country in ipairs(countries) do
+        if not (Config.SkipOwnCountry and country == Helpers.myCountry) and
+           not Helpers.isPlayerCountry(country.Name) then
+            aiCountryCount = aiCountryCount + 1
+        end
+    end
+    
+    -- Track which resources are already maxed out (trading with all AI countries)
+    -- Consumer Goods uses a 100% aced algo - trades always succeed when calculated correctly
+    -- If we're already trading with all AI countries for a resource, skip it entirely
+    local resourcesMaxedOut = {}
+    for _, res in ipairs(enabledResources) do
+        local currentBuyers = Helpers.getBuyerCount(res)
+        if currentBuyers >= aiCountryCount and aiCountryCount > 0 then
+            resourcesMaxedOut[res.name] = true
+            UI.log(string.format("%s: Already trading with all %d AI countries - skipping", res.gameName, aiCountryCount), "success")
+        end
+    end
+    
+    -- If ALL resources are maxed out, skip the entire trade run
+    local allMaxedOut = true
+    for _, res in ipairs(enabledResources) do
+        if not resourcesMaxedOut[res.name] then
+            allMaxedOut = false
+            break
+        end
+    end
+    if allMaxedOut then
+        UI.log("=== All resources maxed out - nothing to trade ===", "success")
+        State.isRunning = false
+        return
+    end
+    
     -- DEBUG: Log detailed info for an example country to understand acceptance/rejection
     if Config.DebugLogging and #countries > 0 then
         local debugCountry = countries[1]  -- First country (highest revenue)
@@ -255,6 +291,9 @@ function M.run()
         
         for _, resource in ipairs(enabledResources) do
             if not State.isRunning then break end
+            
+            -- Skip resources that are already maxed out (trading with all AI countries)
+            if resourcesMaxedOut[resource.name] then continue end
             
             -- CRITICAL: Always get fresh resource from Config, not the snapshot
             local configResource = Helpers.getResourceByName(resource.name)
