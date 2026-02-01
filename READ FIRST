@@ -1,3 +1,44 @@
+--[[
+================================================================================
+FIX APPLIED: Auto-Buy Over-Purchasing Bug (2026-02-01)
+================================================================================
+
+PROBLEM:
+The script was buying too much material (copper, gold, etc.). With 5 factories
+needing 12 copper total, it should buy 12.10 (12 + 0.1 overflow) ONCE.
+Instead, it kept buying 12.10 from EVERY country (Sweden, Turkey, Botswana, 
+India, Mongolia, etc.) - accumulating way too much.
+
+ROOT CAUSE:
+The auto-buy logic wasn't accounting for existing incoming trades when 
+calculating resource needs. After buying from one country:
+1. Script finds that country is now "already selling to us" and skips it
+2. Calculates the same need again (game's flow value doesn't update instantly)
+3. Buys from a NEW country, creating duplicate purchases
+
+FIX APPLIED (in autobuyer.lua and helpers.lua):
+1. Added getTotalIncomingTrade(resourceGameName) function to helpers.lua
+   - Calculates total amount being received via existing trade agreements
+   - Looks for positive X values in the Trade folder
+
+2. Modified checkAndBuyResource in autobuyer.lua:
+   - Gets existing incoming trade amount before attempting purchases
+   - Subtracts existing incoming trades from calculated need
+   - Returns "Already Covered" if need is satisfied by existing trades
+
+EXPECTED NEW BEHAVIOR:
+- First check: Factory needs 12.1 copper, no incoming trades -> buys 12.1
+- Next check: Factory needs 12.1 copper, incoming 12.1 from trade -> need = 0
+- Script logs: "Need satisfied by existing trades, SKIPPING"
+
+The logs below show the OLD BUGGY output (before fix). After applying the fix,
+you should see the script only buy from ONE country, then skip on future checks.
+
+================================================================================
+OLD BUGGY OUTPUT (for reference - this is what the bug looked like):
+================================================================================
+]]
+
 -- output of the result of the script. look here first. the script buy stoo much material aka copper and gold. i have 5 factories its supposed to automaticallyt cauclualte how much i need and buy only that plus a small overflow of 0.1. but it buys way too much. here.
 
 [19:11:16] [AutoBuy] Buying 12.10 Copper from Sweden @ 1.0x

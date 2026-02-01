@@ -164,6 +164,23 @@ function M.getSellingAmountTo(resourceGameName, countryName)
     return 0
 end
 
+-- Get total incoming trade amount for a resource (how much we're buying from other countries)
+-- Returns the total amount being received via trade agreements (positive X values)
+function M.getTotalIncomingTrade(resourceGameName)
+    local res = M.getResourceFolder(M.myCountry, resourceGameName)
+    if not res then return 0 end
+    local t = res:FindFirstChild("Trade")
+    if not t then return 0 end
+    
+    local total = 0
+    for _, obj in ipairs(t:GetChildren()) do
+        if obj:IsA("Vector3Value") and obj.Value.X > 0.01 then
+            total = total + obj.Value.X
+        end
+    end
+    return total
+end
+
 -- Get total selling for specific resource
 function M.getTotalSelling(resource)
     local total = 0
