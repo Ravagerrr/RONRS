@@ -51,7 +51,41 @@ This shows: USA (rank 1) only accepts 0.1x price
 | Revenue | Country's total revenue |
 | Result | `OK` or `FAIL` |
 
-## How to Analyze
+## How to Submit Data for Analysis
+
+### What to Paste
+Just copy all the `TRADE|...` lines from the console output and paste them.
+
+### What I'll Analyze
+
+1. **Ranking patterns** - Do high-ranked countries (1-50) only accept low prices?
+2. **Price tier success rates** - What % succeed at 1.0x vs 0.5x vs 0.1x?
+3. **Journey patterns** - Which countries need multiple attempts?
+4. **The actual game mechanic** - What's really causing acceptance/rejection?
+
+### The format makes it easy to:
+- Sort by ranking
+- Group by result (OK/FAIL)
+- Track each country's journey through price tiers
+- Find the pattern that determines acceptance
+
+### Example Analysis Output
+After receiving data, I'll provide:
+```
+=== RANKING ANALYSIS ===
+Rank 1-20:   1.0x success: 5%,  0.5x success: 30%, 0.1x success: 95%
+Rank 21-50:  1.0x success: 20%, 0.5x success: 60%, 0.1x success: 98%
+Rank 51-100: 1.0x success: 45%, 0.5x success: 85%, 0.1x success: 99%
+Rank 100+:   1.0x success: 70%, 0.5x success: 95%, 0.1x success: 100%
+
+=== RECOMMENDATION ===
+Based on data:
+- Rank 1-20: Start at 0.5x (skip 1.0x to save time)
+- Rank 21-100: Start at 1.0x (worth trying)
+- Rank 100+: Start at 1.0x (high success rate)
+```
+
+## Manual Analysis Steps
 
 ### Step 1: Run the script and collect output
 ```bash
