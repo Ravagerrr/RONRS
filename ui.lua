@@ -114,8 +114,6 @@ function M.updateCountry()
 end
 
 function M.createWindow()
-    M.isRunning = true  -- Enable background loop for this instance
-    
     local Window = Rayfield:CreateWindow({
         Name = "Trade Hub v2.0",
         LoadingTitle = "Loading...",
@@ -336,8 +334,8 @@ function M.cleanup()
     -- Stop background loop
     M.isRunning = false
     
-    -- Destroy Rayfield window
-    if Rayfield and Rayfield.Destroy then
+    -- Destroy Rayfield window using the library's destroy method
+    if Rayfield then
         pcall(function()
             Rayfield:Destroy()
         end)
