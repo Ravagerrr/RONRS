@@ -142,21 +142,24 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local totalCost = amount * actualPricePerUnit
     local costPercent = (totalCost / data.revenue) * 100
     
-    -- Compact debug log for algorithm analysis
-    -- Format: Country|Res|Amt|Price|Cost|Rev|Cost%|Tax|Bal|Pop|Rank|Flow
-    print(string.format("DBG|%s|%s|%.1f|%.1fx|$%.0f|$%.0f|%.1f%%|$%.0f|$%.0f|%.0f|%.0f|%.1f",
-        name, resource.gameName:sub(1,4), amount, price, totalCost, data.revenue, 
-        costPercent, data.tax, data.balance, data.population, data.ranking, data.flow))
+    -- Enhanced debug log for algorithm analysis
+    -- Format: TRADE|Country|Rank|Resource|PriceTier|Amount|Cost%|Revenue|Result
+    -- This format makes it easy to track each country's journey through price tiers
+    -- Example: TRADE|Slovakia|140|Cons|1.0x|1.31|4.85%|$221855|FAIL
+    --          TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
+    -- ^ Shows Slovakia (rank 140) failed 1.0x but succeeded at 0.5x
     
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Flow:%.2f Rev:$%.0f Cost:$%.0f", 
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
-        print(string.format("DBG|%s|%s|OK", name, resource.gameName:sub(1,4)))
+        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|OK",
+            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         return true, false, nil
     else
-        print(string.format("DBG|%s|%s|FAIL", name, resource.gameName:sub(1,4)))
+        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|FAIL",
+            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
             UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")
