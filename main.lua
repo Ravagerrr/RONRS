@@ -1,6 +1,6 @@
 --[[
-    Trade Hub v1.6 - Multi-Resource
-    Auto-start, simplified controls
+    Trade Hub v2.0 - Reorganized UI
+    Cleaner navigation, less redundancy
 ]]
 
 local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
@@ -29,7 +29,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v1.6")
+print("  Trade Hub v2.0")
 print("══════════════════════════")
 
 local Config = loadModule("config")
