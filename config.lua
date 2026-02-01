@@ -42,19 +42,44 @@ return {
     SkipProducingCountries = true,
     SkipOwnCountry = true,
     
+    -- Minimum Demand Threshold
+    -- Skip countries with flow >= this value (no meaningful demand)
+    -- Countries need negative flow (consuming) to actually want to buy
+    -- Set to small negative value like -0.1 to ensure real demand exists
+    MinDemandFlow = -0.1,
+    
     -- Flow Protection
     SmartSell = true,
     SmartSellReserve = 1,
     
-    -- Revenue Spending Limit
-    -- Countries won't spend more than this percentage of their revenue on a single trade
-    -- 0.6 means 60% - prevents rejection when cost is too close to total revenue
-    -- Valid range: 0.0 to 1.0 (0% to 100%). Recommended: 0.5-0.7 for better acceptance rates
-    MaxRevenueSpendingPercent = 0.6,
+    -- Revenue Spending Limit (Dynamic based on country size)
+    -- Bigger countries are more lenient with high cost/revenue ratios
+    -- Smaller countries are stricter and reject trades approaching their revenue limit
+    -- These values define the spending percentage allowed at different revenue tiers
+    MaxRevenueSpendingPercent = 0.35,  -- Default/fallback (used if dynamic calc disabled)
+    
+    -- Dynamic spending limits based on country revenue
+    -- Format: {minRevenue, maxSpendingPercent}
+    -- Countries with revenue >= minRevenue can spend up to maxSpendingPercent
+    -- Tiers are checked from highest to lowest revenue
+    -- CALIBRATED: Brazil ($12.4M revenue) accepted 60 units = 39.8% spending
+    -- Using conservative values below actual observed limits for safety margin
+    RevenueSpendingTiers = {
+        {10000000, 0.38},  -- $10M+ revenue: can spend up to 38%
+        {5000000, 0.35},   -- $5M+ revenue: can spend up to 35%
+        {1000000, 0.32},   -- $1M+ revenue: can spend up to 32%
+        {500000, 0.28},    -- $500K+ revenue: can spend up to 28%
+        {100000, 0.25},    -- $100K+ revenue: can spend up to 25%
+        {0, 0.20},         -- Below $100K: can spend up to 20%
+    },
     
     -- Debug
     -- Enable to log detailed country info at start of each trade run
     DebugLogging = true,
+    
+    -- UI Log Settings
+    -- Number of log entries to display in the UI (higher = more scrolling)
+    LogDisplayCount = 100,
     
     -- Auto-Sell
     AutoSellEnabled = true,

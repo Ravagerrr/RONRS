@@ -63,11 +63,21 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local resourceBuyers = buyers[resName] or {}
     if Config.SkipExistingBuyers and resourceBuyers[name] then return false, false, "Buyer" end
     
+    -- Check if we're already selling this resource to this country (prevents duplicate trades on retry)
+    -- This checks OUR trade folder, not theirs, for reliable detection
+    local alreadySelling = Helpers.getSellingAmountTo(resource.gameName, name)
+    if alreadySelling > 0 then return false, false, "Already Trading" end
+    
     local data = Helpers.getCountryResourceData(country, resource)
     if not data.valid then return false, false, "Invalid" end
     if data.revenue <= 0 or data.balance <= 0 then return false, false, "No Revenue" end
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
+    
+    -- Skip countries with no meaningful demand (flow >= MinDemandFlow threshold)
+    -- Countries need actual negative flow (consumption) to want to buy resources
+    -- This prevents attempting trades to countries with zero or near-zero flow
+    if data.flow >= (Config.MinDemandFlow or 0) then return false, false, "No Demand" end
     
     -- Get optimal price tier based on what country can afford (smart pricing)
     local price = Helpers.getPriceTier(data.revenue, resource, data)
@@ -88,9 +98,12 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         return false, false, "Invalid Price"
     end
     
+    -- Get dynamic spending limit based on country revenue (bigger countries = more lenient)
+    local maxSpendingPercent = Helpers.getMaxSpendingPercent(data.revenue)
+    
     -- Calculate affordable based on ACTUAL price they pay
-    -- Apply revenue spending limit to prevent rejection (countries won't spend 100% of revenue)
-    local maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+    -- Apply dynamic revenue spending limit to prevent rejection
+    local maxAffordable = (data.revenue * maxSpendingPercent) / actualPricePerUnit
     
     local affordable
     if resource.hasCap then
@@ -123,13 +136,23 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     retryState[resName .. "_price"] = price
     
     local totalCost = amount * actualPricePerUnit
+    local costPercent = (totalCost / data.revenue) * 100
+    
+    -- Compact debug log for algorithm analysis
+    -- Format: Country|Res|Amt|Price|Cost|Rev|Cost%|Tax|Bal|Pop|Rank|Flow
+    print(string.format("DBG|%s|%s|%.1f|%.1fx|$%.0f|$%.0f|%.1f%%|$%.0f|$%.0f|%.0f|%.0f|%.1f",
+        name, resource.gameName:sub(1,4), amount, price, totalCost, data.revenue, 
+        costPercent, data.tax, data.balance, data.population, data.ranking, data.flow))
+    
     UI.log(string.format("[%d/%d] %s %s | %.2f @ %.1fx ($%.0f/u) | Flow:%.2f Rev:$%.0f Cost:$%.0f", 
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
+        print(string.format("DBG|%s|%s|OK", name, resource.gameName:sub(1,4)))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         return true, false, nil
     else
+        print(string.format("DBG|%s|%s|FAIL", name, resource.gameName:sub(1,4)))
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
             UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")

@@ -207,7 +207,7 @@ end
 
 -- Get country data for specific resource
 function M.getCountryResourceData(country, resource)
-    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false}
+    local data = {valid = false, revenue = 0, balance = 0, flow = 0, buyAmount = 0, hasSell = false, tax = 0, population = 0, ranking = 0}
     
     local eco = country:FindFirstChild("Economy")
     if not eco then return data end
@@ -221,8 +221,15 @@ function M.getCountryResourceData(country, resource)
     
     data.valid = true
     data.revenue = rev:GetAttribute("Total") or 0
+    data.tax = rev:GetAttribute("Tax") or 0
     data.balance = bal.Value or 0
     data.flow = res:FindFirstChild("Flow") and res.Flow.Value or 0
+    
+    -- Get population and ranking for algorithm analysis
+    local pop = country:FindFirstChild("Population")
+    data.population = pop and pop.Value or 0
+    local rank = country:FindFirstChild("Ranking")
+    data.ranking = rank and rank.Value or 0
     
     for _, obj in ipairs(trade:GetChildren()) do
         if obj:IsA("Vector3Value") then
@@ -238,8 +245,8 @@ function M.getPriceTier(revenue, resource, countryData)
     -- This maximizes revenue by charging full price to countries that can afford it,
     -- while automatically discounting for countries that can't
     -- 
-    -- IMPROVED: Now calculates actual expected trade amount and uses safety margin
-    -- to avoid edge case failures when cost is too close to spending limit
+    -- IMPROVED: Now uses dynamic spending limits based on country size
+    -- Bigger countries are more lenient with high cost/revenue ratios
     
     if not resource or not countryData then
         -- Fallback to full price if no resource info provided
@@ -248,8 +255,11 @@ function M.getPriceTier(revenue, resource, countryData)
     
     local priceTiers = {1.0, 0.5, 0.1}
     -- Safety margin: prefer tiers where cost is well below the limit
-    -- This avoids trades that fail because they're exactly at the 60% limit
+    -- This avoids trades that fail because they're exactly at the limit
     local safetyMargin = 0.90 -- Only use this tier if cost is below 90% of max allowed
+    
+    -- Get dynamic spending limit based on country revenue (bigger = more lenient)
+    local maxSpendingPercent = M.getMaxSpendingPercent(revenue)
     
     for _, tier in ipairs(priceTiers) do
         local actualPricePerUnit = resource.buyPrice * tier
@@ -257,16 +267,16 @@ function M.getPriceTier(revenue, resource, countryData)
             continue
         end
         
-        -- Calculate what they can afford at this price tier
-        local maxAffordable = (revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+        -- Calculate what they can afford at this price tier (using dynamic limit)
+        local maxAffordable = (revenue * maxSpendingPercent) / actualPricePerUnit
         
-        -- Calculate the ACTUAL trade amount we would attempt (not just MinAmount)
+        -- Calculate the ACTUAL trade amount we would attempt
         local expectedTradeAmount
         if resource.hasCap then
             -- Electronics: capped at capAmount
             expectedTradeAmount = math.min(resource.capAmount, maxAffordable)
         else
-            -- Consumer Goods: limited by their demand (negative flow)
+            -- Consumer Goods: limited by their demand (negative flow) AND what they can afford
             if countryData.flow < 0 then
                 local demand = math.abs(countryData.flow)
                 expectedTradeAmount = math.min(demand, maxAffordable)
@@ -289,7 +299,7 @@ function M.getPriceTier(revenue, resource, countryData)
         
         -- Use this tier if spending is well below the limit (with safety margin)
         -- OR if this is the lowest tier (0.1x) - must try something as fallback
-        if spendingPercent < (Config.MaxRevenueSpendingPercent * safetyMargin) or tier == 0.1 then
+        if spendingPercent < (maxSpendingPercent * safetyMargin) or tier == 0.1 then
             return tier
         end
         -- If spending is too close to the limit, try the next (lower) tier
@@ -304,6 +314,30 @@ function M.getNextPriceTier(current)
     if current >= 1.0 then return 0.5
     elseif current >= 0.5 then return 0.1
     else return nil end
+end
+
+-- Get dynamic spending limit based on country revenue
+-- Bigger countries can afford higher cost/revenue ratios
+function M.getMaxSpendingPercent(revenue)
+    -- Check revenue tiers from config
+    -- Tiers must be sorted highest to lowest minRevenue for correct matching
+    if Config.RevenueSpendingTiers then
+        -- Sort tiers by minRevenue descending to ensure correct matching
+        local sortedTiers = {}
+        for _, tier in ipairs(Config.RevenueSpendingTiers) do
+            table.insert(sortedTiers, tier)
+        end
+        table.sort(sortedTiers, function(a, b) return a[1] > b[1] end)
+        
+        for _, tier in ipairs(sortedTiers) do
+            local minRevenue, maxPercent = tier[1], tier[2]
+            if revenue >= minRevenue then
+                return maxPercent
+            end
+        end
+    end
+    -- Fallback to default
+    return Config.MaxRevenueSpendingPercent or 0.6
 end
 
 function M.getCountries()

@@ -1,5 +1,5 @@
 --[[
-    Trade Hub v1.5 - Multi-Resource
+    Trade Hub v1.6 - Multi-Resource
     Auto-start, simplified controls
 ]]
 
@@ -29,7 +29,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v1.5")
+print("  Trade Hub v1.6")
 print("══════════════════════════")
 
 local Config = loadModule("config")
