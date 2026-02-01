@@ -20,22 +20,29 @@ local function attemptTrade(country, resource, amount, price)
     -- Check our trade folder for existing sales to this country BEFORE the trade
     local beforeAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
     
-    pcall(function()
-        ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
-    end)
+    -- Game mechanic: trades can fail randomly even with valid parameters
+    -- Solution: Re-fire the trade request multiple times if not accepted
+    -- This keeps the same price tier instead of unnecessarily lowering price
+    local maxTradeAttempts = 3
+    local pollsPerAttempt = 3
+    local pollInterval = 0.2
     
-    -- Poll multiple times to verify trade was registered (server may take time to update)
-    -- Increased from 5x0.2s=1s to 8x0.25s=2s to handle slower server responses
-    local maxAttempts = 8
-    local pollInterval = 0.25
-    
-    for attempt = 1, maxAttempts do
-        task.wait(pollInterval)
+    for tradeAttempt = 1, maxTradeAttempts do
+        pcall(function()
+            ManageAlliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
+        end)
         
-        local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
-        if afterAmount > beforeAmount then
-            return true
+        -- Poll to verify trade was registered
+        for poll = 1, pollsPerAttempt do
+            task.wait(pollInterval)
+            
+            local afterAmount = Helpers.getSellingAmountTo(resource.gameName, country.Name)
+            if afterAmount > beforeAmount then
+                return true
+            end
         end
+        
+        -- Trade not accepted yet, will retry the request
     end
     
     -- Trade not verified after all attempts
