@@ -1,0 +1,2473 @@
+-- output of the result of the script. look here first. the script buy stoo much material aka copper and gold. i have 5 factories its supposed to automaticallyt cauclualte how much i need and buy only that plus a small overflow of 0.1. but it buys way too much. here.
+
+[19:11:16] [AutoBuy] Buying 12.10 Copper from Sweden @ 1.0x
+[19:11:16] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:11:10] [AutoBuy] Copper: Bought 12.10
+[19:11:10] [AutoBuy] OK Copper from Turkey
+[19:11:10] [AutoBuy] Buying 12.10 Copper from Turkey @ 1.0x
+[19:11:10] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:11:04] [AutoBuy] Copper: Bought 12.10
+[19:11:04] [AutoBuy] OK Copper from Botswana
+[19:11:04] [AutoBuy] Buying 12.10 Copper from Botswana @ 1.0x
+[19:11:04] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:58] [AutoBuy] Copper: Bought 12.10
+[19:10:58] [AutoBuy] OK Copper from India
+[19:10:58] [AutoBuy] Buying 12.10 Copper from India @ 1.0x
+[19:10:58] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:53] [AutoBuy] Copper: Bought 12.10
+[19:10:53] [AutoBuy] OK Copper from Mongolia
+[19:10:52] [AutoBuy] Buying 12.10 Copper from Mongolia @ 1.0x
+[19:10:52] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:46] [AutoBuy] Copper: Bought 12.10
+[19:10:46] [AutoBuy] OK Copper from Democratic Republic of the Congo
+[19:10:46] [AutoBuy] Buying 12.10 Copper from Democratic Republic of the Congo @ 1.0x
+[19:10:46] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:41] [AutoBuy] Copper: Bought 12.10
+[19:10:41] [AutoBuy] OK Copper from Zimbabwe
+[19:10:40] [AutoBuy] Buying 12.10 Copper from Zimbabwe @ 1.0x
+[19:10:40] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:35] [AutoBuy] Copper: Bought 12.10
+[19:10:35] [AutoBuy] OK Copper from Bulgaria
+[19:10:35] [AutoBuy] Buying 12.10 Copper from Bulgaria @ 1.0x
+[19:10:35] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:29] [AutoBuy] Copper: Bought 12.10
+[19:10:29] [AutoBuy] OK Copper from Canada
+[19:10:28] [AutoBuy] Buying 12.10 Copper from Canada @ 1.0x
+[19:10:28] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:23] [AutoBuy] Copper: Bought 12.10
+[19:10:23] [AutoBuy] OK Copper from Japan
+[19:10:23] [AutoBuy] Buying 12.10 Copper from Japan @ 1.0x
+[19:10:23] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:17] [AutoBuy] Copper: Bought 12.10
+[19:10:17] [AutoBuy] OK Copper from Spain
+[19:10:17] [AutoBuy] Buying 12.10 Copper from Spain @ 1.0x
+[19:10:17] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:11] [AutoBuy] Copper: Bought 12.10
+[19:10:11] [AutoBuy] OK Copper from Poland
+[19:10:11] [AutoBuy] Buying 12.10 Copper from Poland @ 1.0x
+[19:10:11] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:05] [AutoBuy] Copper: Bought 12.10
+[19:10:05] [AutoBuy] OK Copper from Argentina
+[19:10:05] [AutoBuy] Buying 12.10 Copper from Argentina @ 1.0x
+[19:10:05] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:10:00] [AutoBuy] Copper: Bought 12.10
+[19:10:00] [AutoBuy] OK Copper from South Africa
+[19:09:59] [AutoBuy] Buying 12.10 Copper from South Africa @ 1.0x
+[19:09:59] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:54] [AutoBuy] Copper: Bought 12.10
+[19:09:54] [AutoBuy] OK Copper from Namibia
+[19:09:53] [AutoBuy] Buying 12.10 Copper from Namibia @ 1.0x
+[19:09:53] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:48] [AutoBuy] Copper: Bought 12.10
+[19:09:48] [AutoBuy] OK Copper from Brazil
+[19:09:48] [AutoBuy] Buying 12.10 Copper from Brazil @ 1.0x
+[19:09:48] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:42] [AutoBuy] Copper: Bought 12.10
+[19:09:42] [AutoBuy] OK Copper from Morocco
+[19:09:41] [AutoBuy] Buying 12.10 Copper from Morocco @ 1.0x
+[19:09:41] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:36] [AutoBuy] Copper: Bought 12.10
+[19:09:36] [AutoBuy] OK Copper from Ukraine
+[19:09:36] [AutoBuy] Buying 12.10 Copper from Ukraine @ 1.0x
+[19:09:36] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:18] [AutoBuy] Copper: Bought 12.10
+[19:09:18] [AutoBuy] OK Copper from China
+[19:09:18] [AutoBuy] Buying 12.10 Copper from China @ 1.0x
+[19:09:18] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:09:06] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:06] === Complete ===
+[19:09:06] === END DEBUG ===
+[19:09:06]     MaxSpend: $8786476 (38% of rev) | MaxAffordable: 86.14
+[19:09:06]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:06]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:06]     Revenue: $23122304 | Balance: $1221641957
+[19:09:06]   Electronics:
+[19:09:06]     MaxSpend: $8786476 (38% of rev) | MaxAffordable: 106.63
+[19:09:06]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:06]     Flow: -261.49 | BuyAmount: 0.00 | HasSell: false
+[19:09:06]     Revenue: $23122304 | Balance: $1221641957
+[19:09:06]   Consumer Goods:
+[19:09:06] Country: United States
+[19:09:06] === DEBUG: Example Country ===
+[19:09:06] Electronics: 139.84 avail | Cap: 5
+[19:09:06] Consumer Goods: 0.00 avail | No Cap
+[19:09:06] === Trade Started ===
+[19:09:06] TRIGGERED: Electronics 139.8
+[19:09:06] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:06] === Complete ===
+[19:09:06] === END DEBUG ===
+[19:09:06]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:06]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:06]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:06]     Revenue: $23120672 | Balance: $1201647653
+[19:09:06]   Electronics:
+[19:09:06]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:06]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:06]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:06]     Revenue: $23120672 | Balance: $1201647653
+[19:09:06]   Consumer Goods:
+[19:09:06] Country: United States
+[19:09:06] === DEBUG: Example Country ===
+[19:09:06] Electronics: 139.84 avail | Cap: 5
+[19:09:06] Consumer Goods: 0.00 avail | No Cap
+[19:09:06] === Trade Started ===
+[19:09:06] TRIGGERED: Electronics 139.8
+[19:09:05] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:05] === Complete ===
+[19:09:05] === END DEBUG ===
+[19:09:05]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:05]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:05]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:05]     Revenue: $23120672 | Balance: $1201647653
+[19:09:05]   Electronics:
+[19:09:05]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:05]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:05]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:05]     Revenue: $23120672 | Balance: $1201647653
+[19:09:05]   Consumer Goods:
+[19:09:05] Country: United States
+[19:09:05] === DEBUG: Example Country ===
+[19:09:05] Electronics: 139.84 avail | Cap: 5
+[19:09:05] Consumer Goods: 0.00 avail | No Cap
+[19:09:05] === Trade Started ===
+[19:09:05] TRIGGERED: Electronics 139.8
+[19:09:05] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:05] === Complete ===
+[19:09:05] === END DEBUG ===
+[19:09:05]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:05]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:05]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:05]     Revenue: $23120672 | Balance: $1201647653
+[19:09:05]   Electronics:
+[19:09:05]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:05]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:05]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:05]     Revenue: $23120672 | Balance: $1201647653
+[19:09:05]   Consumer Goods:
+[19:09:05] Country: United States
+[19:09:05] === DEBUG: Example Country ===
+[19:09:05] Electronics: 139.84 avail | Cap: 5
+[19:09:05] Consumer Goods: 0.00 avail | No Cap
+[19:09:05] === Trade Started ===
+[19:09:05] TRIGGERED: Electronics 139.8
+[19:09:04] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:04] === Complete ===
+[19:09:04] === END DEBUG ===
+[19:09:04]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:04]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:04]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:04]     Revenue: $23120672 | Balance: $1201647653
+[19:09:04]   Electronics:
+[19:09:04]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:04]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:04]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:04]     Revenue: $23120672 | Balance: $1201647653
+[19:09:04]   Consumer Goods:
+[19:09:04] Country: United States
+[19:09:04] === DEBUG: Example Country ===
+[19:09:04] Electronics: 139.84 avail | Cap: 5
+[19:09:04] Consumer Goods: 0.00 avail | No Cap
+[19:09:04] === Trade Started ===
+[19:09:04] TRIGGERED: Electronics 139.8
+[19:09:04] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:04] === Complete ===
+[19:09:04] === END DEBUG ===
+[19:09:04]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:04]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:04]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:04]     Revenue: $23120672 | Balance: $1201647653
+[19:09:04]   Electronics:
+[19:09:04]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:04]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:04]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:04]     Revenue: $23120672 | Balance: $1201647653
+[19:09:04]   Consumer Goods:
+[19:09:04] Country: United States
+[19:09:04] === DEBUG: Example Country ===
+[19:09:04] Electronics: 139.84 avail | Cap: 5
+[19:09:04] Consumer Goods: 0.00 avail | No Cap
+[19:09:04] === Trade Started ===
+[19:09:04] TRIGGERED: Electronics 139.8
+[19:09:03] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:03] === Complete ===
+[19:09:03] === END DEBUG ===
+[19:09:03]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:03]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:03]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:03]     Revenue: $23120672 | Balance: $1201647653
+[19:09:03]   Electronics:
+[19:09:03]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:03]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:03]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:03]     Revenue: $23120672 | Balance: $1201647653
+[19:09:03]   Consumer Goods:
+[19:09:03] Country: United States
+[19:09:03] === DEBUG: Example Country ===
+[19:09:03] Electronics: 139.84 avail | Cap: 5
+[19:09:03] Consumer Goods: 0.00 avail | No Cap
+[19:09:03] === Trade Started ===
+[19:09:03] TRIGGERED: Electronics 139.8
+[19:09:03] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:03] === Complete ===
+[19:09:03] === END DEBUG ===
+[19:09:03]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:03]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:03]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:03]     Revenue: $23120672 | Balance: $1201647653
+[19:09:03]   Electronics:
+[19:09:03]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:03]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:03]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:03]     Revenue: $23120672 | Balance: $1201647653
+[19:09:03]   Consumer Goods:
+[19:09:03] Country: United States
+[19:09:03] === DEBUG: Example Country ===
+[19:09:03] Electronics: 139.84 avail | Cap: 5
+[19:09:03] Consumer Goods: 0.00 avail | No Cap
+[19:09:03] === Trade Started ===
+[19:09:03] TRIGGERED: Electronics 139.8
+[19:09:02] [AutoBuy] Copper: Bought 12.10
+[19:09:02] [AutoBuy] OK Copper from Chile
+[19:09:02] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:02] === Complete ===
+[19:09:02] === END DEBUG ===
+[19:09:02]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:02]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:02]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:02]     Revenue: $23120672 | Balance: $1201647653
+[19:09:02]   Electronics:
+[19:09:02]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:02]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:02]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:02]     Revenue: $23120672 | Balance: $1201647653
+[19:09:02]   Consumer Goods:
+[19:09:02] Country: United States
+[19:09:02] === DEBUG: Example Country ===
+[19:09:02] Electronics: 139.84 avail | Cap: 5
+[19:09:02] Consumer Goods: 0.00 avail | No Cap
+[19:09:02] === Trade Started ===
+[19:09:02] TRIGGERED: Electronics 139.8
+[19:09:02] [AutoBuy] Buying 12.10 Copper from Chile @ 1.0x
+[19:09:02] [AutoBuy] Failed Copper from Kazakhstan, trying next
+[19:09:02] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:02] === Complete ===
+[19:09:02] === END DEBUG ===
+[19:09:02]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:02]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:02]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:02]     Revenue: $23120672 | Balance: $1201647653
+[19:09:02]   Electronics:
+[19:09:02]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:02]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:02]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:02]     Revenue: $23120672 | Balance: $1201647653
+[19:09:02]   Consumer Goods:
+[19:09:02] Country: United States
+[19:09:02] === DEBUG: Example Country ===
+[19:09:02] Electronics: 139.84 avail | Cap: 5
+[19:09:02] Consumer Goods: 0.00 avail | No Cap
+[19:09:02] === Trade Started ===
+[19:09:02] TRIGGERED: Electronics 139.8
+[19:09:01] [AutoBuy] Buying 12.10 Copper from Kazakhstan @ 1.0x
+[19:09:01] [AutoBuy] Copper flow: -12.00, target: 0.10, need: 12.10
+[19:09:01] [AutoBuy] Gold: Bought 12.10
+[19:09:01] [AutoBuy] OK Gold from South Africa
+[19:09:01] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:01] === Complete ===
+[19:09:01] === END DEBUG ===
+[19:09:01]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:01]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:01]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:01]     Revenue: $23120672 | Balance: $1201647653
+[19:09:01]   Electronics:
+[19:09:01]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:01]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:01]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:01]     Revenue: $23120672 | Balance: $1201647653
+[19:09:01]   Consumer Goods:
+[19:09:01] Country: United States
+[19:09:01] === DEBUG: Example Country ===
+[19:09:01] Electronics: 139.84 avail | Cap: 5
+[19:09:01] Consumer Goods: 0.00 avail | No Cap
+[19:09:01] === Trade Started ===
+[19:09:01] TRIGGERED: Electronics 139.8
+[19:09:01] [AutoBuy] Buying 12.10 Gold from South Africa @ 1.0x
+[19:09:01] [AutoBuy] Gold flow: -12.00, target: 0.10, need: 12.10
+[19:09:01] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:01] === Complete ===
+[19:09:01] === END DEBUG ===
+[19:09:01]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 86.14
+[19:09:01]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:01]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:01]     Revenue: $23120672 | Balance: $1201647653
+[19:09:01]   Electronics:
+[19:09:01]     MaxSpend: $8785855 (38% of rev) | MaxAffordable: 106.62
+[19:09:01]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:01]     Flow: -261.47 | BuyAmount: 0.00 | HasSell: false
+[19:09:01]     Revenue: $23120672 | Balance: $1201647653
+[19:09:01]   Consumer Goods:
+[19:09:01] Country: United States
+[19:09:01] === DEBUG: Example Country ===
+[19:09:00] Electronics: 139.84 avail | Cap: 5
+[19:09:00] Consumer Goods: 0.00 avail | No Cap
+[19:09:00] === Trade Started ===
+[19:09:00] TRIGGERED: Electronics 139.8
+[19:09:00] 0.0s | OK:0 Skip:240 Fail:0
+[19:09:00] === Complete ===
+[19:09:00] === END DEBUG ===
+[19:09:00]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:09:00]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:09:00]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:09:00]     Revenue: $23525598 | Balance: $1181654981
+[19:09:00]   Electronics:
+[19:09:00]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:09:00]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:09:00]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:09:00]     Revenue: $23525598 | Balance: $1181654981
+[19:09:00]   Consumer Goods:
+[19:09:00] Country: United States
+[19:09:00] === DEBUG: Example Country ===
+[19:09:00] Electronics: 139.82 avail | Cap: 5
+[19:09:00] Consumer Goods: 0.00 avail | No Cap
+[19:09:00] === Trade Started ===
+[19:09:00] TRIGGERED: Electronics 139.8
+[19:08:59] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:59] === Complete ===
+[19:08:59] === END DEBUG ===
+[19:08:59]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:59]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:59]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:59]     Revenue: $23525598 | Balance: $1181654981
+[19:08:59]   Electronics:
+[19:08:59]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:59]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:59]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:59]     Revenue: $23525598 | Balance: $1181654981
+[19:08:59]   Consumer Goods:
+[19:08:59] Country: United States
+[19:08:59] === DEBUG: Example Country ===
+[19:08:59] Electronics: 139.82 avail | Cap: 5
+[19:08:59] Consumer Goods: 0.00 avail | No Cap
+[19:08:59] === Trade Started ===
+[19:08:59] TRIGGERED: Electronics 139.8
+[19:08:59] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:59] === Complete ===
+[19:08:59] === END DEBUG ===
+[19:08:59]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:59]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:59]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:59]     Revenue: $23525598 | Balance: $1181654981
+[19:08:59]   Electronics:
+[19:08:59]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:59]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:59]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:59]     Revenue: $23525598 | Balance: $1181654981
+[19:08:59]   Consumer Goods:
+[19:08:59] Country: United States
+[19:08:59] === DEBUG: Example Country ===
+[19:08:59] Electronics: 139.82 avail | Cap: 5
+[19:08:59] Consumer Goods: 0.00 avail | No Cap
+[19:08:59] === Trade Started ===
+[19:08:59] TRIGGERED: Electronics 139.8
+[19:08:58] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:58] === Complete ===
+[19:08:58] === END DEBUG ===
+[19:08:58]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:58]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:58]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:58]     Revenue: $23525598 | Balance: $1181654981
+[19:08:58]   Electronics:
+[19:08:58]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:58]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:58]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:58]     Revenue: $23525598 | Balance: $1181654981
+[19:08:58]   Consumer Goods:
+[19:08:58] Country: United States
+[19:08:58] === DEBUG: Example Country ===
+[19:08:58] Electronics: 139.82 avail | Cap: 5
+[19:08:58] Consumer Goods: 0.00 avail | No Cap
+[19:08:58] === Trade Started ===
+[19:08:58] TRIGGERED: Electronics 139.8
+[19:08:58] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:58] === Complete ===
+[19:08:58] === END DEBUG ===
+[19:08:58]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:58]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:58]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:58]     Revenue: $23525598 | Balance: $1181654981
+[19:08:58]   Electronics:
+[19:08:58]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:58]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:58]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:58]     Revenue: $23525598 | Balance: $1181654981
+[19:08:58]   Consumer Goods:
+[19:08:58] Country: United States
+[19:08:58] === DEBUG: Example Country ===
+[19:08:58] Electronics: 139.82 avail | Cap: 5
+[19:08:58] Consumer Goods: 0.00 avail | No Cap
+[19:08:58] === Trade Started ===
+[19:08:58] TRIGGERED: Electronics 139.8
+[19:08:57] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:57] === Complete ===
+[19:08:57] === END DEBUG ===
+[19:08:57]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:57]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:57]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:57]     Revenue: $23525598 | Balance: $1181654981
+[19:08:57]   Electronics:
+[19:08:57]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:57]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:57]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:57]     Revenue: $23525598 | Balance: $1181654981
+[19:08:57]   Consumer Goods:
+[19:08:57] Country: United States
+[19:08:57] === DEBUG: Example Country ===
+[19:08:57] Electronics: 139.82 avail | Cap: 5
+[19:08:57] Consumer Goods: 0.00 avail | No Cap
+[19:08:57] === Trade Started ===
+[19:08:57] TRIGGERED: Electronics 139.8
+[19:08:57] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:57] === Complete ===
+[19:08:57] === END DEBUG ===
+[19:08:57]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:57]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:57]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:57]     Revenue: $23525598 | Balance: $1181654981
+[19:08:57]   Electronics:
+[19:08:57]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:57]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:57]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:57]     Revenue: $23525598 | Balance: $1181654981
+[19:08:57]   Consumer Goods:
+[19:08:57] Country: United States
+[19:08:57] === DEBUG: Example Country ===
+[19:08:57] Electronics: 139.82 avail | Cap: 5
+[19:08:57] Consumer Goods: 0.00 avail | No Cap
+[19:08:57] === Trade Started ===
+[19:08:57] TRIGGERED: Electronics 139.8
+[19:08:56] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:56] === Complete ===
+[19:08:56] === END DEBUG ===
+[19:08:56]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:56]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:56]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:56]     Revenue: $23525598 | Balance: $1181654981
+[19:08:56]   Electronics:
+[19:08:56]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:56]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:56]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:56]     Revenue: $23525598 | Balance: $1181654981
+[19:08:56]   Consumer Goods:
+[19:08:56] Country: United States
+[19:08:56] === DEBUG: Example Country ===
+[19:08:56] Electronics: 139.82 avail | Cap: 5
+[19:08:56] Consumer Goods: 0.00 avail | No Cap
+[19:08:56] === Trade Started ===
+[19:08:56] TRIGGERED: Electronics 139.8
+[19:08:56] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:56] === Complete ===
+[19:08:56] === END DEBUG ===
+[19:08:56]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:56]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:56]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:56]     Revenue: $23525598 | Balance: $1181654981
+[19:08:56]   Electronics:
+[19:08:56]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:56]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:56]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:56]     Revenue: $23525598 | Balance: $1181654981
+[19:08:56]   Consumer Goods:
+[19:08:56] Country: United States
+[19:08:56] === DEBUG: Example Country ===
+[19:08:56] Electronics: 139.82 avail | Cap: 5
+[19:08:56] Consumer Goods: 0.00 avail | No Cap
+[19:08:56] === Trade Started ===
+[19:08:56] TRIGGERED: Electronics 139.8
+[19:08:55] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:55] === Complete ===
+[19:08:55] === END DEBUG ===
+[19:08:55]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:55]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:55]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:55]     Revenue: $23525598 | Balance: $1181654981
+[19:08:55]   Electronics:
+[19:08:55]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:55]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:55]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:55]     Revenue: $23525598 | Balance: $1181654981
+[19:08:55]   Consumer Goods:
+[19:08:55] Country: United States
+[19:08:55] === DEBUG: Example Country ===
+[19:08:55] Electronics: 139.82 avail | Cap: 5
+[19:08:55] Consumer Goods: 0.00 avail | No Cap
+[19:08:55] === Trade Started ===
+[19:08:55] TRIGGERED: Electronics 139.8
+[19:08:55] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:55] === Complete ===
+[19:08:55] === END DEBUG ===
+[19:08:55]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 87.64
+[19:08:55]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:55]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:55]     Revenue: $23525598 | Balance: $1181654981
+[19:08:55]   Electronics:
+[19:08:55]     MaxSpend: $8939727 (38% of rev) | MaxAffordable: 108.49
+[19:08:55]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:55]     Flow: -261.45 | BuyAmount: 0.00 | HasSell: false
+[19:08:55]     Revenue: $23525598 | Balance: $1181654981
+[19:08:55]   Consumer Goods:
+[19:08:55] Country: United States
+[19:08:55] === DEBUG: Example Country ===
+[19:08:55] Electronics: 139.82 avail | Cap: 5
+[19:08:55] Consumer Goods: 0.00 avail | No Cap
+[19:08:55] === Trade Started ===
+[19:08:55] TRIGGERED: Electronics 139.8
+[19:08:54] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:54] === Complete ===
+[19:08:54] === END DEBUG ===
+[19:08:54]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:54]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:54]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:54]     Revenue: $23523965 | Balance: $1161257383
+[19:08:54]   Electronics:
+[19:08:54]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:54]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:54]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:54]     Revenue: $23523965 | Balance: $1161257383
+[19:08:54]   Consumer Goods:
+[19:08:54] Country: United States
+[19:08:54] === DEBUG: Example Country ===
+[19:08:54] Electronics: 139.80 avail | Cap: 5
+[19:08:54] Consumer Goods: 0.00 avail | No Cap
+[19:08:54] === Trade Started ===
+[19:08:54] TRIGGERED: Electronics 139.8
+[19:08:54] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:54] === Complete ===
+[19:08:54] === END DEBUG ===
+[19:08:54]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:54]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:54]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:54]     Revenue: $23523965 | Balance: $1161257383
+[19:08:54]   Electronics:
+[19:08:54]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:54]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:54]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:54]     Revenue: $23523965 | Balance: $1161257383
+[19:08:54]   Consumer Goods:
+[19:08:54] Country: United States
+[19:08:54] === DEBUG: Example Country ===
+[19:08:54] Electronics: 139.80 avail | Cap: 5
+[19:08:54] Consumer Goods: 0.00 avail | No Cap
+[19:08:54] === Trade Started ===
+[19:08:54] TRIGGERED: Electronics 139.8
+[19:08:53] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:53] === Complete ===
+[19:08:53] === END DEBUG ===
+[19:08:53]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:53]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:53]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:53]     Revenue: $23523965 | Balance: $1161257383
+[19:08:53]   Electronics:
+[19:08:53]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:53]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:53]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:53]     Revenue: $23523965 | Balance: $1161257383
+[19:08:53]   Consumer Goods:
+[19:08:53] Country: United States
+[19:08:53] === DEBUG: Example Country ===
+[19:08:53] Electronics: 139.80 avail | Cap: 5
+[19:08:53] Consumer Goods: 0.00 avail | No Cap
+[19:08:53] === Trade Started ===
+[19:08:53] TRIGGERED: Electronics 139.8
+[19:08:53] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:53] === Complete ===
+[19:08:53] === END DEBUG ===
+[19:08:53]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:53]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:53]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:53]     Revenue: $23523965 | Balance: $1161257383
+[19:08:53]   Electronics:
+[19:08:53]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:53]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:53]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:53]     Revenue: $23523965 | Balance: $1161257383
+[19:08:53]   Consumer Goods:
+[19:08:53] Country: United States
+[19:08:53] === DEBUG: Example Country ===
+[19:08:53] Electronics: 139.80 avail | Cap: 5
+[19:08:53] Consumer Goods: 0.00 avail | No Cap
+[19:08:53] === Trade Started ===
+[19:08:53] TRIGGERED: Electronics 139.8
+[19:08:52] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:52] === Complete ===
+[19:08:52] === END DEBUG ===
+[19:08:52]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:52]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:52]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:52]     Revenue: $23523965 | Balance: $1161257383
+[19:08:52]   Electronics:
+[19:08:52]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:52]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:52]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:52]     Revenue: $23523965 | Balance: $1161257383
+[19:08:52]   Consumer Goods:
+[19:08:52] Country: United States
+[19:08:52] === DEBUG: Example Country ===
+[19:08:52] Electronics: 139.80 avail | Cap: 5
+[19:08:52] Consumer Goods: 0.00 avail | No Cap
+[19:08:52] === Trade Started ===
+[19:08:52] TRIGGERED: Electronics 139.8
+[19:08:52] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:52] === Complete ===
+[19:08:52] === END DEBUG ===
+[19:08:52]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:52]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:52]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:52]     Revenue: $23523965 | Balance: $1161257383
+[19:08:52]   Electronics:
+[19:08:52]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:52]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:52]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:52]     Revenue: $23523965 | Balance: $1161257383
+[19:08:52]   Consumer Goods:
+[19:08:52] Country: United States
+[19:08:52] === DEBUG: Example Country ===
+[19:08:52] Electronics: 139.80 avail | Cap: 5
+[19:08:52] Consumer Goods: 0.00 avail | No Cap
+[19:08:52] === Trade Started ===
+[19:08:52] TRIGGERED: Electronics 139.8
+[19:08:51] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:51] === Complete ===
+[19:08:51] === END DEBUG ===
+[19:08:51]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:51]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:51]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:51]     Revenue: $23523965 | Balance: $1161257383
+[19:08:51]   Electronics:
+[19:08:51]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:51]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:51]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:51]     Revenue: $23523965 | Balance: $1161257383
+[19:08:51]   Consumer Goods:
+[19:08:51] Country: United States
+[19:08:51] === DEBUG: Example Country ===
+[19:08:51] Electronics: 139.80 avail | Cap: 5
+[19:08:51] Consumer Goods: 0.00 avail | No Cap
+[19:08:51] === Trade Started ===
+[19:08:51] TRIGGERED: Electronics 139.8
+[19:08:51] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:51] === Complete ===
+[19:08:51] === END DEBUG ===
+[19:08:51]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:51]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:51]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:51]     Revenue: $23523965 | Balance: $1161257383
+[19:08:51]   Electronics:
+[19:08:51]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:51]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:51]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:51]     Revenue: $23523965 | Balance: $1161257383
+[19:08:51]   Consumer Goods:
+[19:08:51] Country: United States
+[19:08:51] === DEBUG: Example Country ===
+[19:08:51] Electronics: 139.80 avail | Cap: 5
+[19:08:51] Consumer Goods: 0.00 avail | No Cap
+[19:08:51] === Trade Started ===
+[19:08:51] TRIGGERED: Electronics 139.8
+[19:08:50] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:50] === Complete ===
+[19:08:50] === END DEBUG ===
+[19:08:50]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:50]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:50]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:50]     Revenue: $23523965 | Balance: $1161257383
+[19:08:50]   Electronics:
+[19:08:50]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:50]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:50]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:50]     Revenue: $23523965 | Balance: $1161257383
+[19:08:50]   Consumer Goods:
+[19:08:50] Country: United States
+[19:08:50] === DEBUG: Example Country ===
+[19:08:50] Electronics: 139.80 avail | Cap: 5
+[19:08:50] Consumer Goods: 0.00 avail | No Cap
+[19:08:50] === Trade Started ===
+[19:08:50] TRIGGERED: Electronics 139.8
+[19:08:50] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:50] === Complete ===
+[19:08:50] === END DEBUG ===
+[19:08:50]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:50]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:50]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:50]     Revenue: $23523965 | Balance: $1161257383
+[19:08:50]   Electronics:
+[19:08:50]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:50]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:50]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:50]     Revenue: $23523965 | Balance: $1161257383
+[19:08:50]   Consumer Goods:
+[19:08:50] Country: United States
+[19:08:50] === DEBUG: Example Country ===
+[19:08:50] Electronics: 139.80 avail | Cap: 5
+[19:08:50] Consumer Goods: 0.00 avail | No Cap
+[19:08:50] === Trade Started ===
+[19:08:50] TRIGGERED: Electronics 139.8
+[19:08:49] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:49] === Complete ===
+[19:08:49] === END DEBUG ===
+[19:08:49]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:49]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:49]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:49]     Revenue: $23523965 | Balance: $1161257383
+[19:08:49]   Electronics:
+[19:08:49]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:49]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:49]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:49]     Revenue: $23523965 | Balance: $1161257383
+[19:08:49]   Consumer Goods:
+[19:08:49] Country: United States
+[19:08:49] === DEBUG: Example Country ===
+[19:08:49] Electronics: 139.80 avail | Cap: 5
+[19:08:49] Consumer Goods: 0.00 avail | No Cap
+[19:08:49] === Trade Started ===
+[19:08:49] TRIGGERED: Electronics 139.8
+[19:08:49] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:49] === Complete ===
+[19:08:49] === END DEBUG ===
+[19:08:49]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 87.64
+[19:08:49]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:49]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:49]     Revenue: $23523965 | Balance: $1161257383
+[19:08:49]   Electronics:
+[19:08:49]     MaxSpend: $8939107 (38% of rev) | MaxAffordable: 108.48
+[19:08:49]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:49]     Flow: -261.43 | BuyAmount: 0.00 | HasSell: false
+[19:08:49]     Revenue: $23523965 | Balance: $1161257383
+[19:08:49]   Consumer Goods:
+[19:08:49] Country: United States
+[19:08:49] === DEBUG: Example Country ===
+[19:08:49] Electronics: 139.78 avail | Cap: 5
+[19:08:49] Consumer Goods: 0.00 avail | No Cap
+[19:08:49] === Trade Started ===
+[19:08:49] TRIGGERED: Electronics 139.8
+[19:08:48] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:48] === Complete ===
+[19:08:48] === END DEBUG ===
+[19:08:48]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:48]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:48]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:48]     Revenue: $23522333 | Balance: $1140861418
+[19:08:48]   Electronics:
+[19:08:48]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:48]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:48]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:48]     Revenue: $23522333 | Balance: $1140861418
+[19:08:48]   Consumer Goods:
+[19:08:48] Country: United States
+[19:08:48] === DEBUG: Example Country ===
+[19:08:48] Electronics: 139.78 avail | Cap: 5
+[19:08:48] Consumer Goods: 0.00 avail | No Cap
+[19:08:48] === Trade Started ===
+[19:08:48] TRIGGERED: Electronics 139.8
+[19:08:48] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:48] === Complete ===
+[19:08:48] === END DEBUG ===
+[19:08:48]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:48]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:48]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:48]     Revenue: $23522333 | Balance: $1140861418
+[19:08:48]   Electronics:
+[19:08:48]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:48]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:48]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:48]     Revenue: $23522333 | Balance: $1140861418
+[19:08:48]   Consumer Goods:
+[19:08:48] Country: United States
+[19:08:48] === DEBUG: Example Country ===
+[19:08:48] Electronics: 139.78 avail | Cap: 5
+[19:08:48] Consumer Goods: 0.00 avail | No Cap
+[19:08:48] === Trade Started ===
+[19:08:48] TRIGGERED: Electronics 139.8
+[19:08:47] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:47] === Complete ===
+[19:08:47] === END DEBUG ===
+[19:08:47]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:47]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:47]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:47]     Revenue: $23522333 | Balance: $1140861418
+[19:08:47]   Electronics:
+[19:08:47]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:47]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:47]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:47]     Revenue: $23522333 | Balance: $1140861418
+[19:08:47]   Consumer Goods:
+[19:08:47] Country: United States
+[19:08:47] === DEBUG: Example Country ===
+[19:08:47] Electronics: 139.78 avail | Cap: 5
+[19:08:47] Consumer Goods: 0.00 avail | No Cap
+[19:08:47] === Trade Started ===
+[19:08:47] TRIGGERED: Electronics 139.8
+[19:08:47] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:47] === Complete ===
+[19:08:47] === END DEBUG ===
+[19:08:47]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:47]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:47]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:47]     Revenue: $23522333 | Balance: $1140861418
+[19:08:47]   Electronics:
+[19:08:47]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:47]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:47]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:47]     Revenue: $23522333 | Balance: $1140861418
+[19:08:47]   Consumer Goods:
+[19:08:47] Country: United States
+[19:08:47] === DEBUG: Example Country ===
+[19:08:47] Electronics: 139.78 avail | Cap: 5
+[19:08:47] Consumer Goods: 0.00 avail | No Cap
+[19:08:47] === Trade Started ===
+[19:08:47] TRIGGERED: Electronics 139.8
+[19:08:46] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:46] === Complete ===
+[19:08:46] === END DEBUG ===
+[19:08:46]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:46]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:46]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:46]     Revenue: $23522333 | Balance: $1140861418
+[19:08:46]   Electronics:
+[19:08:46]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:46]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:46]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:46]     Revenue: $23522333 | Balance: $1140861418
+[19:08:46]   Consumer Goods:
+[19:08:46] Country: United States
+[19:08:46] === DEBUG: Example Country ===
+[19:08:46] Electronics: 139.78 avail | Cap: 5
+[19:08:46] Consumer Goods: 0.00 avail | No Cap
+[19:08:46] === Trade Started ===
+[19:08:46] TRIGGERED: Electronics 139.8
+[19:08:46] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:46] === Complete ===
+[19:08:46] === END DEBUG ===
+[19:08:46]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:46]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:46]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:46]     Revenue: $23522333 | Balance: $1140861418
+[19:08:46]   Electronics:
+[19:08:46]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:46]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:46]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:46]     Revenue: $23522333 | Balance: $1140861418
+[19:08:46]   Consumer Goods:
+[19:08:46] Country: United States
+[19:08:46] === DEBUG: Example Country ===
+[19:08:46] Electronics: 139.78 avail | Cap: 5
+[19:08:46] Consumer Goods: 0.00 avail | No Cap
+[19:08:46] === Trade Started ===
+[19:08:46] TRIGGERED: Electronics 139.8
+[19:08:45] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:45] === Complete ===
+[19:08:45] === END DEBUG ===
+[19:08:45]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:45]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:45]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:45]     Revenue: $23522333 | Balance: $1140861418
+[19:08:45]   Electronics:
+[19:08:45]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:45]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:45]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:45]     Revenue: $23522333 | Balance: $1140861418
+[19:08:45]   Consumer Goods:
+[19:08:45] Country: United States
+[19:08:45] === DEBUG: Example Country ===
+[19:08:45] Electronics: 139.78 avail | Cap: 5
+[19:08:45] Consumer Goods: 0.00 avail | No Cap
+[19:08:45] === Trade Started ===
+[19:08:45] TRIGGERED: Electronics 139.8
+[19:08:44] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:44] === Complete ===
+[19:08:44] === END DEBUG ===
+[19:08:44]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:44]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:44]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:44]     Revenue: $23522333 | Balance: $1140861418
+[19:08:44]   Electronics:
+[19:08:44]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:44]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:44]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:44]     Revenue: $23522333 | Balance: $1140861418
+[19:08:44]   Consumer Goods:
+[19:08:44] Country: United States
+[19:08:44] === DEBUG: Example Country ===
+[19:08:44] Electronics: 139.78 avail | Cap: 5
+[19:08:44] Consumer Goods: 0.00 avail | No Cap
+[19:08:44] === Trade Started ===
+[19:08:44] TRIGGERED: Electronics 139.8
+[19:08:44] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:44] === Complete ===
+[19:08:44] === END DEBUG ===
+[19:08:44]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:44]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:44]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:44]     Revenue: $23522333 | Balance: $1140861418
+[19:08:44]   Electronics:
+[19:08:44]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:44]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:44]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:44]     Revenue: $23522333 | Balance: $1140861418
+[19:08:44]   Consumer Goods:
+[19:08:44] Country: United States
+[19:08:44] === DEBUG: Example Country ===
+[19:08:44] Electronics: 139.78 avail | Cap: 5
+[19:08:44] Consumer Goods: 0.00 avail | No Cap
+[19:08:44] === Trade Started ===
+[19:08:44] TRIGGERED: Electronics 139.8
+[19:08:43] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:43] === Complete ===
+[19:08:43] === END DEBUG ===
+[19:08:43]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:43]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:43]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:43]     Revenue: $23522333 | Balance: $1140861418
+[19:08:43]   Electronics:
+[19:08:43]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:43]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:43]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:43]     Revenue: $23522333 | Balance: $1140861418
+[19:08:43]   Consumer Goods:
+[19:08:43] Country: United States
+[19:08:43] === DEBUG: Example Country ===
+[19:08:43] Electronics: 139.78 avail | Cap: 5
+[19:08:43] Consumer Goods: 0.00 avail | No Cap
+[19:08:43] === Trade Started ===
+[19:08:43] TRIGGERED: Electronics 139.8
+[19:08:43] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:43] === Complete ===
+[19:08:43] === END DEBUG ===
+[19:08:43]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 87.63
+[19:08:43]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:43]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:43]     Revenue: $23522333 | Balance: $1140861418
+[19:08:43]   Electronics:
+[19:08:43]     MaxSpend: $8938487 (38% of rev) | MaxAffordable: 108.48
+[19:08:43]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:43]     Flow: -261.41 | BuyAmount: 0.00 | HasSell: false
+[19:08:43]     Revenue: $23522333 | Balance: $1140861418
+[19:08:43]   Consumer Goods:
+[19:08:43] Country: United States
+[19:08:43] === DEBUG: Example Country ===
+[19:08:43] Electronics: 139.78 avail | Cap: 5
+[19:08:43] Consumer Goods: 0.00 avail | No Cap
+[19:08:43] === Trade Started ===
+[19:08:43] TRIGGERED: Electronics 139.8
+[19:08:42] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:42] === Complete ===
+[19:08:42] === END DEBUG ===
+[19:08:42]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:42]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:42]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:42]     Revenue: $23520700 | Balance: $1120467085
+[19:08:42]   Electronics:
+[19:08:42]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:42]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:42]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:42]     Revenue: $23520700 | Balance: $1120467085
+[19:08:42]   Consumer Goods:
+[19:08:42] Country: United States
+[19:08:42] === DEBUG: Example Country ===
+[19:08:42] Electronics: 139.77 avail | Cap: 5
+[19:08:42] Consumer Goods: 0.00 avail | No Cap
+[19:08:42] === Trade Started ===
+[19:08:42] TRIGGERED: Electronics 139.8
+[19:08:42] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:42] === Complete ===
+[19:08:42] === END DEBUG ===
+[19:08:42]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:42]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:42]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:42]     Revenue: $23520700 | Balance: $1120467085
+[19:08:42]   Electronics:
+[19:08:42]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:42]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:42]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:42]     Revenue: $23520700 | Balance: $1120467085
+[19:08:42]   Consumer Goods:
+[19:08:42] Country: United States
+[19:08:42] === DEBUG: Example Country ===
+[19:08:42] Electronics: 139.77 avail | Cap: 5
+[19:08:42] Consumer Goods: 0.00 avail | No Cap
+[19:08:42] === Trade Started ===
+[19:08:42] TRIGGERED: Electronics 139.8
+[19:08:41] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:41] === Complete ===
+[19:08:41] === END DEBUG ===
+[19:08:41]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:41]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:41]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:41]     Revenue: $23520700 | Balance: $1120467085
+[19:08:41]   Electronics:
+[19:08:41]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:41]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:41]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:41]     Revenue: $23520700 | Balance: $1120467085
+[19:08:41]   Consumer Goods:
+[19:08:41] Country: United States
+[19:08:41] === DEBUG: Example Country ===
+[19:08:41] Electronics: 139.77 avail | Cap: 5
+[19:08:41] Consumer Goods: 0.00 avail | No Cap
+[19:08:41] === Trade Started ===
+[19:08:41] TRIGGERED: Electronics 139.8
+[19:08:41] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:41] === Complete ===
+[19:08:41] === END DEBUG ===
+[19:08:41]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:41]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:41]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:41]     Revenue: $23520700 | Balance: $1120467085
+[19:08:41]   Electronics:
+[19:08:41]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:41]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:41]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:41]     Revenue: $23520700 | Balance: $1120467085
+[19:08:41]   Consumer Goods:
+[19:08:41] Country: United States
+[19:08:41] === DEBUG: Example Country ===
+[19:08:41] Electronics: 139.77 avail | Cap: 5
+[19:08:41] Consumer Goods: 0.00 avail | No Cap
+[19:08:41] === Trade Started ===
+[19:08:41] TRIGGERED: Electronics 139.8
+[19:08:40] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:40] === Complete ===
+[19:08:40] === END DEBUG ===
+[19:08:40]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:40]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:40]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:40]     Revenue: $23520700 | Balance: $1120467085
+[19:08:40]   Electronics:
+[19:08:40]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:40]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:40]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:40]     Revenue: $23520700 | Balance: $1120467085
+[19:08:40]   Consumer Goods:
+[19:08:40] Country: United States
+[19:08:40] === DEBUG: Example Country ===
+[19:08:40] Electronics: 139.77 avail | Cap: 5
+[19:08:40] Consumer Goods: 0.00 avail | No Cap
+[19:08:40] === Trade Started ===
+[19:08:40] TRIGGERED: Electronics 139.8
+[19:08:40] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:40] === Complete ===
+[19:08:40] === END DEBUG ===
+[19:08:40]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:40]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:40]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:40]     Revenue: $23520700 | Balance: $1120467085
+[19:08:40]   Electronics:
+[19:08:40]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:40]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:40]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:40]     Revenue: $23520700 | Balance: $1120467085
+[19:08:40]   Consumer Goods:
+[19:08:40] Country: United States
+[19:08:40] === DEBUG: Example Country ===
+[19:08:40] Electronics: 139.77 avail | Cap: 5
+[19:08:40] Consumer Goods: 0.00 avail | No Cap
+[19:08:40] === Trade Started ===
+[19:08:40] TRIGGERED: Electronics 139.8
+[19:08:39] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:39] === Complete ===
+[19:08:39] === END DEBUG ===
+[19:08:39]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:39]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:39]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:39]     Revenue: $23520700 | Balance: $1120467085
+[19:08:39]   Electronics:
+[19:08:39]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:39]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:39]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:39]     Revenue: $23520700 | Balance: $1120467085
+[19:08:39]   Consumer Goods:
+[19:08:39] Country: United States
+[19:08:39] === DEBUG: Example Country ===
+[19:08:39] Electronics: 139.77 avail | Cap: 5
+[19:08:39] Consumer Goods: 0.00 avail | No Cap
+[19:08:39] === Trade Started ===
+[19:08:39] TRIGGERED: Electronics 139.8
+[19:08:39] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:39] === Complete ===
+[19:08:39] === END DEBUG ===
+[19:08:39]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:39]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:39]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:39]     Revenue: $23520700 | Balance: $1120467085
+[19:08:39]   Electronics:
+[19:08:39]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:39]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:39]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:39]     Revenue: $23520700 | Balance: $1120467085
+[19:08:39]   Consumer Goods:
+[19:08:39] Country: United States
+[19:08:39] === DEBUG: Example Country ===
+[19:08:39] Electronics: 139.77 avail | Cap: 5
+[19:08:39] Consumer Goods: 0.00 avail | No Cap
+[19:08:39] === Trade Started ===
+[19:08:39] TRIGGERED: Electronics 139.8
+[19:08:38] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:38] === Complete ===
+[19:08:38] === END DEBUG ===
+[19:08:38]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:38]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:38]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:38]     Revenue: $23520700 | Balance: $1120467085
+[19:08:38]   Electronics:
+[19:08:38]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:38]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:38]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:38]     Revenue: $23520700 | Balance: $1120467085
+[19:08:38]   Consumer Goods:
+[19:08:38] Country: United States
+[19:08:38] === DEBUG: Example Country ===
+[19:08:38] Electronics: 139.77 avail | Cap: 5
+[19:08:38] Consumer Goods: 0.00 avail | No Cap
+[19:08:38] === Trade Started ===
+[19:08:38] TRIGGERED: Electronics 139.8
+[19:08:38] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:38] === Complete ===
+[19:08:38] === END DEBUG ===
+[19:08:38]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:38]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:38]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:38]     Revenue: $23520700 | Balance: $1120467085
+[19:08:38]   Electronics:
+[19:08:38]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:38]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:38]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:38]     Revenue: $23520700 | Balance: $1120467085
+[19:08:38]   Consumer Goods:
+[19:08:38] Country: United States
+[19:08:38] === DEBUG: Example Country ===
+[19:08:38] Electronics: 139.77 avail | Cap: 5
+[19:08:38] Consumer Goods: 0.00 avail | No Cap
+[19:08:38] === Trade Started ===
+[19:08:38] TRIGGERED: Electronics 139.8
+[19:08:37] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:37] === Complete ===
+[19:08:37] === END DEBUG ===
+[19:08:37]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 87.63
+[19:08:37]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:37]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:37]     Revenue: $23520700 | Balance: $1120467085
+[19:08:37]   Electronics:
+[19:08:37]     MaxSpend: $8937866 (38% of rev) | MaxAffordable: 108.47
+[19:08:37]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:37]     Flow: -261.39 | BuyAmount: 0.00 | HasSell: false
+[19:08:37]     Revenue: $23520700 | Balance: $1120467085
+[19:08:37]   Consumer Goods:
+[19:08:37] Country: United States
+[19:08:37] === DEBUG: Example Country ===
+[19:08:37] Electronics: 139.77 avail | Cap: 5
+[19:08:37] Consumer Goods: 0.00 avail | No Cap
+[19:08:37] === Trade Started ===
+[19:08:37] TRIGGERED: Electronics 139.8
+[19:08:37] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:37] === Complete ===
+[19:08:37] === END DEBUG ===
+[19:08:37]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:37]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:37]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:37]     Revenue: $23519067 | Balance: $1100074385
+[19:08:37]   Electronics:
+[19:08:37]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:37]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:37]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:37]     Revenue: $23519067 | Balance: $1100074385
+[19:08:37]   Consumer Goods:
+[19:08:37] Country: United States
+[19:08:37] === DEBUG: Example Country ===
+[19:08:37] Electronics: 139.75 avail | Cap: 5
+[19:08:37] Consumer Goods: 0.00 avail | No Cap
+[19:08:37] === Trade Started ===
+[19:08:37] TRIGGERED: Electronics 139.7
+[19:08:36] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:36] === Complete ===
+[19:08:36] === END DEBUG ===
+[19:08:36]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:36]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:36]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:36]     Revenue: $23519067 | Balance: $1100074385
+[19:08:36]   Electronics:
+[19:08:36]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:36]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:36]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:36]     Revenue: $23519067 | Balance: $1100074385
+[19:08:36]   Consumer Goods:
+[19:08:36] Country: United States
+[19:08:36] === DEBUG: Example Country ===
+[19:08:36] Electronics: 139.75 avail | Cap: 5
+[19:08:36] Consumer Goods: 0.00 avail | No Cap
+[19:08:36] === Trade Started ===
+[19:08:36] TRIGGERED: Electronics 139.7
+[19:08:36] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:36] === Complete ===
+[19:08:36] === END DEBUG ===
+[19:08:36]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:36]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:36]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:36]     Revenue: $23519067 | Balance: $1100074385
+[19:08:36]   Electronics:
+[19:08:36]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:36]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:36]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:36]     Revenue: $23519067 | Balance: $1100074385
+[19:08:36]   Consumer Goods:
+[19:08:36] Country: United States
+[19:08:36] === DEBUG: Example Country ===
+[19:08:36] Electronics: 139.75 avail | Cap: 5
+[19:08:36] Consumer Goods: 0.00 avail | No Cap
+[19:08:36] === Trade Started ===
+[19:08:36] TRIGGERED: Electronics 139.7
+[19:08:35] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:35] === Complete ===
+[19:08:35] === END DEBUG ===
+[19:08:35]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:35]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:35]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:35]     Revenue: $23519067 | Balance: $1100074385
+[19:08:35]   Electronics:
+[19:08:35]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:35]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:35]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:35]     Revenue: $23519067 | Balance: $1100074385
+[19:08:35]   Consumer Goods:
+[19:08:35] Country: United States
+[19:08:35] === DEBUG: Example Country ===
+[19:08:35] Electronics: 139.75 avail | Cap: 5
+[19:08:35] Consumer Goods: 0.00 avail | No Cap
+[19:08:35] === Trade Started ===
+[19:08:35] TRIGGERED: Electronics 139.7
+[19:08:35] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:35] === Complete ===
+[19:08:35] === END DEBUG ===
+[19:08:35]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:35]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:35]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:35]     Revenue: $23519067 | Balance: $1100074385
+[19:08:35]   Electronics:
+[19:08:35]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:35]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:35]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:35]     Revenue: $23519067 | Balance: $1100074385
+[19:08:35]   Consumer Goods:
+[19:08:35] Country: United States
+[19:08:35] === DEBUG: Example Country ===
+[19:08:35] Electronics: 139.75 avail | Cap: 5
+[19:08:35] Consumer Goods: 0.00 avail | No Cap
+[19:08:35] === Trade Started ===
+[19:08:35] TRIGGERED: Electronics 139.7
+[19:08:34] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:34] === Complete ===
+[19:08:34] === END DEBUG ===
+[19:08:34]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:34]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:34]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:34]     Revenue: $23519067 | Balance: $1100074385
+[19:08:34]   Electronics:
+[19:08:34]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:34]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:34]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:34]     Revenue: $23519067 | Balance: $1100074385
+[19:08:34]   Consumer Goods:
+[19:08:34] Country: United States
+[19:08:34] === DEBUG: Example Country ===
+[19:08:34] Electronics: 139.75 avail | Cap: 5
+[19:08:34] Consumer Goods: 0.00 avail | No Cap
+[19:08:34] === Trade Started ===
+[19:08:34] TRIGGERED: Electronics 139.7
+[19:08:34] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:34] === Complete ===
+[19:08:34] === END DEBUG ===
+[19:08:34]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:34]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:34]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:34]     Revenue: $23519067 | Balance: $1100074385
+[19:08:34]   Electronics:
+[19:08:34]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:34]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:34]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:34]     Revenue: $23519067 | Balance: $1100074385
+[19:08:34]   Consumer Goods:
+[19:08:34] Country: United States
+[19:08:34] === DEBUG: Example Country ===
+[19:08:34] Electronics: 139.75 avail | Cap: 5
+[19:08:34] Consumer Goods: 0.00 avail | No Cap
+[19:08:34] === Trade Started ===
+[19:08:34] TRIGGERED: Electronics 139.7
+[19:08:33] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:33] === Complete ===
+[19:08:33] === END DEBUG ===
+[19:08:33]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:33]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:33]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:33]     Revenue: $23519067 | Balance: $1100074385
+[19:08:33]   Electronics:
+[19:08:33]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:33]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:33]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:33]     Revenue: $23519067 | Balance: $1100074385
+[19:08:33]   Consumer Goods:
+[19:08:33] Country: United States
+[19:08:33] === DEBUG: Example Country ===
+[19:08:33] Electronics: 139.75 avail | Cap: 5
+[19:08:33] Consumer Goods: 0.00 avail | No Cap
+[19:08:33] === Trade Started ===
+[19:08:33] TRIGGERED: Electronics 139.7
+[19:08:33] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:33] === Complete ===
+[19:08:33] === END DEBUG ===
+[19:08:33]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:33]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:33]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:33]     Revenue: $23519067 | Balance: $1100074385
+[19:08:33]   Electronics:
+[19:08:33]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:33]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:33]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:33]     Revenue: $23519067 | Balance: $1100074385
+[19:08:33]   Consumer Goods:
+[19:08:33] Country: United States
+[19:08:33] === DEBUG: Example Country ===
+[19:08:33] Electronics: 139.75 avail | Cap: 5
+[19:08:33] Consumer Goods: 0.00 avail | No Cap
+[19:08:33] === Trade Started ===
+[19:08:33] TRIGGERED: Electronics 139.7
+[19:08:32] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:32] === Complete ===
+[19:08:32] === END DEBUG ===
+[19:08:32]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:32]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:32]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:32]     Revenue: $23519067 | Balance: $1100074385
+[19:08:32]   Electronics:
+[19:08:32]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:32]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:32]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:32]     Revenue: $23519067 | Balance: $1100074385
+[19:08:32]   Consumer Goods:
+[19:08:32] Country: United States
+[19:08:32] === DEBUG: Example Country ===
+[19:08:32] Electronics: 139.75 avail | Cap: 5
+[19:08:32] Consumer Goods: 0.00 avail | No Cap
+[19:08:32] === Trade Started ===
+[19:08:32] TRIGGERED: Electronics 139.7
+[19:08:32] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:32] === Complete ===
+[19:08:32] === END DEBUG ===
+[19:08:32]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 87.62
+[19:08:32]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:32]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:32]     Revenue: $23519067 | Balance: $1100074385
+[19:08:32]   Electronics:
+[19:08:32]     MaxSpend: $8937245 (38% of rev) | MaxAffordable: 108.46
+[19:08:32]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:32]     Flow: -261.38 | BuyAmount: 0.00 | HasSell: false
+[19:08:32]     Revenue: $23519067 | Balance: $1100074385
+[19:08:32]   Consumer Goods:
+[19:08:32] Country: United States
+[19:08:32] === DEBUG: Example Country ===
+[19:08:32] Electronics: 139.75 avail | Cap: 5
+[19:08:32] Consumer Goods: 0.00 avail | No Cap
+[19:08:32] === Trade Started ===
+[19:08:32] TRIGGERED: Electronics 139.7
+[19:08:31] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:31] === Complete ===
+[19:08:31] === END DEBUG ===
+[19:08:31]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:31]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:31]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:31]     Revenue: $23517436 | Balance: $1079683318
+[19:08:31]   Electronics:
+[19:08:31]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:31]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:31]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:31]     Revenue: $23517436 | Balance: $1079683318
+[19:08:31]   Consumer Goods:
+[19:08:31] Country: United States
+[19:08:31] === DEBUG: Example Country ===
+[19:08:31] Electronics: 139.73 avail | Cap: 5
+[19:08:31] Consumer Goods: 0.00 avail | No Cap
+[19:08:31] === Trade Started ===
+[19:08:31] TRIGGERED: Electronics 139.7
+[19:08:31] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:31] === Complete ===
+[19:08:31] === END DEBUG ===
+[19:08:31]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:31]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:31]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:31]     Revenue: $23517436 | Balance: $1079683318
+[19:08:31]   Electronics:
+[19:08:31]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:31]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:31]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:31]     Revenue: $23517436 | Balance: $1079683318
+[19:08:31]   Consumer Goods:
+[19:08:31] Country: United States
+[19:08:31] === DEBUG: Example Country ===
+[19:08:31] Electronics: 139.73 avail | Cap: 5
+[19:08:31] Consumer Goods: 0.00 avail | No Cap
+[19:08:31] === Trade Started ===
+[19:08:31] TRIGGERED: Electronics 139.7
+[19:08:30] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:30] === Complete ===
+[19:08:30] === END DEBUG ===
+[19:08:30]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:30]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:30]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:30]     Revenue: $23517436 | Balance: $1079683318
+[19:08:30]   Electronics:
+[19:08:30]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:30]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:30]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:30]     Revenue: $23517436 | Balance: $1079683318
+[19:08:30]   Consumer Goods:
+[19:08:30] Country: United States
+[19:08:30] === DEBUG: Example Country ===
+[19:08:30] Electronics: 139.73 avail | Cap: 5
+[19:08:30] Consumer Goods: 0.00 avail | No Cap
+[19:08:30] === Trade Started ===
+[19:08:30] TRIGGERED: Electronics 139.7
+[19:08:30] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:30] === Complete ===
+[19:08:30] === END DEBUG ===
+[19:08:30]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:30]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:30]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:30]     Revenue: $23517436 | Balance: $1079683318
+[19:08:30]   Electronics:
+[19:08:30]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:30]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:30]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:30]     Revenue: $23517436 | Balance: $1079683318
+[19:08:30]   Consumer Goods:
+[19:08:30] Country: United States
+[19:08:30] === DEBUG: Example Country ===
+[19:08:29] Electronics: 139.73 avail | Cap: 5
+[19:08:29] Consumer Goods: 0.00 avail | No Cap
+[19:08:29] === Trade Started ===
+[19:08:29] TRIGGERED: Electronics 139.7
+[19:08:29] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:29] === Complete ===
+[19:08:29] === END DEBUG ===
+[19:08:29]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:29]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:29]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:29]     Revenue: $23517436 | Balance: $1079683318
+[19:08:29]   Electronics:
+[19:08:29]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:29]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:29]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:29]     Revenue: $23517436 | Balance: $1079683318
+[19:08:29]   Consumer Goods:
+[19:08:29] Country: United States
+[19:08:29] === DEBUG: Example Country ===
+[19:08:29] Electronics: 139.73 avail | Cap: 5
+[19:08:29] Consumer Goods: 0.00 avail | No Cap
+[19:08:29] === Trade Started ===
+[19:08:29] TRIGGERED: Electronics 139.7
+[19:08:28] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:28] === Complete ===
+[19:08:28] === END DEBUG ===
+[19:08:28]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:28]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:28]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:28]     Revenue: $23517436 | Balance: $1079683318
+[19:08:28]   Electronics:
+[19:08:28]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:28]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:28]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:28]     Revenue: $23517436 | Balance: $1079683318
+[19:08:28]   Consumer Goods:
+[19:08:28] Country: United States
+[19:08:28] === DEBUG: Example Country ===
+[19:08:28] Electronics: 139.73 avail | Cap: 5
+[19:08:28] Consumer Goods: 0.00 avail | No Cap
+[19:08:28] === Trade Started ===
+[19:08:28] TRIGGERED: Electronics 139.7
+[19:08:28] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:28] === Complete ===
+[19:08:28] === END DEBUG ===
+[19:08:28]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:28]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:28]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:28]     Revenue: $23517436 | Balance: $1079683318
+[19:08:28]   Electronics:
+[19:08:28]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:28]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:28]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:28]     Revenue: $23517436 | Balance: $1079683318
+[19:08:28]   Consumer Goods:
+[19:08:28] Country: United States
+[19:08:28] === DEBUG: Example Country ===
+[19:08:28] Electronics: 139.73 avail | Cap: 5
+[19:08:28] Consumer Goods: 0.00 avail | No Cap
+[19:08:28] === Trade Started ===
+[19:08:28] TRIGGERED: Electronics 139.7
+[19:08:27] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:27] === Complete ===
+[19:08:27] === END DEBUG ===
+[19:08:27]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:27]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:27]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:27]     Revenue: $23517436 | Balance: $1079683318
+[19:08:27]   Electronics:
+[19:08:27]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:27]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:27]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:27]     Revenue: $23517436 | Balance: $1079683318
+[19:08:27]   Consumer Goods:
+[19:08:27] Country: United States
+[19:08:27] === DEBUG: Example Country ===
+[19:08:27] Electronics: 139.73 avail | Cap: 5
+[19:08:27] Consumer Goods: 0.00 avail | No Cap
+[19:08:27] === Trade Started ===
+[19:08:27] TRIGGERED: Electronics 139.7
+[19:08:27] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:27] === Complete ===
+[19:08:27] === END DEBUG ===
+[19:08:27]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:27]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:27]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:27]     Revenue: $23517436 | Balance: $1079683318
+[19:08:27]   Electronics:
+[19:08:27]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:27]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:27]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:27]     Revenue: $23517436 | Balance: $1079683318
+[19:08:27]   Consumer Goods:
+[19:08:27] Country: United States
+[19:08:27] === DEBUG: Example Country ===
+[19:08:27] Electronics: 139.73 avail | Cap: 5
+[19:08:27] Consumer Goods: 0.00 avail | No Cap
+[19:08:27] === Trade Started ===
+[19:08:27] TRIGGERED: Electronics 139.7
+[19:08:26] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:26] === Complete ===
+[19:08:26] === END DEBUG ===
+[19:08:26]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:26]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:26]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:26]     Revenue: $23517436 | Balance: $1079683318
+[19:08:26]   Electronics:
+[19:08:26]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:26]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:26]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:26]     Revenue: $23517436 | Balance: $1079683318
+[19:08:26]   Consumer Goods:
+[19:08:26] Country: United States
+[19:08:26] === DEBUG: Example Country ===
+[19:08:26] Electronics: 139.73 avail | Cap: 5
+[19:08:26] Consumer Goods: 0.00 avail | No Cap
+[19:08:26] === Trade Started ===
+[19:08:26] TRIGGERED: Electronics 139.7
+[19:08:26] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:26] === Complete ===
+[19:08:26] === END DEBUG ===
+[19:08:26]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:26]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:26]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:26]     Revenue: $23517436 | Balance: $1079683318
+[19:08:26]   Electronics:
+[19:08:26]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:26]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:26]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:26]     Revenue: $23517436 | Balance: $1079683318
+[19:08:26]   Consumer Goods:
+[19:08:26] Country: United States
+[19:08:26] === DEBUG: Example Country ===
+[19:08:26] Electronics: 139.73 avail | Cap: 5
+[19:08:26] Consumer Goods: 0.00 avail | No Cap
+[19:08:26] === Trade Started ===
+[19:08:26] TRIGGERED: Electronics 139.7
+[19:08:25] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:25] === Complete ===
+[19:08:25] === END DEBUG ===
+[19:08:25]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 87.61
+[19:08:25]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:25]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:25]     Revenue: $23517436 | Balance: $1079683318
+[19:08:25]   Electronics:
+[19:08:25]     MaxSpend: $8936626 (38% of rev) | MaxAffordable: 108.45
+[19:08:25]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:25]     Flow: -261.36 | BuyAmount: 0.00 | HasSell: false
+[19:08:25]     Revenue: $23517436 | Balance: $1079683318
+[19:08:25]   Consumer Goods:
+[19:08:25] Country: United States
+[19:08:25] === DEBUG: Example Country ===
+[19:08:25] Electronics: 139.73 avail | Cap: 5
+[19:08:25] Consumer Goods: 0.00 avail | No Cap
+[19:08:25] === Trade Started ===
+[19:08:25] TRIGGERED: Electronics 139.7
+[19:08:25] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:25] === Complete ===
+[19:08:25] === END DEBUG ===
+[19:08:25]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:25]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:25]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:25]     Revenue: $23515804 | Balance: $1059293882
+[19:08:25]   Electronics:
+[19:08:25]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:25]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:25]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:25]     Revenue: $23515804 | Balance: $1059293882
+[19:08:25]   Consumer Goods:
+[19:08:25] Country: United States
+[19:08:25] === DEBUG: Example Country ===
+[19:08:25] Electronics: 139.71 avail | Cap: 5
+[19:08:25] Consumer Goods: 0.00 avail | No Cap
+[19:08:25] === Trade Started ===
+[19:08:25] TRIGGERED: Electronics 139.7
+[19:08:24] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:24] === Complete ===
+[19:08:24] === END DEBUG ===
+[19:08:24]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:24]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:24]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:24]     Revenue: $23515804 | Balance: $1059293882
+[19:08:24]   Electronics:
+[19:08:24]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:24]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:24]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:24]     Revenue: $23515804 | Balance: $1059293882
+[19:08:24]   Consumer Goods:
+[19:08:24] Country: United States
+[19:08:24] === DEBUG: Example Country ===
+[19:08:24] Electronics: 139.71 avail | Cap: 5
+[19:08:24] Consumer Goods: 0.00 avail | No Cap
+[19:08:24] === Trade Started ===
+[19:08:24] TRIGGERED: Electronics 139.7
+[19:08:24] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:24] === Complete ===
+[19:08:24] === END DEBUG ===
+[19:08:24]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:24]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:24]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:24]     Revenue: $23515804 | Balance: $1059293882
+[19:08:24]   Electronics:
+[19:08:24]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:24]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:24]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:24]     Revenue: $23515804 | Balance: $1059293882
+[19:08:24]   Consumer Goods:
+[19:08:24] Country: United States
+[19:08:24] === DEBUG: Example Country ===
+[19:08:24] Electronics: 139.71 avail | Cap: 5
+[19:08:24] Consumer Goods: 0.00 avail | No Cap
+[19:08:24] === Trade Started ===
+[19:08:24] TRIGGERED: Electronics 139.7
+[19:08:23] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:23] === Complete ===
+[19:08:23] === END DEBUG ===
+[19:08:23]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:23]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:23]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:23]     Revenue: $23515804 | Balance: $1059293882
+[19:08:23]   Electronics:
+[19:08:23]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:23]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:23]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:23]     Revenue: $23515804 | Balance: $1059293882
+[19:08:23]   Consumer Goods:
+[19:08:23] Country: United States
+[19:08:23] === DEBUG: Example Country ===
+[19:08:23] Electronics: 139.71 avail | Cap: 5
+[19:08:23] Consumer Goods: 0.00 avail | No Cap
+[19:08:23] === Trade Started ===
+[19:08:23] TRIGGERED: Electronics 139.7
+[19:08:23] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:23] === Complete ===
+[19:08:23] === END DEBUG ===
+[19:08:23]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:23]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:23]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:23]     Revenue: $23515804 | Balance: $1059293882
+[19:08:23]   Electronics:
+[19:08:23]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:23]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:23]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:23]     Revenue: $23515804 | Balance: $1059293882
+[19:08:23]   Consumer Goods:
+[19:08:23] Country: United States
+[19:08:23] === DEBUG: Example Country ===
+[19:08:23] Electronics: 139.71 avail | Cap: 5
+[19:08:23] Consumer Goods: 0.00 avail | No Cap
+[19:08:23] === Trade Started ===
+[19:08:23] TRIGGERED: Electronics 139.7
+[19:08:22] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:22] === Complete ===
+[19:08:22] === END DEBUG ===
+[19:08:22]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:22]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:22]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:22]     Revenue: $23515804 | Balance: $1059293882
+[19:08:22]   Electronics:
+[19:08:22]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:22]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:22]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:22]     Revenue: $23515804 | Balance: $1059293882
+[19:08:22]   Consumer Goods:
+[19:08:22] Country: United States
+[19:08:22] === DEBUG: Example Country ===
+[19:08:22] Electronics: 139.71 avail | Cap: 5
+[19:08:22] Consumer Goods: 0.00 avail | No Cap
+[19:08:22] === Trade Started ===
+[19:08:22] TRIGGERED: Electronics 139.7
+[19:08:22] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:22] === Complete ===
+[19:08:22] === END DEBUG ===
+[19:08:22]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:22]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:22]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:22]     Revenue: $23515804 | Balance: $1059293882
+[19:08:22]   Electronics:
+[19:08:22]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:22]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:22]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:22]     Revenue: $23515804 | Balance: $1059293882
+[19:08:22]   Consumer Goods:
+[19:08:22] Country: United States
+[19:08:22] === DEBUG: Example Country ===
+[19:08:22] Electronics: 139.71 avail | Cap: 5
+[19:08:22] Consumer Goods: 0.00 avail | No Cap
+[19:08:22] === Trade Started ===
+[19:08:22] TRIGGERED: Electronics 139.7
+[19:08:21] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:21] === Complete ===
+[19:08:21] === END DEBUG ===
+[19:08:21]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:21]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:21]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:21]     Revenue: $23515804 | Balance: $1059293882
+[19:08:21]   Electronics:
+[19:08:21]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:21]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:21]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:21]     Revenue: $23515804 | Balance: $1059293882
+[19:08:21]   Consumer Goods:
+[19:08:21] Country: United States
+[19:08:21] === DEBUG: Example Country ===
+[19:08:21] Electronics: 139.71 avail | Cap: 5
+[19:08:21] Consumer Goods: 0.00 avail | No Cap
+[19:08:21] === Trade Started ===
+[19:08:21] TRIGGERED: Electronics 139.7
+[19:08:21] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:21] === Complete ===
+[19:08:21] === END DEBUG ===
+[19:08:21]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:21]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:21]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:21]     Revenue: $23515804 | Balance: $1059293882
+[19:08:21]   Electronics:
+[19:08:21]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:21]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:21]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:21]     Revenue: $23515804 | Balance: $1059293882
+[19:08:21]   Consumer Goods:
+[19:08:21] Country: United States
+[19:08:21] === DEBUG: Example Country ===
+[19:08:21] Electronics: 139.71 avail | Cap: 5
+[19:08:21] Consumer Goods: 0.00 avail | No Cap
+[19:08:21] === Trade Started ===
+[19:08:21] TRIGGERED: Electronics 139.7
+[19:08:20] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:20] === Complete ===
+[19:08:20] === END DEBUG ===
+[19:08:20]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:20]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:20]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:20]     Revenue: $23515804 | Balance: $1059293882
+[19:08:20]   Electronics:
+[19:08:20]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:20]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:20]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:20]     Revenue: $23515804 | Balance: $1059293882
+[19:08:20]   Consumer Goods:
+[19:08:20] Country: United States
+[19:08:20] === DEBUG: Example Country ===
+[19:08:20] Electronics: 139.71 avail | Cap: 5
+[19:08:20] Consumer Goods: 0.00 avail | No Cap
+[19:08:20] === Trade Started ===
+[19:08:20] TRIGGERED: Electronics 139.7
+[19:08:20] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:20] === Complete ===
+[19:08:20] === END DEBUG ===
+[19:08:20]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 87.61
+[19:08:20]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:20]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:20]     Revenue: $23515804 | Balance: $1059293882
+[19:08:20]   Electronics:
+[19:08:20]     MaxSpend: $8936006 (38% of rev) | MaxAffordable: 108.45
+[19:08:20]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:20]     Flow: -261.34 | BuyAmount: 0.00 | HasSell: false
+[19:08:20]     Revenue: $23515804 | Balance: $1059293882
+[19:08:20]   Consumer Goods:
+[19:08:20] Country: United States
+[19:08:20] === DEBUG: Example Country ===
+[19:08:20] Electronics: 139.71 avail | Cap: 5
+[19:08:20] Consumer Goods: 0.00 avail | No Cap
+[19:08:20] === Trade Started ===
+[19:08:20] TRIGGERED: Electronics 139.7
+[19:08:19] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:19] === Complete ===
+[19:08:19] === END DEBUG ===
+[19:08:19]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:19]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:19]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:19]     Revenue: $23514172 | Balance: $1038906078
+[19:08:19]   Electronics:
+[19:08:19]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:19]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:19]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:19]     Revenue: $23514172 | Balance: $1038906078
+[19:08:19]   Consumer Goods:
+[19:08:19] Country: United States
+[19:08:19] === DEBUG: Example Country ===
+[19:08:19] Electronics: 139.70 avail | Cap: 5
+[19:08:19] Consumer Goods: 0.00 avail | No Cap
+[19:08:19] === Trade Started ===
+[19:08:19] TRIGGERED: Electronics 139.7
+[19:08:19] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:19] === Complete ===
+[19:08:19] === END DEBUG ===
+[19:08:19]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:19]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:19]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:19]     Revenue: $23514172 | Balance: $1038906078
+[19:08:19]   Electronics:
+[19:08:19]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:19]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:19]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:19]     Revenue: $23514172 | Balance: $1038906078
+[19:08:19]   Consumer Goods:
+[19:08:19] Country: United States
+[19:08:19] === DEBUG: Example Country ===
+[19:08:19] Electronics: 139.70 avail | Cap: 5
+[19:08:19] Consumer Goods: 0.00 avail | No Cap
+[19:08:19] === Trade Started ===
+[19:08:19] TRIGGERED: Electronics 139.7
+[19:08:18] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:18] === Complete ===
+[19:08:18] === END DEBUG ===
+[19:08:18]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:18]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:18]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:18]     Revenue: $23514172 | Balance: $1038906078
+[19:08:18]   Electronics:
+[19:08:18]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:18]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:18]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:18]     Revenue: $23514172 | Balance: $1038906078
+[19:08:18]   Consumer Goods:
+[19:08:18] Country: United States
+[19:08:18] === DEBUG: Example Country ===
+[19:08:18] Electronics: 139.70 avail | Cap: 5
+[19:08:18] Consumer Goods: 0.00 avail | No Cap
+[19:08:18] === Trade Started ===
+[19:08:18] TRIGGERED: Electronics 139.7
+[19:08:18] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:18] === Complete ===
+[19:08:18] === END DEBUG ===
+[19:08:18]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:18]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:18]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:18]     Revenue: $23514172 | Balance: $1038906078
+[19:08:18]   Electronics:
+[19:08:18]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:18]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:18]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:18]     Revenue: $23514172 | Balance: $1038906078
+[19:08:18]   Consumer Goods:
+[19:08:18] Country: United States
+[19:08:18] === DEBUG: Example Country ===
+[19:08:18] Electronics: 139.70 avail | Cap: 5
+[19:08:18] Consumer Goods: 0.00 avail | No Cap
+[19:08:18] === Trade Started ===
+[19:08:18] TRIGGERED: Electronics 139.7
+[19:08:17] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:17] === Complete ===
+[19:08:17] === END DEBUG ===
+[19:08:17]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:17]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:17]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:17]     Revenue: $23514172 | Balance: $1038906078
+[19:08:17]   Electronics:
+[19:08:17]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:17]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:17]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:17]     Revenue: $23514172 | Balance: $1038906078
+[19:08:17]   Consumer Goods:
+[19:08:17] Country: United States
+[19:08:17] === DEBUG: Example Country ===
+[19:08:17] Electronics: 139.70 avail | Cap: 5
+[19:08:17] Consumer Goods: 0.00 avail | No Cap
+[19:08:17] === Trade Started ===
+[19:08:17] TRIGGERED: Electronics 139.7
+[19:08:17] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:17] === Complete ===
+[19:08:17] === END DEBUG ===
+[19:08:17]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:17]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:17]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:17]     Revenue: $23514172 | Balance: $1038906078
+[19:08:17]   Electronics:
+[19:08:17]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:17]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:17]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:17]     Revenue: $23514172 | Balance: $1038906078
+[19:08:17]   Consumer Goods:
+[19:08:17] Country: United States
+[19:08:17] === DEBUG: Example Country ===
+[19:08:17] Electronics: 139.70 avail | Cap: 5
+[19:08:17] Consumer Goods: 0.00 avail | No Cap
+[19:08:17] === Trade Started ===
+[19:08:17] TRIGGERED: Electronics 139.7
+[19:08:16] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:16] === Complete ===
+[19:08:16] === END DEBUG ===
+[19:08:16]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:16]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:16]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:16]     Revenue: $23514172 | Balance: $1038906078
+[19:08:16]   Electronics:
+[19:08:16]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:16]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:16]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:16]     Revenue: $23514172 | Balance: $1038906078
+[19:08:16]   Consumer Goods:
+[19:08:16] Country: United States
+[19:08:16] === DEBUG: Example Country ===
+[19:08:16] Electronics: 139.70 avail | Cap: 5
+[19:08:16] Consumer Goods: 0.00 avail | No Cap
+[19:08:16] === Trade Started ===
+[19:08:16] TRIGGERED: Electronics 139.7
+[19:08:16] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:16] === Complete ===
+[19:08:16] === END DEBUG ===
+[19:08:16]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:16]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:16]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:16]     Revenue: $23514172 | Balance: $1038906078
+[19:08:16]   Electronics:
+[19:08:16]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:16]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:16]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:16]     Revenue: $23514172 | Balance: $1038906078
+[19:08:16]   Consumer Goods:
+[19:08:16] Country: United States
+[19:08:16] === DEBUG: Example Country ===
+[19:08:16] Electronics: 139.70 avail | Cap: 5
+[19:08:16] Consumer Goods: 0.00 avail | No Cap
+[19:08:16] === Trade Started ===
+[19:08:16] TRIGGERED: Electronics 139.7
+[19:08:15] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:15] === Complete ===
+[19:08:15] === END DEBUG ===
+[19:08:15]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:15]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:15]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:15]     Revenue: $23514172 | Balance: $1038906078
+[19:08:15]   Electronics:
+[19:08:15]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:15]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:15]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:15]     Revenue: $23514172 | Balance: $1038906078
+[19:08:15]   Consumer Goods:
+[19:08:15] Country: United States
+[19:08:15] === DEBUG: Example Country ===
+[19:08:15] Electronics: 139.70 avail | Cap: 5
+[19:08:15] Consumer Goods: 0.00 avail | No Cap
+[19:08:15] === Trade Started ===
+[19:08:15] TRIGGERED: Electronics 139.7
+[19:08:14] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:14] === Complete ===
+[19:08:14] === END DEBUG ===
+[19:08:14]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:14]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:14]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:14]     Revenue: $23514172 | Balance: $1038906078
+[19:08:14]   Electronics:
+[19:08:14]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:14]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:14]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:14]     Revenue: $23514172 | Balance: $1038906078
+[19:08:14]   Consumer Goods:
+[19:08:14] Country: United States
+[19:08:14] === DEBUG: Example Country ===
+[19:08:14] Electronics: 139.70 avail | Cap: 5
+[19:08:14] Consumer Goods: 0.00 avail | No Cap
+[19:08:14] === Trade Started ===
+[19:08:14] TRIGGERED: Electronics 139.7
+[19:08:14] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:14] === Complete ===
+[19:08:14] === END DEBUG ===
+[19:08:14]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 87.60
+[19:08:14]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:14]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:14]     Revenue: $23514172 | Balance: $1038906078
+[19:08:14]   Electronics:
+[19:08:14]     MaxSpend: $8935385 (38% of rev) | MaxAffordable: 108.44
+[19:08:14]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:14]     Flow: -261.32 | BuyAmount: 0.00 | HasSell: false
+[19:08:14]     Revenue: $23514172 | Balance: $1038906078
+[19:08:14]   Consumer Goods:
+[19:08:14] Country: United States
+[19:08:14] === DEBUG: Example Country ===
+[19:08:14] Electronics: 139.70 avail | Cap: 5
+[19:08:14] Consumer Goods: 0.00 avail | No Cap
+[19:08:14] === Trade Started ===
+[19:08:14] TRIGGERED: Electronics 139.7
+[19:08:13] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:13] === Complete ===
+[19:08:13] === END DEBUG ===
+[19:08:13]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:13]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:13]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:13]     Revenue: $23512540 | Balance: $1018519906
+[19:08:13]   Electronics:
+[19:08:13]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:13]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:13]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:13]     Revenue: $23512540 | Balance: $1018519906
+[19:08:13]   Consumer Goods:
+[19:08:13] Country: United States
+[19:08:13] === DEBUG: Example Country ===
+[19:08:13] Electronics: 139.68 avail | Cap: 5
+[19:08:13] Consumer Goods: 0.00 avail | No Cap
+[19:08:13] === Trade Started ===
+[19:08:13] TRIGGERED: Electronics 139.7
+[19:08:13] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:13] === Complete ===
+[19:08:13] === END DEBUG ===
+[19:08:13]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:13]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:13]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:13]     Revenue: $23512540 | Balance: $1018519906
+[19:08:13]   Electronics:
+[19:08:13]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:13]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:13]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:13]     Revenue: $23512540 | Balance: $1018519906
+[19:08:13]   Consumer Goods:
+[19:08:13] Country: United States
+[19:08:13] === DEBUG: Example Country ===
+[19:08:13] Electronics: 139.68 avail | Cap: 5
+[19:08:13] Consumer Goods: 0.00 avail | No Cap
+[19:08:13] === Trade Started ===
+[19:08:13] TRIGGERED: Electronics 139.7
+[19:08:12] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:12] === Complete ===
+[19:08:12] === END DEBUG ===
+[19:08:12]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:12]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:12]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:12]     Revenue: $23512540 | Balance: $1018519906
+[19:08:12]   Electronics:
+[19:08:12]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:12]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:12]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:12]     Revenue: $23512540 | Balance: $1018519906
+[19:08:12]   Consumer Goods:
+[19:08:12] Country: United States
+[19:08:12] === DEBUG: Example Country ===
+[19:08:12] Electronics: 139.68 avail | Cap: 5
+[19:08:12] Consumer Goods: 0.00 avail | No Cap
+[19:08:12] === Trade Started ===
+[19:08:12] TRIGGERED: Electronics 139.7
+[19:08:12] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:12] === Complete ===
+[19:08:12] === END DEBUG ===
+[19:08:12]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:12]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:12]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:12]     Revenue: $23512540 | Balance: $1018519906
+[19:08:12]   Electronics:
+[19:08:12]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:12]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:12]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:12]     Revenue: $23512540 | Balance: $1018519906
+[19:08:12]   Consumer Goods:
+[19:08:12] Country: United States
+[19:08:12] === DEBUG: Example Country ===
+[19:08:12] Electronics: 139.68 avail | Cap: 5
+[19:08:12] Consumer Goods: 0.00 avail | No Cap
+[19:08:12] === Trade Started ===
+[19:08:12] TRIGGERED: Electronics 139.7
+[19:08:11] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:11] === Complete ===
+[19:08:11] === END DEBUG ===
+[19:08:11]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:11]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:11]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:11]     Revenue: $23512540 | Balance: $1018519906
+[19:08:11]   Electronics:
+[19:08:11]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:11]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:11]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:11]     Revenue: $23512540 | Balance: $1018519906
+[19:08:11]   Consumer Goods:
+[19:08:11] Country: United States
+[19:08:11] === DEBUG: Example Country ===
+[19:08:11] Electronics: 139.68 avail | Cap: 5
+[19:08:11] Consumer Goods: 0.00 avail | No Cap
+[19:08:11] === Trade Started ===
+[19:08:11] TRIGGERED: Electronics 139.7
+[19:08:11] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:11] === Complete ===
+[19:08:11] === END DEBUG ===
+[19:08:11]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:11]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:11]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:11]     Revenue: $23512540 | Balance: $1018519906
+[19:08:11]   Electronics:
+[19:08:11]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:11]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:11]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:11]     Revenue: $23512540 | Balance: $1018519906
+[19:08:11]   Consumer Goods:
+[19:08:11] Country: United States
+[19:08:11] === DEBUG: Example Country ===
+[19:08:11] Electronics: 139.68 avail | Cap: 5
+[19:08:11] Consumer Goods: 0.00 avail | No Cap
+[19:08:11] === Trade Started ===
+[19:08:11] TRIGGERED: Electronics 139.7
+[19:08:10] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:10] === Complete ===
+[19:08:10] === END DEBUG ===
+[19:08:10]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:10]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:10]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:10]     Revenue: $23512540 | Balance: $1018519906
+[19:08:10]   Electronics:
+[19:08:10]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:10]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:10]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:10]     Revenue: $23512540 | Balance: $1018519906
+[19:08:10]   Consumer Goods:
+[19:08:10] Country: United States
+[19:08:10] === DEBUG: Example Country ===
+[19:08:10] Electronics: 139.68 avail | Cap: 5
+[19:08:10] Consumer Goods: 0.00 avail | No Cap
+[19:08:10] === Trade Started ===
+[19:08:10] TRIGGERED: Electronics 139.7
+[19:08:10] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:10] === Complete ===
+[19:08:10] === END DEBUG ===
+[19:08:10]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:10]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:10]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:10]     Revenue: $23512540 | Balance: $1018519906
+[19:08:10]   Electronics:
+[19:08:10]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:10]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:10]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:10]     Revenue: $23512540 | Balance: $1018519906
+[19:08:10]   Consumer Goods:
+[19:08:10] Country: United States
+[19:08:10] === DEBUG: Example Country ===
+[19:08:10] Electronics: 139.68 avail | Cap: 5
+[19:08:10] Consumer Goods: 0.00 avail | No Cap
+[19:08:10] === Trade Started ===
+[19:08:10] TRIGGERED: Electronics 139.7
+[19:08:09] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:09] === Complete ===
+[19:08:09] === END DEBUG ===
+[19:08:09]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:09]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:09]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:09]     Revenue: $23512540 | Balance: $1018519906
+[19:08:09]   Electronics:
+[19:08:09]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:09]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:09]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:09]     Revenue: $23512540 | Balance: $1018519906
+[19:08:09]   Consumer Goods:
+[19:08:09] Country: United States
+[19:08:09] === DEBUG: Example Country ===
+[19:08:09] Electronics: 139.68 avail | Cap: 5
+[19:08:09] Consumer Goods: 0.00 avail | No Cap
+[19:08:09] === Trade Started ===
+[19:08:09] TRIGGERED: Electronics 139.7
+[19:08:09] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:09] === Complete ===
+[19:08:09] === END DEBUG ===
+[19:08:09]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:09]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:09]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:09]     Revenue: $23512540 | Balance: $1018519906
+[19:08:09]   Electronics:
+[19:08:09]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:09]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:09]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:09]     Revenue: $23512540 | Balance: $1018519906
+[19:08:09]   Consumer Goods:
+[19:08:09] Country: United States
+[19:08:09] === DEBUG: Example Country ===
+[19:08:09] Electronics: 139.68 avail | Cap: 5
+[19:08:09] Consumer Goods: 0.00 avail | No Cap
+[19:08:09] === Trade Started ===
+[19:08:09] TRIGGERED: Electronics 139.7
+[19:08:08] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:08] === Complete ===
+[19:08:08] === END DEBUG ===
+[19:08:08]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:08]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:08]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:08]     Revenue: $23512540 | Balance: $1018519906
+[19:08:08]   Electronics:
+[19:08:08]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:08]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:08]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:08]     Revenue: $23512540 | Balance: $1018519906
+[19:08:08]   Consumer Goods:
+[19:08:08] Country: United States
+[19:08:08] === DEBUG: Example Country ===
+[19:08:08] Electronics: 139.68 avail | Cap: 5
+[19:08:08] Consumer Goods: 0.00 avail | No Cap
+[19:08:08] === Trade Started ===
+[19:08:08] TRIGGERED: Electronics 139.7
+[19:08:08] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:08] === Complete ===
+[19:08:08] === END DEBUG ===
+[19:08:08]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 87.60
+[19:08:08]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:08]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:08]     Revenue: $23512540 | Balance: $1018519906
+[19:08:08]   Electronics:
+[19:08:08]     MaxSpend: $8934765 (38% of rev) | MaxAffordable: 108.43
+[19:08:08]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:08]     Flow: -261.30 | BuyAmount: 0.00 | HasSell: false
+[19:08:08]     Revenue: $23512540 | Balance: $1018519906
+[19:08:08]   Consumer Goods:
+[19:08:08] Country: United States
+[19:08:08] === DEBUG: Example Country ===
+[19:08:08] Electronics: 139.66 avail | Cap: 5
+[19:08:08] Consumer Goods: 0.00 avail | No Cap
+[19:08:08] === Trade Started ===
+[19:08:08] TRIGGERED: Electronics 139.7
+[19:08:07] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:07] === Complete ===
+[19:08:07] === END DEBUG ===
+[19:08:07]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:07]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:07]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:07]     Revenue: $23510908 | Balance: $998135366
+[19:08:07]   Electronics:
+[19:08:07]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:07]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:07]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:07]     Revenue: $23510908 | Balance: $998135366
+[19:08:07]   Consumer Goods:
+[19:08:07] Country: United States
+[19:08:07] === DEBUG: Example Country ===
+[19:08:07] Electronics: 139.66 avail | Cap: 5
+[19:08:07] Consumer Goods: 0.00 avail | No Cap
+[19:08:07] === Trade Started ===
+[19:08:07] TRIGGERED: Electronics 139.7
+[19:08:07] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:07] === Complete ===
+[19:08:07] === END DEBUG ===
+[19:08:07]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:07]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:07]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:07]     Revenue: $23510908 | Balance: $998135366
+[19:08:07]   Electronics:
+[19:08:07]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:07]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:07]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:07]     Revenue: $23510908 | Balance: $998135366
+[19:08:07]   Consumer Goods:
+[19:08:07] Country: United States
+[19:08:07] === DEBUG: Example Country ===
+[19:08:07] Electronics: 139.66 avail | Cap: 5
+[19:08:07] Consumer Goods: 0.00 avail | No Cap
+[19:08:07] === Trade Started ===
+[19:08:07] TRIGGERED: Electronics 139.7
+[19:08:06] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:06] === Complete ===
+[19:08:06] === END DEBUG ===
+[19:08:06]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:06]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:06]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:06]     Revenue: $23510908 | Balance: $998135366
+[19:08:06]   Electronics:
+[19:08:06]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:06]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:06]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:06]     Revenue: $23510908 | Balance: $998135366
+[19:08:06]   Consumer Goods:
+[19:08:06] Country: United States
+[19:08:06] === DEBUG: Example Country ===
+[19:08:06] Electronics: 139.66 avail | Cap: 5
+[19:08:06] Consumer Goods: 0.00 avail | No Cap
+[19:08:06] === Trade Started ===
+[19:08:06] TRIGGERED: Electronics 139.7
+[19:08:06] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:06] === Complete ===
+[19:08:06] === END DEBUG ===
+[19:08:06]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:06]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:06]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:06]     Revenue: $23510908 | Balance: $998135366
+[19:08:06]   Electronics:
+[19:08:06]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:06]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:06]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:06]     Revenue: $23510908 | Balance: $998135366
+[19:08:06]   Consumer Goods:
+[19:08:06] Country: United States
+[19:08:06] === DEBUG: Example Country ===
+[19:08:06] Electronics: 139.66 avail | Cap: 5
+[19:08:06] Consumer Goods: 0.00 avail | No Cap
+[19:08:06] === Trade Started ===
+[19:08:06] TRIGGERED: Electronics 139.7
+[19:08:05] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:05] === Complete ===
+[19:08:05] === END DEBUG ===
+[19:08:05]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:05]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:05]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:05]     Revenue: $23510908 | Balance: $998135366
+[19:08:05]   Electronics:
+[19:08:05]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:05]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:05]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:05]     Revenue: $23510908 | Balance: $998135366
+[19:08:05]   Consumer Goods:
+[19:08:05] Country: United States
+[19:08:05] === DEBUG: Example Country ===
+[19:08:05] Electronics: 139.66 avail | Cap: 5
+[19:08:05] Consumer Goods: 0.00 avail | No Cap
+[19:08:05] === Trade Started ===
+[19:08:05] TRIGGERED: Electronics 139.7
+[19:08:05] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:05] === Complete ===
+[19:08:05] === END DEBUG ===
+[19:08:05]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:05]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:05]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:05]     Revenue: $23510908 | Balance: $998135366
+[19:08:05]   Electronics:
+[19:08:05]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:05]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:05]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:05]     Revenue: $23510908 | Balance: $998135366
+[19:08:05]   Consumer Goods:
+[19:08:05] Country: United States
+[19:08:05] === DEBUG: Example Country ===
+[19:08:05] Electronics: 139.66 avail | Cap: 5
+[19:08:05] Consumer Goods: 0.00 avail | No Cap
+[19:08:05] === Trade Started ===
+[19:08:05] TRIGGERED: Electronics 139.7
+[19:08:04] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:04] === Complete ===
+[19:08:04] === END DEBUG ===
+[19:08:04]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:04]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:04]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:04]     Revenue: $23510908 | Balance: $998135366
+[19:08:04]   Electronics:
+[19:08:04]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:04]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:04]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:04]     Revenue: $23510908 | Balance: $998135366
+[19:08:04]   Consumer Goods:
+[19:08:04] Country: United States
+[19:08:04] === DEBUG: Example Country ===
+[19:08:04] Electronics: 139.66 avail | Cap: 5
+[19:08:04] Consumer Goods: 0.00 avail | No Cap
+[19:08:04] === Trade Started ===
+[19:08:04] TRIGGERED: Electronics 139.7
+[19:08:04] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:04] === Complete ===
+[19:08:04] === END DEBUG ===
+[19:08:04]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:04]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:04]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:04]     Revenue: $23510908 | Balance: $998135366
+[19:08:04]   Electronics:
+[19:08:04]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:04]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:04]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:04]     Revenue: $23510908 | Balance: $998135366
+[19:08:04]   Consumer Goods:
+[19:08:04] Country: United States
+[19:08:04] === DEBUG: Example Country ===
+[19:08:04] Electronics: 139.66 avail | Cap: 5
+[19:08:04] Consumer Goods: 0.00 avail | No Cap
+[19:08:04] === Trade Started ===
+[19:08:04] TRIGGERED: Electronics 139.7
+[19:08:03] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:03] === Complete ===
+[19:08:03] === END DEBUG ===
+[19:08:03]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:03]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:03]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:03]     Revenue: $23510908 | Balance: $998135366
+[19:08:03]   Electronics:
+[19:08:03]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:03]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:03]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:03]     Revenue: $23510908 | Balance: $998135366
+[19:08:03]   Consumer Goods:
+[19:08:03] Country: United States
+[19:08:03] === DEBUG: Example Country ===
+[19:08:03] Electronics: 139.66 avail | Cap: 5
+[19:08:03] Consumer Goods: 0.00 avail | No Cap
+[19:08:03] === Trade Started ===
+[19:08:03] TRIGGERED: Electronics 139.7
+[19:08:03] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:03] === Complete ===
+[19:08:03] === END DEBUG ===
+[19:08:03]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:03]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:03]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:03]     Revenue: $23510908 | Balance: $998135366
+[19:08:03]   Electronics:
+[19:08:03]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:03]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:03]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:03]     Revenue: $23510908 | Balance: $998135366
+[19:08:03]   Consumer Goods:
+[19:08:03] Country: United States
+[19:08:03] === DEBUG: Example Country ===
+[19:08:03] Electronics: 139.66 avail | Cap: 5
+[19:08:03] Consumer Goods: 0.00 avail | No Cap
+[19:08:03] === Trade Started ===
+[19:08:03] TRIGGERED: Electronics 139.7
+[19:08:02] 0.0s | OK:0 Skip:240 Fail:0
+[19:08:02] === Complete ===
+[19:08:02] === END DEBUG ===
+[19:08:02]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 87.59
+[19:08:02]     PriceTier: 1.0x | PricePerUnit: $102000
+[19:08:02]     Flow: 0.00 | BuyAmount: 0.00 | HasSell: false
+[19:08:02]     Revenue: $23510908 | Balance: $998135366
+[19:08:02]   Electronics:
+[19:08:02]     MaxSpend: $8934145 (38% of rev) | MaxAffordable: 108.42
+[19:08:02]     PriceTier: 1.0x | PricePerUnit: $82400
+[19:08:02]     Flow: -261.28 | BuyAmount: 0.00 | HasSell: false
+[19:08:02]     Revenue: $23510908 | Balance: $998135366
+[19:08:02]   Consumer Goods:
+[19:08:02] Country: United States
+[19:08:02] === DEBUG: Example Country ===
+[19:08:02] Electronics: 139.66 avail | Cap: 5
+[19:08:02] Consumer Goods: 0.00 avail | No Cap
+[19:08:02] === Trade Started ===
+[19:08:02] TRIGGERED: Electronics 139.7
+[19:07:51] [AutoBuy] Copper: Bought 12.10
+[19:07:51] [AutoBuy] OK Copper from United States
+[19:07:51] [AutoBuy] Buying 12.10 Copper from United States @ 1.0x
+[19:07:51] [AutoBuy] Copper need: 12.10 (factory: 12.00, flow: 0.00)
+[19:07:39] [AutoBuy] Gold: Bought 10.10
+[19:07:39] [AutoBuy] OK Gold from Zimbabwe
+[19:07:39] [AutoBuy] Buying 10.10 Gold from Zimbabwe @ 1.0x
+[19:07:39] [AutoBuy] Gold need: 10.10 (factory: 10.00, flow: 0.00)
+[19:05:57] Auto-Buy: ON
+[19:05:57] Auto-Sell: ON
+[19:05:56] No country selected
+[19:05:56] === Trade Hub v2.0 ===
