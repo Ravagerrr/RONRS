@@ -3,6 +3,14 @@
     Cleaner navigation, less redundancy
 ]]
 
+-- Cleanup previous instance before re-injection
+-- This prevents lag from accumulating loops and UI elements
+if _G.TradeHubCleanup then
+    print("[Cleanup] Cleaning up previous instance...")
+    pcall(_G.TradeHubCleanup)
+    _G.TradeHubCleanup = nil
+end
+
 local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
 
 local function loadModule(name)
@@ -58,6 +66,21 @@ AutoSell.init(Config, State, Helpers, Trading, UI)
 AutoBuyer.init(Config, State, Helpers, UI)
 
 -- Create UI (auto-start is handled in UI after config is loaded)
-UI.createWindow()
+local Window = UI.createWindow()
+
+-- Register cleanup function for next injection
+_G.TradeHubCleanup = function()
+    print("[Cleanup] Stopping automation...")
+    -- Stop running processes
+    State.isRunning = false
+    if AutoSell then AutoSell.stop() end
+    if AutoBuyer then AutoBuyer.stop() end
+    
+    print("[Cleanup] Destroying UI...")
+    -- Destroy Rayfield window
+    if UI.cleanup then
+        UI.cleanup()
+    end
+end
 
 print("[Ready]")
