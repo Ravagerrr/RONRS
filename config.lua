@@ -52,6 +52,11 @@ return {
     SmartSell = true,
     SmartSellReserve = 1,
     
+    -- Flow Queue: Queue trades when flow is insufficient and retry when flow becomes available
+    -- When a trade is limited by flow protection, queue the remaining amount to try later
+    FlowQueueEnabled = true,
+    FlowQueueTimeout = 30,  -- Seconds before a queued trade expires (0 = never expire)
+    
     -- Revenue Spending Limit (Dynamic based on country size)
     -- Bigger countries are more lenient with high cost/revenue ratios
     -- Smaller countries are stricter and reject trades approaching their revenue limit

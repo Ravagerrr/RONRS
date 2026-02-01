@@ -49,6 +49,15 @@ function M.start()
                 
                 local totalAvail = Helpers.getTotalAvailableFlow()
                 
+                -- Process flow queue if we have available flow (even below threshold)
+                -- This allows queued trades to complete when flow becomes available
+                if totalAvail >= Config.MinAmount and Trading.getFlowQueueCount() > 0 then
+                    local queueSuccess = Trading.processFlowQueue()
+                    if queueSuccess > 0 then
+                        UI.log(string.format("[FLOW Q] Completed %d queued trades", queueSuccess), "success")
+                    end
+                end
+                
                 if totalAvail >= Config.AutoSellThreshold then
                     -- Check again right before starting trade
                     if not Config.AutoSellEnabled then
