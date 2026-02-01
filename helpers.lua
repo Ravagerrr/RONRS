@@ -241,47 +241,25 @@ function M.getCountryResourceData(country, resource)
 end
 
 function M.getPriceTier(revenue, resource, countryData)
-    -- User preference: Maximize volume and first-try success over price
-    -- Always use lowest price tier (0.1x) for highest acceptance rate
-    -- The affordability calculation in processCountryResource will use this tier
-    -- to calculate the maximum amount they can buy at 0.1x price
+    -- Strategy: Start at HIGHEST price tier (1.0x) to maximize revenue
+    -- Only drop to lower tiers as a last resort after retries fail
+    -- The attemptTrade function will retry at the same tier multiple times
     
     if not resource or not countryData then
-        return 0.1
+        return 1.0
     end
     
-    -- Verify they can afford at least something at 0.1x
-    local actualPricePerUnit = resource.buyPrice * 0.1
-    local maxSpendingPercent = M.getMaxSpendingPercent(revenue)
-    local maxAffordable = (revenue * maxSpendingPercent) / actualPricePerUnit
-    
-    -- Check if there's meaningful demand
-    local expectedTradeAmount
-    if resource.hasCap then
-        expectedTradeAmount = math.min(resource.capAmount, maxAffordable)
-    else
-        if countryData.flow < 0 then
-            local demand = math.abs(countryData.flow)
-            expectedTradeAmount = math.min(demand, maxAffordable)
-        else
-            expectedTradeAmount = maxAffordable
-        end
-    end
-    
-    -- Subtract existing purchases
-    expectedTradeAmount = math.max(0, expectedTradeAmount - countryData.buyAmount)
-    
-    if expectedTradeAmount < Config.MinAmount then
-        return nil  -- Can't afford meaningful trade even at 0.1x
-    end
-    
-    return 0.1
+    -- Start with full price (1.0x) - maximum revenue per unit
+    -- The retry mechanism will handle if this tier fails
+    return 1.0
 end
 
 function M.getNextPriceTier(current)
-    -- With the new approach of always using 0.1x, there's no lower tier to try
-    -- The in-function retry in attemptTrade handles retrying at the same tier
-    return nil
+    -- Retry sequence: 1.0 -> 0.5 -> 0.1 -> nil
+    -- Each tier is only tried AFTER the previous tier fails multiple attempts
+    if current >= 1.0 then return 0.5
+    elseif current >= 0.5 then return 0.1
+    else return nil end
 end
 
 -- Get dynamic spending limit based on country revenue
