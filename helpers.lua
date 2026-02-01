@@ -264,15 +264,18 @@ function M.getPriceTier(revenue, resource, countryData)
         local maxAffordable = (revenue * maxSpendingPercent) / actualPricePerUnit
         
         -- Calculate the ACTUAL trade amount we would attempt
-        -- For non-capped resources, don't limit by flow - countries can buy more than their consumption
         local expectedTradeAmount
         if resource.hasCap then
             -- Electronics: capped at capAmount
             expectedTradeAmount = math.min(resource.capAmount, maxAffordable)
         else
-            -- Consumer Goods: limited only by what they can afford
-            -- (flow check ensures they have demand, but doesn't cap the amount)
-            expectedTradeAmount = maxAffordable
+            -- Consumer Goods: limited by their demand (negative flow) AND what they can afford
+            if countryData.flow < 0 then
+                local demand = math.abs(countryData.flow)
+                expectedTradeAmount = math.min(demand, maxAffordable)
+            else
+                expectedTradeAmount = maxAffordable
+            end
         end
         
         -- Subtract what they're already buying (ensure non-negative)
