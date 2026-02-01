@@ -42,6 +42,12 @@ return {
     SkipProducingCountries = true,
     SkipOwnCountry = true,
     
+    -- Minimum Demand Threshold
+    -- Skip countries with flow >= this value (no meaningful demand)
+    -- Countries need negative flow (consuming) to actually want to buy
+    -- Set to small negative value like -0.1 to ensure real demand exists
+    MinDemandFlow = -0.1,
+    
     -- Flow Protection
     SmartSell = true,
     SmartSellReserve = 1,

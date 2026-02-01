@@ -69,6 +69,11 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     if data.hasSell then return false, false, "Already Selling" end
     if Config.SkipProducingCountries and data.flow > 0 then return false, false, "Producing" end
     
+    -- Skip countries with no meaningful demand (flow >= MinDemandFlow threshold)
+    -- Countries need actual negative flow (consumption) to want to buy resources
+    -- This prevents attempting trades to countries with zero or near-zero flow
+    if data.flow >= (Config.MinDemandFlow or 0) then return false, false, "No Demand" end
+    
     -- Get optimal price tier based on what country can afford (smart pricing)
     local price = Helpers.getPriceTier(data.revenue, resource, data)
     
