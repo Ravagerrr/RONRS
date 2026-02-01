@@ -63,6 +63,11 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
     local resourceBuyers = buyers[resName] or {}
     if Config.SkipExistingBuyers and resourceBuyers[name] then return false, false, "Buyer" end
     
+    -- Check if we're already selling this resource to this country (prevents duplicate trades on retry)
+    -- This checks OUR trade folder, not theirs, for reliable detection
+    local alreadySelling = Helpers.getSellingAmountTo(resource.gameName, name)
+    if alreadySelling > 0 then return false, false, "Already Trading" end
+    
     local data = Helpers.getCountryResourceData(country, resource)
     if not data.valid then return false, false, "Invalid" end
     if data.revenue <= 0 or data.balance <= 0 then return false, false, "No Revenue" end
@@ -93,25 +98,22 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         return false, false, "Invalid Price"
     end
     
+    -- Get dynamic spending limit based on country revenue (bigger countries = more lenient)
+    local maxSpendingPercent = Helpers.getMaxSpendingPercent(data.revenue)
+    
     -- Calculate affordable based on ACTUAL price they pay
-    -- Apply revenue spending limit to prevent rejection (countries won't spend 100% of revenue)
-    local maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+    -- Apply dynamic revenue spending limit to prevent rejection
+    local maxAffordable = (data.revenue * maxSpendingPercent) / actualPricePerUnit
     
     local affordable
     if resource.hasCap then
         -- Electronics: cap at capAmount (5), but also check what they can afford at this price
         affordable = math.min(resource.capAmount, maxAffordable)
     else
-        -- Consumer Goods: Limited by negative flow (demand) AND what they can afford
-        -- If country has negative flow (consuming), that's their max demand
-        -- Use absolute value of flow as the max they want to buy
-        if data.flow < 0 then
-            local maxDemand = math.abs(data.flow)
-            affordable = math.min(maxAffordable, maxDemand)
-        else
-            -- If flow is positive or zero, just use what they can afford
-            affordable = maxAffordable
-        end
+        -- Consumer Goods: Limited only by what they can afford
+        -- Countries can buy more than their current consumption rate
+        -- (the MinDemandFlow check ensures they have actual demand)
+        affordable = maxAffordable
     end
     
     if affordable < Config.MinAmount then return false, false, "Insufficient" end

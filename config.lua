@@ -52,15 +52,33 @@ return {
     SmartSell = true,
     SmartSellReserve = 1,
     
-    -- Revenue Spending Limit
-    -- Countries won't spend more than this percentage of their revenue on a single trade
-    -- 0.6 means 60% - prevents rejection when cost is too close to total revenue
-    -- Valid range: 0.0 to 1.0 (0% to 100%). Recommended: 0.5-0.7 for better acceptance rates
-    MaxRevenueSpendingPercent = 0.6,
+    -- Revenue Spending Limit (Dynamic based on country size)
+    -- Bigger countries are more lenient with high cost/revenue ratios
+    -- Smaller countries are stricter and reject trades approaching their revenue limit
+    -- These values define the spending percentage allowed at different revenue tiers
+    MaxRevenueSpendingPercent = 0.6,  -- Default/fallback (used if dynamic calc disabled)
+    
+    -- Dynamic spending limits based on country revenue
+    -- Format: {minRevenue, maxSpendingPercent}
+    -- Countries with revenue >= minRevenue can spend up to maxSpendingPercent
+    -- Tiers are checked from highest to lowest revenue
+    -- These values are based on game behavior: larger countries are more lenient
+    -- with high cost/revenue ratios, while smaller countries reject trades approaching their limits
+    RevenueSpendingTiers = {
+        {5000000, 0.85},   -- $5M+ revenue: can spend up to 85%
+        {1000000, 0.75},   -- $1M+ revenue: can spend up to 75%
+        {500000, 0.65},    -- $500K+ revenue: can spend up to 65%
+        {100000, 0.55},    -- $100K+ revenue: can spend up to 55%
+        {0, 0.45},         -- Below $100K: can spend up to 45%
+    },
     
     -- Debug
     -- Enable to log detailed country info at start of each trade run
     DebugLogging = true,
+    
+    -- UI Log Settings
+    -- Number of log entries to display in the UI (higher = more scrolling)
+    LogDisplayCount = 100,
     
     -- Auto-Sell
     AutoSellEnabled = true,

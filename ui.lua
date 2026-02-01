@@ -25,7 +25,9 @@ end
 function M.log(msg, msgType)
     local entry = string.format("[%s] %s", os.date("%H:%M:%S"), msg)
     table.insert(M.Logs, 1, entry)
-    if #M.Logs > 100 then table.remove(M.Logs) end
+    -- Keep unlimited logs in memory (or set a very high limit)
+    -- Use while loop to handle edge cases where multiple entries exceed limit
+    while #M.Logs > 10000 do table.remove(M.Logs) end
     
     -- Always print to console, never skip
     warn(entry)
@@ -41,11 +43,13 @@ end
 function M.updateLogs()
     if not M.Elements.LogParagraph then return end
     local text = ""
-    for i = 1, math.min(15, #M.Logs) do
+    -- Show more logs in UI (configurable via LogDisplayCount, default 100)
+    local displayCount = Config.LogDisplayCount or 100
+    for i = 1, math.min(displayCount, #M.Logs) do
         text = text .. M.Logs[i] .. "\n"
     end
     pcall(function()
-        M.Elements.LogParagraph:Set({Title = "Logs", Content = text ~= "" and text or "Ready"})
+        M.Elements.LogParagraph:Set({Title = string.format("Logs (%d total)", #M.Logs), Content = text ~= "" and text or "Ready"})
     end)
 end
 
@@ -116,7 +120,7 @@ end
 
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v1.5",
+        Name = "Trade Hub v1.6",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v4"}
     })
@@ -228,7 +232,7 @@ function M.createWindow()
     end})
     Logs:CreateButton({Name = "Clear", Callback = function() M.Logs = {} M.updateLogs() end})
     
-    M.log("=== Trade Hub v1.5 ===", "info")
+    M.log("=== Trade Hub v1.6 ===", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else
