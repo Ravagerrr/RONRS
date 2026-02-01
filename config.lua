@@ -56,20 +56,21 @@ return {
     -- Bigger countries are more lenient with high cost/revenue ratios
     -- Smaller countries are stricter and reject trades approaching their revenue limit
     -- These values define the spending percentage allowed at different revenue tiers
-    MaxRevenueSpendingPercent = 0.6,  -- Default/fallback (used if dynamic calc disabled)
+    MaxRevenueSpendingPercent = 0.35,  -- Default/fallback (used if dynamic calc disabled)
     
     -- Dynamic spending limits based on country revenue
     -- Format: {minRevenue, maxSpendingPercent}
     -- Countries with revenue >= minRevenue can spend up to maxSpendingPercent
     -- Tiers are checked from highest to lowest revenue
-    -- These values are based on game behavior: larger countries are more lenient
-    -- with high cost/revenue ratios, while smaller countries reject trades approaching their limits
+    -- CALIBRATED: Brazil ($12.4M revenue) accepted 60 units = 39.8% spending
+    -- Using conservative values below actual observed limits for safety margin
     RevenueSpendingTiers = {
-        {5000000, 0.85},   -- $5M+ revenue: can spend up to 85%
-        {1000000, 0.75},   -- $1M+ revenue: can spend up to 75%
-        {500000, 0.65},    -- $500K+ revenue: can spend up to 65%
-        {100000, 0.55},    -- $100K+ revenue: can spend up to 55%
-        {0, 0.45},         -- Below $100K: can spend up to 45%
+        {10000000, 0.38},  -- $10M+ revenue: can spend up to 38%
+        {5000000, 0.35},   -- $5M+ revenue: can spend up to 35%
+        {1000000, 0.32},   -- $1M+ revenue: can spend up to 32%
+        {500000, 0.28},    -- $500K+ revenue: can spend up to 28%
+        {100000, 0.25},    -- $100K+ revenue: can spend up to 25%
+        {0, 0.20},         -- Below $100K: can spend up to 20%
     },
     
     -- Debug
