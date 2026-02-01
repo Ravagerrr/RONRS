@@ -245,10 +245,6 @@ function M.processFlowQueue()
             continue
         end
         
-        -- Calculate how much we can sell now (up to remaining amount)
-        local sellAmount = math.min(item.remainingAmount, avail)
-        if sellAmount < Config.MinAmount then continue end
-        
         -- Re-check that we're still selling to this country (trade wasn't cancelled)
         local currentSelling = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
         if currentSelling <= 0 then
@@ -257,6 +253,32 @@ function M.processFlowQueue()
             table.insert(toRemove, key)
             continue
         end
+        
+        -- Re-check the country's current capacity (account for trades set up since queuing)
+        -- This prevents trying to sell more than the country can accept
+        local countryData = Helpers.getCountryResourceData(item.country, item.resource)
+        local sellAmount
+        
+        if configResource.hasCap then
+            -- For capped resources (like Electronics), check remaining capacity
+            local maxCapacity = configResource.capAmount or 5
+            local remainingCapacity = math.max(0, maxCapacity - countryData.buyAmount)
+            
+            if remainingCapacity < Config.MinAmount then
+                -- Country has reached cap from other trades, remove from queue
+                UI.log(string.format("[FLOW Q] %s reached cap for %s, removing", item.countryName, item.resource.gameName), "info")
+                table.insert(toRemove, key)
+                continue
+            end
+            
+            -- Calculate sell amount considering remaining amount, available flow, AND remaining capacity
+            sellAmount = math.min(item.remainingAmount, avail, remainingCapacity)
+        else
+            -- For uncapped resources, just consider remaining amount and available flow
+            sellAmount = math.min(item.remainingAmount, avail)
+        end
+        
+        if sellAmount < Config.MinAmount then continue end
         
         -- Attempt the trade
         UI.log(string.format("[FLOW Q] Trying %.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "info")

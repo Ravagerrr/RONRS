@@ -134,6 +134,19 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-01 04:16
+- **FIX: Flow queue not accounting for existing trades** - Fixed issue where flow queue didn't check country's current capacity
+  - **Problem**: When processing queued trades, the flow queue didn't re-check what the country was already buying
+  - **Root Cause**: `processFlowQueue()` calculated `sellAmount` without considering `countryData.buyAmount`
+  - For capped resources like Electronics (cap 5), if a country bought more since the trade was queued, the queue would try to sell more than remaining capacity
+  - **Fix**: Added capacity re-check in `processFlowQueue()`:
+    1. Get fresh `countryData` from `Helpers.getCountryResourceData()`
+    2. For capped resources, calculate `remainingCapacity = maxCapacity - countryData.buyAmount`
+    3. If capacity is full, remove from queue with log message
+    4. Limit `sellAmount` to `math.min(item.remainingAmount, avail, remainingCapacity)`
+  - This ensures queued trades account for any trades set up since the original was queued
+- Removed old/unrelated "READ FIRST" debug file
+
 ### Session 2026-02-01 03:38
 - **FIX: Electronics skipping all countries** - Identified root cause and applied fix
   - **Problem**: MinDemandFlow check (flow >= -0.1) was skipping countries with 0 flow
