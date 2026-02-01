@@ -25,8 +25,9 @@ local function attemptTrade(country, resource, amount, price)
     end)
     
     -- Poll multiple times to verify trade was registered (server may take time to update)
-    local maxAttempts = 5
-    local pollInterval = 0.2
+    -- Increased from 5x0.2s=1s to 8x0.25s=2s to handle slower server responses
+    local maxAttempts = 8
+    local pollInterval = 0.25
     
     for attempt = 1, maxAttempts do
         task.wait(pollInterval)
@@ -216,9 +217,10 @@ function M.run()
                 local priceTier = Helpers.getPriceTier(data.revenue, res, data)
                 local tierStr = priceTier and string.format("%.1fx", priceTier) or "N/A (cannot afford)"
                 local actualPricePerUnit = priceTier and res.buyPrice * priceTier or 0
+                local maxSpendingPercent = Helpers.getMaxSpendingPercent(data.revenue)
                 local maxAffordable = 0
                 if actualPricePerUnit > 0 then
-                    maxAffordable = (data.revenue * Config.MaxRevenueSpendingPercent) / actualPricePerUnit
+                    maxAffordable = (data.revenue * maxSpendingPercent) / actualPricePerUnit
                 end
                 
                 UI.log(string.format("  %s:", res.gameName), "info")
@@ -226,7 +228,7 @@ function M.run()
                 UI.log(string.format("    Flow: %.2f | BuyAmount: %.2f | HasSell: %s", data.flow, data.buyAmount, tostring(data.hasSell)), "info")
                 UI.log(string.format("    PriceTier: %s | PricePerUnit: $%.0f", tierStr, actualPricePerUnit), "info")
                 UI.log(string.format("    MaxSpend: $%.0f (%.0f%% of rev) | MaxAffordable: %.2f", 
-                    data.revenue * Config.MaxRevenueSpendingPercent, Config.MaxRevenueSpendingPercent * 100, maxAffordable), "info")
+                    data.revenue * maxSpendingPercent, maxSpendingPercent * 100, maxAffordable), "info")
             end
         end
         UI.log("=== END DEBUG ===", "info")
