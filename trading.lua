@@ -159,8 +159,6 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         i, total, resource.gameName, name, amount, price, actualPricePerUnit, data.flow, data.revenue, totalCost), "info")
     
     if attemptTrade(country, configResource, amount, price) then
-        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|OK",
-            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         UI.log(string.format("[%d/%d] OK %s %s", i, total, resource.gameName, name), "success")
         
         -- If trade was flow-limited, queue the remaining amount for later
@@ -170,8 +168,6 @@ function M.processCountryResource(country, resource, i, total, buyers, retryStat
         
         return true, false, nil
     else
-        print(string.format("TRADE|%s|%.0f|%s|%.1fx|%.2f|%.1f%%|$%.0f|FAIL",
-            name, data.ranking, resource.gameName:sub(1,4), price, amount, costPercent, data.revenue))
         local nextPrice = Helpers.getNextPriceTier(price)
         if Config.RetryEnabled and nextPrice and not isRetry then
             UI.log(string.format("[%d/%d] RETRY %s %s (will try %.1fx)", i, total, resource.gameName, name, nextPrice), "warning")
@@ -211,8 +207,6 @@ function M.queueFlowLimitedTrade(country, resource, remainingAmount, price, coun
     
     UI.log(string.format("[FLOW Q] Queued %.2f %s to %s (expires in %ds)", 
         remainingAmount, resource.gameName, name, Config.FlowQueueTimeout), "info")
-    print(string.format("FLOWQ|ADD|%s|%s|%.2f|%.1fx|%ds", 
-        name, resName, remainingAmount, price, Config.FlowQueueTimeout))
 end
 
 -- Process the flow queue - attempt to complete queued trades when flow becomes available
@@ -229,7 +223,6 @@ function M.processFlowQueue()
         -- Check if expired
         if item.expiresAt and now > item.expiresAt then
             UI.log(string.format("[FLOW Q] Expired: %s %s", item.resource.gameName, item.countryName), "warning")
-            print(string.format("FLOWQ|EXPIRED|%s|%s|%.2f", item.countryName, item.resource.name, item.remainingAmount))
             table.insert(toRemove, key)
             continue
         end
@@ -309,8 +302,6 @@ function M.processFlowQueue()
             item.remainingAmount = item.remainingAmount - sellAmount
             
             UI.log(string.format("[FLOW Q] OK +%.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "success")
-            print(string.format("FLOWQ|OK|%s|%s|%.2f|remaining:%.2f", 
-                item.countryName, item.resource.name, sellAmount, item.remainingAmount))
             
             -- If fully completed, remove from queue
             if item.remainingAmount < Config.MinAmount then
@@ -324,7 +315,6 @@ function M.processFlowQueue()
             end
         else
             UI.log(string.format("[FLOW Q] Failed: %s %s", item.resource.gameName, item.countryName), "warning")
-            print(string.format("FLOWQ|FAIL|%s|%s|%.2f", item.countryName, item.resource.name, sellAmount))
         end
     end
     

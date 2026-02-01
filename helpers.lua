@@ -35,11 +35,6 @@ function M.refreshMyCountry()
     if newCountryName ~= M.myCountryName then
         M.myCountryName = newCountryName
         M.myCountry = newCountryName and CountryData:FindFirstChild(newCountryName)
-        if newCountryName then
-            print("[Helpers] Country updated: " .. newCountryName)
-        else
-            print("[Helpers] No country selected")
-        end
         return true -- Country changed
     end
     return false -- No change
@@ -558,20 +553,11 @@ function M.getFactoryResourceConsumption()
     local consumption = {}
     local factories = M.getFactories()
     
-    print(string.format("[Helpers] Found %d factories", #factories))
-    
     -- Check each factory individually to read its actual demands
     for _, factory in ipairs(factories) do
         local demands = M.getFactoryDemands(factory)
-        local demandParts = {}
         for resourceName, amount in pairs(demands) do
             consumption[resourceName] = (consumption[resourceName] or 0) + amount
-            table.insert(demandParts, string.format("%s=%.2f", resourceName, amount))
-        end
-        if #demandParts > 0 then
-            print(string.format("[Helpers] Factory %s in %s needs: %s", factory.name, factory.city, table.concat(demandParts, " ")))
-        else
-            print(string.format("[Helpers] Factory %s in %s: no demands (operational or no shortage)", factory.name, factory.city))
         end
     end
     
