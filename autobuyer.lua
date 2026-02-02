@@ -212,6 +212,9 @@ local function checkAndBuyResource(resource)
     local boughtTotal = 0
     local remainingNeed = neededAmount  -- Track remaining need during loop (neededAmount preserved for final summary)
     
+    -- Start blocking AlertPopup during script trades
+    Helpers.startScriptTrade()
+    
     for idx, seller in ipairs(sellers) do
         -- Check if auto-buy was disabled mid-operation
         if not M.isMonitoring or not Config.AutoBuyEnabled then
@@ -263,6 +266,9 @@ local function checkAndBuyResource(resource)
         -- Delay between seller attempts (configurable, default 0.2s for fast buying)
         task.wait(Config.AutoBuyRetryDelay or 0.2)
     end
+    
+    -- Stop blocking AlertPopup after script trades complete
+    Helpers.stopScriptTrade()
     
     if boughtTotal > 0 then
         return true, string.format("Bought %.2f", boughtTotal)

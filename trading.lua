@@ -219,6 +219,9 @@ function M.processFlowQueue()
     local successCount = 0
     local toRemove = {}
     
+    -- Start blocking AlertPopup during flow queue processing
+    Helpers.startScriptTrade()
+    
     for key, item in pairs(State.flowQueue) do
         -- Check if expired
         if item.expiresAt and now > item.expiresAt then
@@ -323,6 +326,9 @@ function M.processFlowQueue()
         State.flowQueue[key] = nil
     end
     
+    -- Stop blocking AlertPopup after flow queue processing
+    Helpers.stopScriptTrade()
+    
     return successCount
 end
 
@@ -356,6 +362,9 @@ function M.run()
     State.isRunning = true
     State.retryQueue = {}
     State.Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
+    
+    -- Start blocking AlertPopup during script trades
+    Helpers.startScriptTrade()
     
     for _, res in ipairs(enabledResources) do
         State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
@@ -555,6 +564,9 @@ function M.run()
     local elapsed = tick() - startTime
     UI.log("=== Complete ===", "info")
     UI.log(string.format("%.1fs | OK:%d Skip:%d Fail:%d", elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
+    
+    -- Stop blocking AlertPopup after script trades complete
+    Helpers.stopScriptTrade()
     
     State.isRunning = false
     UI.updateStats()

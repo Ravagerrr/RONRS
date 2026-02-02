@@ -86,6 +86,11 @@ return {
     -- Number of log entries to display in the UI (higher = more scrolling)
     LogDisplayCount = 100,
     
+    -- Alert Popup Blocking
+    -- When enabled, blocks the AlertPopup remote event during script-initiated trades
+    -- This prevents visual spam from fast automated trades while allowing manual trade popups
+    BlockAlertPopupDuringTrade = true,
+    
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,

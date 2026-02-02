@@ -21,6 +21,12 @@ M.myCountry = nil
 local countryCacheTime = 0
 local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redundant lookups
 
+-- AlertPopup blocking state
+-- When true, script-initiated trades are in progress and we block AlertPopup
+M.isScriptTrading = false
+local alertPopupHooked = false
+local originalOnClientEvent = nil
+
 -- Refresh the player's country (call when country might have changed)
 -- Uses caching to avoid excessive GetAttribute calls
 function M.refreshMyCountry()
@@ -51,6 +57,45 @@ function M.init(cfg)
     -- Initialize country on startup (force refresh by resetting cache)
     countryCacheTime = 0
     M.refreshMyCountry()
+    
+    -- Setup AlertPopup blocking if enabled
+    M.setupAlertPopupBlocking()
+end
+
+-- Setup the AlertPopup blocking hook
+-- This hooks into the AlertPopup remote event and blocks it during script trades
+function M.setupAlertPopupBlocking()
+    if alertPopupHooked then return end
+    
+    local success = pcall(function()
+        local GameManager = workspace:WaitForChild("GameManager", 5)
+        if not GameManager then return end
+        
+        local AlertPopup = GameManager:FindFirstChild("AlertPopup")
+        if not AlertPopup or not AlertPopup:IsA("RemoteEvent") then return end
+        
+        -- Hook the OnClientEvent by connecting our own handler
+        -- When script is trading, we simply don't process the event (block it)
+        AlertPopup.OnClientEvent:Connect(function(...)
+            if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
+                -- Block the popup by doing nothing
+                return
+            end
+            -- Otherwise let it through (original behavior handled by game's own handler)
+        end)
+        
+        alertPopupHooked = true
+    end)
+end
+
+-- Start blocking AlertPopup (call before script-initiated trades)
+function M.startScriptTrade()
+    M.isScriptTrading = true
+end
+
+-- Stop blocking AlertPopup (call after script-initiated trades complete)
+function M.stopScriptTrade()
+    M.isScriptTrading = false
 end
 
 -- Get enabled resources sorted by priority

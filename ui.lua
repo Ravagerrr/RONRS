@@ -270,6 +270,13 @@ function M.createWindow()
         Callback = function(v) Config.SkipExistingBuyers = v end
     })
     
+    Settings:CreateSection("🎨 Visuals")
+    Settings:CreateToggle({
+        Name = "Block Alert Popups During Trades",
+        CurrentValue = Config.BlockAlertPopupDuringTrade,
+        Callback = function(v) Config.BlockAlertPopupDuringTrade = v end
+    })
+    
     -- ══════════════════════════════════════════════════════════════
     -- TAB 5: LOGS - Activity log
     -- ══════════════════════════════════════════════════════════════
