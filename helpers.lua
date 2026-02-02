@@ -418,6 +418,9 @@ M.FactoryConsumption = {
         ["Copper"] = 1,
         ["Tungsten"] = 1,
     },
+    ["Aircraft Manufactory"] = {
+        ["Aluminum"] = 2,  -- Fallback: game shows "Aluminum [Need: 2]"
+    },
 }
 
 -- Parse factory Operational_Reason attribute to extract resource demands

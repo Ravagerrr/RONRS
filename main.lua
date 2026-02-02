@@ -11,7 +11,14 @@ if _G.TradeHubCleanup then
     _G.TradeHubCleanup = nil
 end
 
-local BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
+-- BASE_URL Configuration
+-- To test a fork or different branch, set _G.RONRS_BASE_URL before executing:
+-- Example for fork: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
+-- Example for branch: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/your-branch/"
+local BASE_URL = _G.RONRS_BASE_URL or "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
+
+-- Log which source we're loading from (helps debug fork issues)
+print("[Source] " .. BASE_URL)
 
 local function loadModule(name)
     local url = BASE_URL .. name .. ".lua"

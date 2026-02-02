@@ -80,7 +80,7 @@ return {
     
     -- Debug
     -- Enable to log detailed country info at start of each trade run
-    DebugLogging = true,
+    DebugLogging = false,
     
     -- UI Log Settings
     -- Number of log entries to display in the UI (higher = more scrolling)
@@ -95,9 +95,19 @@ return {
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
     AutoBuyCheckInterval = 0.5,  -- Fast real-time detection
-    AutoBuyTargetSurplus = 0.1,  -- Target flow surplus (buys to +0.1 instead of 0)
+    AutoBuyTargetSurplus = 1.0,  -- Target flow surplus (buys to +1.0 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
-    AutoBuyStopAtPositiveFlow = 1,  -- Stop auto-buying when flow reaches this positive value (e.g., 1 means stop when flow >= 1)
+    AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
+    
+    -- Auto-Buy Speed Settings (optimized for game's ~0.3s server cooldown)
+    AutoBuyPollInterval = 0.15,  -- How often to check if trade was accepted
+    AutoBuyMaxPolls = 5,         -- Max poll attempts (0.15 * 5 = 0.75s max wait for full trade)
+    AutoBuyRetryDelay = 0.2,     -- Delay between seller attempts when one fails
+    
+    -- Auto-Buy Priority: Factory materials are now ALWAYS prioritized
+    -- Auto-buy runs even during sell cycles to prevent factory material shortages
+    -- This ensures your factories never run out of materials due to long-running sell operations
+    
     AutoBuyResources = {
         {name = "Tungsten", gameName = "Tungsten", enabled = true},
         {name = "Titanium", gameName = "Titanium", enabled = true},
@@ -105,5 +115,7 @@ return {
         {name = "Iron", gameName = "Iron", enabled = true},
         {name = "Gold", gameName = "Gold", enabled = true},
         {name = "Copper", gameName = "Copper", enabled = true},
+        {name = "Chromium", gameName = "Chromium", enabled = true},
+        {name = "Aluminum", gameName = "Aluminum", enabled = true},
     },
 }

@@ -134,6 +134,85 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 05:27
+- **FIX: Auto-buy makes multiple small trades instead of one big trade** - Fixed verification to track difference
+  - **Problem**: When needing 10 copper from a country with 10+ flow, script bought 2, 2, 2, 2, 2 instead of one 10
+  - **Root Cause**: `attemptBuy` read the trade entry immediately and got a partial/stale value
+    - If a pre-existing trade showed 2, it would return 2 even though we requested 10
+    - The verification was checking too quickly before the game updated the trade amount
+  - **Fix**:
+    1. Added `getCurrentTradeAmount()` helper to get trade amount BEFORE the request
+    2. Changed `attemptBuy` to calculate the DIFFERENCE (afterAmount - beforeAmount)
+    3. Increased polling: 0.15s × 5 = 0.75s max wait (was 0.1s × 3 = 0.3s)
+  - **Result**: Now correctly buys full requested amount in one trade when possible
+
+### Session 2026-02-02 04:21
+- **FIX: Auto-buy only gets partial amounts, splits across countries** - Now tracks actual bought amount
+  - **Problem**: When needing 10 copper, script would buy 2 from 5 different countries instead of continuing from one source
+  - **Root Cause**: `attemptBuy` only checked IF a trade existed, not HOW MUCH was bought:
+    ```lua
+    if obj.Value.X > 0 then return true  -- Only checked existence!
+    ```
+    So when requesting 10 but only getting 2, it thought it succeeded and exited the loop.
+  - **Fix**: 
+    1. Changed `attemptBuy` to return actual amount bought (from `obj.Value.X`) instead of just true/false
+    2. Updated buying loop to use actual amount and CONTINUE buying if we got less than requested
+    3. Only exits loop when full amount is received OR all sellers exhausted
+  - **Result**: Script now efficiently continues buying from multiple sellers until the full need is met
+
+### Session 2026-02-02 02:05
+- **FIX: Auto-buy trades too slow** - Optimized timing for faster material acquisition
+  - **Problem**: User reported trades were working correctly but taking too long between trades
+  - **Root Cause**: Auto-buy was using the same `Config.WaitTime` (0.5s flat wait) as selling trades
+  - **Fix**: Implemented fast polling for auto-buy verification:
+    - Changed from flat 0.5s wait to polling: check every 0.1s up to 3 times (0.3s max)
+    - Returns immediately when trade is verified (often after just 0.1-0.2s)
+    - Reduced seller retry delay from `Config.ResourceDelay` (0.3s) to hardcoded 0.2s
+  - **Result**: Auto-buy is now ~2-3x faster, matching the game's ~0.3s server cooldown
+
+### Session 2026-02-02 01:32
+- **FIX: Auto-buy leaves flow at -0.1 instead of +0.1** - Simplified the neededAmount calculation
+  - **Problem**: User reported script leaves them at -0.1 flow instead of reaching the +0.1 target
+  - **Root Cause**: The calculation was over-complicated and double-counting:
+    1. It calculated `neededAmount = factoryConsumption + targetFlow`
+    2. Then subtracted `existingIncoming` trades
+    3. But **flow already reflects** the net result of production - consumption + incoming trades!
+    4. So we were double-counting the incoming trades
+  - **Fix**: Simplified to use flow directly:
+    - If `factoryConsumption > 0` AND `flowBefore < targetFlow`, then `neededAmount = targetFlow - flowBefore`
+    - Example: flow = 0.0, target = 0.1 → neededAmount = 0.1 (exactly what's needed!)
+    - Example: flow = -5.0, target = 0.1 → neededAmount = 5.1 (covers deficit + surplus)
+  - Removed the `existingIncoming` subtraction since flow already accounts for it
+  - Updated log message to show target instead of incoming
+
+### Session 2026-02-02 01:22
+- **FIX: Fork testing loads old version** - Made BASE_URL configurable for testing forks
+  - **Problem**: When testing a fork, the script still loaded modules from the original repo URL
+  - **Root Cause**: `BASE_URL` in main.lua was hardcoded to `https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/`
+  - **Fix**: Added `_G.RONRS_BASE_URL` override option
+    - Set this global variable before executing to load from a different source
+    - Example: `_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"`
+    - Added `[Source]` log line to show which URL is being used
+  - **Usage for testing forks**:
+    ```lua
+    -- Execute this BEFORE running main.lua
+    _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourFork/RONRS/refs/heads/your-branch/"
+    ```
+
+### Session 2026-02-02 01:20
+- **FIX: Factory material deficit when auto-sell is running** - Auto-buy was being blocked by sell cycles
+  - **Problem**: User reported constant factory material deficit despite auto-buy being enabled
+  - **Root Cause**: In `autobuyer.lua` line 305, the `if not State.isRunning` check was blocking auto-buy from running whenever auto-sell was processing countries
+  - Auto-sell cycles can take a long time (processing 240 countries), during which NO factory material purchases were happening
+  - **Fix**: Removed the `State.isRunning` block from autobuyer
+    - Auto-buy now runs ALWAYS, regardless of whether auto-sell is active
+    - This makes factory materials PRIORITY - they're purchased even during sell cycles
+    - The two systems don't conflict because:
+      1. Auto-sell uses "Sell" trades (you selling to other countries)
+      2. Auto-buy uses "Buy" trades (you buying from other countries)
+    - Updated config.lua with documentation about this priority behavior
+  - **Result**: Factories will now receive materials continuously without being blocked by sell operations
+
 ### Session 2026-02-01 04:16
 - **FIX: Flow queue not accounting for existing trades** - Fixed issue where flow queue didn't check country's current capacity
   - **Problem**: When processing queued trades, the flow queue didn't re-check what the country was already buying

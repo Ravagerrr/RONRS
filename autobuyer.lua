@@ -93,26 +93,50 @@ local function findSellingCountries(resourceGameName)
     return sellers
 end
 
+-- Get current trade amount with a specific seller (0 if no trade exists)
+local function getCurrentTradeAmount(resourceGameName, sellerName)
+    local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
+    if not res then return 0 end
+    local trade = res:FindFirstChild("Trade")
+    if not trade then return 0 end
+    
+    for _, obj in ipairs(trade:GetChildren()) do
+        if obj:IsA("Vector3Value") and obj.Name == sellerName and obj.Value.X > 0 then
+            return obj.Value.X
+        end
+    end
+    return 0
+end
+
 -- Attempt to buy from a country
+-- Returns the actual amount bought (difference from before), or 0 if failed
 local function attemptBuy(seller, resourceGameName, amount, price)
+    -- Record trade amount BEFORE the request
+    local beforeAmount = getCurrentTradeAmount(resourceGameName, seller.name)
+    
     pcall(function()
         ManageAlliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
     end)
     
-    task.wait(Config.WaitTime)
+    -- Fast polling: check frequently for trade verification
+    -- Configurable via Config.AutoBuyPollInterval and Config.AutoBuyMaxPolls
+    local maxPolls = Config.AutoBuyMaxPolls or 3
+    local pollInterval = Config.AutoBuyPollInterval or 0.1
     
-    -- Verify the trade was accepted
-    local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
-    if not res then return false end
-    local trade = res:FindFirstChild("Trade")
-    if not trade then return false end
-    
-    for _, obj in ipairs(trade:GetChildren()) do
-        if obj:IsA("Vector3Value") and obj.Name == seller.name and obj.Value.X > 0 then
-            return true
+    for poll = 1, maxPolls do
+        task.wait(pollInterval)
+        
+        -- Get trade amount AFTER the request
+        local afterAmount = getCurrentTradeAmount(resourceGameName, seller.name)
+        
+        -- Check if trade amount increased
+        if afterAmount > beforeAmount then
+            -- Return the DIFFERENCE (how much we actually bought this time)
+            return afterAmount - beforeAmount
         end
     end
-    return false
+    
+    return 0  -- Failed - no trade increase detected
 end
 
 -- Check and buy for a single resource
@@ -134,18 +158,22 @@ local function checkAndBuyResource(resource)
     -- e.g., Electronics Factory consumes Titanium, Copper, and Gold
     local factoryConsumption = Helpers.getFactoryConsumption(resource.gameName)
     
-    -- If factories need this resource, we need to buy
-    -- Otherwise fall back to flow-based check
+    -- SIMPLIFIED LOGIC:
+    -- Flow already reflects: production - consumption + incoming trades
+    -- So if flow is negative or below target, we need to buy more
+    -- If factories are consuming and flow is below target, buy to reach target
+    
     local neededAmount = 0
     
     if factoryConsumption > 0 then
-        -- Factory consumption: what factories need minus our current production
-        -- If we have positive flow (production), it offsets the factory need
-        -- Only buy the difference that isn't covered by our own production
-        local positiveFlow = math.max(0, flowBefore)
-        -- Subtract our production from factory needs: e.g., factories need 100, we produce 50, so we only need to buy 50
-        local actualDeficit = math.max(0, factoryConsumption - positiveFlow)
-        neededAmount = actualDeficit + targetFlow
+        -- Factory mode: factories are consuming this resource
+        -- Flow already accounts for existing incoming trades
+        -- If flow < targetFlow, we need to buy more
+        if flowBefore < targetFlow then
+            neededAmount = targetFlow - flowBefore  -- e.g., 0.1 - 0.0 = 0.1, or 0.1 - (-5) = 5.1
+        else
+            return false, "Already at target"
+        end
     else
         -- Fallback to flow-based check if no factory consumption exists
         -- Only trigger if flow is NEGATIVE (actively consuming the resource)
@@ -162,25 +190,14 @@ local function checkAndBuyResource(resource)
         return false, "No Deficit"
     end
     
-    -- Subtract existing incoming trades from needed amount
-    -- This prevents buying from new countries when we already have trade agreements covering the need
-    local existingIncoming = Helpers.getTotalIncomingTrade(resource.gameName)
-    if existingIncoming > 0 then
-        neededAmount = neededAmount - existingIncoming
-    end
-    
-    if neededAmount <= 0 then
-        return false, "Already Covered"
-    end
-    
     if neededAmount < Config.MinAmount then
         return false, "Needed amount too small"
     end
     
     -- Log to UI when actually buying
     if factoryConsumption > 0 then
-        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, incoming: %.2f)", 
-            resource.gameName, neededAmount, factoryConsumption, flowBefore, existingIncoming), "info")
+        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, target: %.2f)", 
+            resource.gameName, neededAmount, factoryConsumption, flowBefore, targetFlow), "info")
     else
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
@@ -219,21 +236,32 @@ local function checkAndBuyResource(resource)
         UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx", 
             buyAmount, resource.gameName, seller.name, price), "info")
         
-        if attemptBuy(seller, resource.gameName, buyAmount, price) then
-            boughtTotal = boughtTotal + buyAmount
-            remainingNeed = remainingNeed - buyAmount
+        -- attemptBuy now returns ACTUAL amount bought (not just true/false)
+        local actualBought = attemptBuy(seller, resource.gameName, buyAmount, price)
+        
+        if actualBought > 0 then
+            boughtTotal = boughtTotal + actualBought
+            remainingNeed = remainingNeed - actualBought
             M.purchases = M.purchases + 1
             
-            UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
-            
-            -- Exit loop immediately after successful purchase to minimize trades
-            break
+            -- Log actual amount vs requested
+            if actualBought < buyAmount then
+                UI.log(string.format("[AutoBuy] Partial: got %.2f/%.2f %s from %s", 
+                    actualBought, buyAmount, resource.gameName, seller.name), "warning")
+                -- DON'T break - continue to next seller to get remaining amount
+            else
+                UI.log(string.format("[AutoBuy] OK %.2f %s from %s", 
+                    actualBought, resource.gameName, seller.name), "success")
+                -- Full amount received, exit loop
+                break
+            end
         else
             -- AI NPCs don't accept flexibility - if 1.0x fails, move to next seller
             UI.log(string.format("[AutoBuy] Failed %s from %s, trying next", resource.gameName, seller.name), "warning")
         end
         
-        task.wait(Config.ResourceDelay)
+        -- Delay between seller attempts (configurable, default 0.2s for fast buying)
+        task.wait(Config.AutoBuyRetryDelay or 0.2)
     end
     
     if boughtTotal > 0 then
@@ -300,10 +328,10 @@ function M.start()
             
             UI.updateAutoBuy()
             
-            -- Only run if we're not currently in a sell cycle
-            if not State.isRunning then
-                M.runCheck()
-            end
+            -- Factory material purchases are PRIORITY - run even during sell cycles
+            -- This ensures factories never run out of materials due to long sell cycles
+            -- The sell cycle uses "Sell" trades, auto-buy uses "Buy" trades - they don't conflict
+            M.runCheck()
             
             task.wait(Config.AutoBuyCheckInterval)
         end
