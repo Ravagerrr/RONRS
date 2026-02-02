@@ -134,6 +134,20 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 01:22
+- **FIX: Fork testing loads old version** - Made BASE_URL configurable for testing forks
+  - **Problem**: When testing a fork, the script still loaded modules from the original repo URL
+  - **Root Cause**: `BASE_URL` in main.lua was hardcoded to `https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/`
+  - **Fix**: Added `_G.RONRS_BASE_URL` override option
+    - Set this global variable before executing to load from a different source
+    - Example: `_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"`
+    - Added `[Source]` log line to show which URL is being used
+  - **Usage for testing forks**:
+    ```lua
+    -- Execute this BEFORE running main.lua
+    _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourFork/RONRS/refs/heads/your-branch/"
+    ```
+
 ### Session 2026-02-02 01:20
 - **FIX: Factory material deficit when auto-sell is running** - Auto-buy was being blocked by sell cycles
   - **Problem**: User reported constant factory material deficit despite auto-buy being enabled
