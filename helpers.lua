@@ -419,7 +419,7 @@ M.FactoryConsumption = {
         ["Tungsten"] = 1,
     },
     ["Aircraft Manufactory"] = {
-        ["Aluminium"] = 2,  -- Fallback: game shows "Aluminium [Need: 2]"
+        ["Aluminum"] = 2,  -- Fallback: game shows "Aluminum [Need: 2]"
     },
 }
 
