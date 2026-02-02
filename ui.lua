@@ -11,7 +11,7 @@
 ]]
 
 local M = {}
-local Config, State, Helpers, Trading, AutoSell, AutoBuyer
+local Config, State, Helpers, Trading, AutoSell, AutoBuyer, WarMonitor
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -22,13 +22,14 @@ M.lastLogUpdate = 0
 M.Window = nil
 M.isRunning = true  -- Controls the background update loop
 
-function M.init(cfg, state, helpers, trading, autosell, autobuyer)
+function M.init(cfg, state, helpers, trading, autosell, autobuyer, warmonitor)
     Config = cfg
     State = state
     Helpers = helpers
     Trading = trading
     AutoSell = autosell
     AutoBuyer = autobuyer
+    WarMonitor = warmonitor
 end
 
 function M.log(msg, msgType)
@@ -75,7 +76,8 @@ function M.updateStats()
             local status = State.isRunning and "RUNNING" or "IDLE"
             local autoSell = (AutoSell and AutoSell.isMonitoring) and "ON" or "OFF"
             local autoBuy = (AutoBuyer and AutoBuyer.isMonitoring) and "ON" or "OFF"
-            M.Elements.StatusLabel:Set(string.format("[%s] %s | Sell:%s Buy:%s", status, countryName, autoSell, autoBuy))
+            local warMon = (WarMonitor and WarMonitor.isMonitoring) and "ON" or "OFF"
+            M.Elements.StatusLabel:Set(string.format("[%s] %s | Sell:%s Buy:%s War:%s", status, countryName, autoSell, autoBuy, warMon))
         end
         
         if M.Elements.StatsLabel then
@@ -88,6 +90,20 @@ function M.updateStats()
             local sellTriggers = AutoSell and AutoSell.triggers or 0
             local buyPurchases = AutoBuyer and AutoBuyer.purchases or 0
             M.Elements.AutomationStats:Set(string.format("Sell Triggers: %d | Buy Purchases: %d", sellTriggers, buyPurchases))
+        end
+        
+        -- Update war alert status
+        if M.Elements.WarAlertLabel then
+            if WarMonitor and WarMonitor.isMonitoring then
+                local justifications = WarMonitor.getActiveJustifications()
+                if #justifications > 0 then
+                    M.Elements.WarAlertLabel:Set(string.format("⚠️ WAR: %s", table.concat(justifications, ", ")))
+                else
+                    M.Elements.WarAlertLabel:Set("✅ No war justifications detected")
+                end
+            else
+                M.Elements.WarAlertLabel:Set("War monitor disabled")
+            end
         end
     end)
 end
@@ -131,6 +147,9 @@ function M.createWindow()
     M.Elements.StatsLabel = Dashboard:CreateLabel("Trades: 0 OK | 0 Skip | 0 Fail")
     M.Elements.AutomationStats = Dashboard:CreateLabel("Sell Triggers: 0 | Buy Purchases: 0")
     
+    Dashboard:CreateSection("⚔️ War Alert")
+    M.Elements.WarAlertLabel = Dashboard:CreateLabel("No war justifications detected")
+    
     Dashboard:CreateSection("Resource Flow")
     for _, res in ipairs(Config.Resources) do
         M.Elements[res.name .. "Label"] = Dashboard:CreateLabel(string.format("%s: Loading...", res.gameName))
@@ -143,6 +162,7 @@ function M.createWindow()
             State.isRunning = false
             AutoSell.stop()
             if AutoBuyer then AutoBuyer.stop() end
+            if WarMonitor then WarMonitor.stop() end
             M.log("EMERGENCY STOP", "warning")
         end
     })
@@ -223,6 +243,25 @@ function M.createWindow()
         Increment = 0.1,
         CurrentValue = Config.AutoBuyCheckInterval,
         Callback = function(v) Config.AutoBuyCheckInterval = v end
+    })
+    
+    Automation:CreateSection("⚔️ War Monitor")
+    Automation:CreateToggle({
+        Name = "Enable War Monitor",
+        CurrentValue = Config.WarMonitorEnabled,
+        Callback = function(v) 
+            Config.WarMonitorEnabled = v
+            if WarMonitor then
+                if v then WarMonitor.start() else WarMonitor.stop() end
+            end
+        end
+    })
+    Automation:CreateSlider({
+        Name = "Check Interval (s)",
+        Range = {0.5, 5},
+        Increment = 0.5,
+        CurrentValue = Config.WarMonitorCheckInterval,
+        Callback = function(v) Config.WarMonitorCheckInterval = v end
     })
     
     -- ══════════════════════════════════════════════════════════════
@@ -322,6 +361,9 @@ function M.createWindow()
         end
         if Config.AutoBuyEnabled and AutoBuyer then
             AutoBuyer.start()
+        end
+        if Config.WarMonitorEnabled and WarMonitor then
+            WarMonitor.start()
         end
     end)
     

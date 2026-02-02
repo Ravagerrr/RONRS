@@ -118,4 +118,9 @@ return {
         {name = "Chromium", gameName = "Chromium", enabled = true},
         {name = "Aluminum", gameName = "Aluminum", enabled = true},
     },
+    
+    -- War Monitor (detects when countries are justifying war against you)
+    -- War justifications appear in: workspace.CountryData.[YourCountry].Diplomacy.Actions.[EnemyCountry]
+    WarMonitorEnabled = true,
+    WarMonitorCheckInterval = 1.0,  -- How often to check for war justifications (seconds)
 }

@@ -46,6 +46,42 @@ function M.hasCountry()
     return M.myCountryName ~= nil and M.myCountry ~= nil
 end
 
+-- Get countries that are currently justifying war against us
+-- War justifications appear in: workspace.CountryData.[YourCountry].Diplomacy.Actions.[EnemyCountry]
+-- Returns a table of country names that are justifying war
+function M.getWarJustifications()
+    M.refreshMyCountry()
+    if not M.myCountry then return {} end
+    
+    local diplomacy = M.myCountry:FindFirstChild("Diplomacy")
+    if not diplomacy then return {} end
+    
+    local actions = diplomacy:FindFirstChild("Actions")
+    if not actions then return {} end
+    
+    local justifications = {}
+    for _, entry in ipairs(actions:GetChildren()) do
+        -- Each child in Actions folder represents a country justifying war
+        table.insert(justifications, entry.Name)
+    end
+    
+    return justifications
+end
+
+-- Check if a specific country is justifying war against us
+function M.isJustifyingWar(countryName)
+    M.refreshMyCountry()
+    if not M.myCountry then return false end
+    
+    local diplomacy = M.myCountry:FindFirstChild("Diplomacy")
+    if not diplomacy then return false end
+    
+    local actions = diplomacy:FindFirstChild("Actions")
+    if not actions then return false end
+    
+    return actions:FindFirstChild(countryName) ~= nil
+end
+
 function M.init(cfg)
     Config = cfg
     -- Initialize country on startup (force refresh by resetting cache)
