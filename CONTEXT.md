@@ -134,6 +134,21 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 01:32
+- **FIX: Auto-buy leaves flow at -0.1 instead of +0.1** - Simplified the neededAmount calculation
+  - **Problem**: User reported script leaves them at -0.1 flow instead of reaching the +0.1 target
+  - **Root Cause**: The calculation was over-complicated and double-counting:
+    1. It calculated `neededAmount = factoryConsumption + targetFlow`
+    2. Then subtracted `existingIncoming` trades
+    3. But **flow already reflects** the net result of production - consumption + incoming trades!
+    4. So we were double-counting the incoming trades
+  - **Fix**: Simplified to use flow directly:
+    - If `factoryConsumption > 0` AND `flowBefore < targetFlow`, then `neededAmount = targetFlow - flowBefore`
+    - Example: flow = 0.0, target = 0.1 → neededAmount = 0.1 (exactly what's needed!)
+    - Example: flow = -5.0, target = 0.1 → neededAmount = 5.1 (covers deficit + surplus)
+  - Removed the `existingIncoming` subtraction since flow already accounts for it
+  - Updated log message to show target instead of incoming
+
 ### Session 2026-02-02 01:22
 - **FIX: Fork testing loads old version** - Made BASE_URL configurable for testing forks
   - **Problem**: When testing a fork, the script still loaded modules from the original repo URL

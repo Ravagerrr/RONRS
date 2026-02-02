@@ -134,18 +134,22 @@ local function checkAndBuyResource(resource)
     -- e.g., Electronics Factory consumes Titanium, Copper, and Gold
     local factoryConsumption = Helpers.getFactoryConsumption(resource.gameName)
     
-    -- If factories need this resource, we need to buy
-    -- Otherwise fall back to flow-based check
+    -- SIMPLIFIED LOGIC:
+    -- Flow already reflects: production - consumption + incoming trades
+    -- So if flow is negative or below target, we need to buy more
+    -- If factories are consuming and flow is below target, buy to reach target
+    
     local neededAmount = 0
     
     if factoryConsumption > 0 then
-        -- Factory consumption: what factories need minus our current production
-        -- If we have positive flow (production), it offsets the factory need
-        -- Only buy the difference that isn't covered by our own production
-        local positiveFlow = math.max(0, flowBefore)
-        -- Subtract our production from factory needs: e.g., factories need 100, we produce 50, so we only need to buy 50
-        local actualDeficit = math.max(0, factoryConsumption - positiveFlow)
-        neededAmount = actualDeficit + targetFlow
+        -- Factory mode: factories are consuming this resource
+        -- Flow already accounts for existing incoming trades
+        -- If flow < targetFlow, we need to buy more
+        if flowBefore < targetFlow then
+            neededAmount = targetFlow - flowBefore  -- e.g., 0.1 - 0.0 = 0.1, or 0.1 - (-5) = 5.1
+        else
+            return false, "Already at target"
+        end
     else
         -- Fallback to flow-based check if no factory consumption exists
         -- Only trigger if flow is NEGATIVE (actively consuming the resource)
@@ -162,25 +166,14 @@ local function checkAndBuyResource(resource)
         return false, "No Deficit"
     end
     
-    -- Subtract existing incoming trades from needed amount
-    -- This prevents buying from new countries when we already have trade agreements covering the need
-    local existingIncoming = Helpers.getTotalIncomingTrade(resource.gameName)
-    if existingIncoming > 0 then
-        neededAmount = neededAmount - existingIncoming
-    end
-    
-    if neededAmount <= 0 then
-        return false, "Already Covered"
-    end
-    
     if neededAmount < Config.MinAmount then
         return false, "Needed amount too small"
     end
     
     -- Log to UI when actually buying
     if factoryConsumption > 0 then
-        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, incoming: %.2f)", 
-            resource.gameName, neededAmount, factoryConsumption, flowBefore, existingIncoming), "info")
+        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, target: %.2f)", 
+            resource.gameName, neededAmount, factoryConsumption, flowBefore, targetFlow), "info")
     else
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end
