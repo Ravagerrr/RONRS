@@ -418,6 +418,10 @@ M.FactoryConsumption = {
         ["Copper"] = 1,
         ["Tungsten"] = 1,
     },
+    ["Aircraft Manufactory"] = {
+        ["Aluminum"] = 1,
+        ["Chromium"] = 1,
+    },
 }
 
 -- Parse factory Operational_Reason attribute to extract resource demands
