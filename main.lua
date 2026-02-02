@@ -53,8 +53,9 @@ local UI = loadModule("ui")
 local Trading = loadModule("trading")
 local AutoSell = loadModule("autosell")
 local AutoBuyer = loadModule("autobuyer")
+local WarMonitor = loadModule("warmonitor")
 
-if not (Config and Helpers and UI and Trading and AutoSell and AutoBuyer) then
+if not (Config and Helpers and UI and Trading and AutoSell and AutoBuyer and WarMonitor) then
     error("Module load failed!")
 end
 
@@ -68,10 +69,11 @@ local State = {
 
 -- Initialize
 Helpers.init(Config)
-UI.init(Config, State, Helpers, Trading, AutoSell, AutoBuyer)
+UI.init(Config, State, Helpers, Trading, AutoSell, AutoBuyer, WarMonitor)
 Trading.init(Config, State, Helpers, UI)
 AutoSell.init(Config, State, Helpers, Trading, UI)
 AutoBuyer.init(Config, State, Helpers, UI)
+WarMonitor.init(Config, State, Helpers, UI)
 
 -- Create UI (auto-start is handled in UI after config is loaded)
 local Window = UI.createWindow()
@@ -83,6 +85,7 @@ _G.TradeHubCleanup = function()
     State.isRunning = false
     if AutoSell then AutoSell.stop() end
     if AutoBuyer then AutoBuyer.stop() end
+    if WarMonitor then WarMonitor.stop() end
     
     print("[Cleanup] Destroying UI...")
     -- Destroy Rayfield window

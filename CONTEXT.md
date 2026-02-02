@@ -79,15 +79,16 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 | `config.lua` | Revenue spending tiers, retry settings |
 | `autosell.lua` | Triggers trading when flow exceeds threshold |
 | `autobuyer.lua` | Auto-buys resources when needed |
+| `warmonitor.lua` | Detects and alerts when countries are justifying war against you |
 | `ui.lua` | Rayfield UI v2.0 - Dashboard, Resources, Automation, Settings, Logs |
 | `main.lua` | Entry point, module loader |
 | `TRADE_ANALYSIS.md` | Detailed analysis documentation |
 | `CONTEXT.md` | **THIS FILE** - read first, update last |
 
 ### UI v2.0 Tab Structure
-1. **Dashboard** - Status overview (country, state, auto-sell/buy), resource flow, emergency stop
+1. **Dashboard** - Status overview (country, state, auto-sell/buy/war), war alerts, resource flow, emergency stop
 2. **Resources** - Sell resource toggles + Buy resource toggles (all in one place)
-3. **Automation** - Auto-Sell settings + Auto-Buy settings (enable, thresholds, intervals)
+3. **Automation** - Auto-Sell settings + Auto-Buy settings + War Monitor settings (enable, thresholds, intervals)
 4. **Settings** - Flow protection, timing, trade filters
 5. **Logs** - Activity log with copy/clear buttons
 
@@ -133,6 +134,21 @@ When user pastes TRADE| lines, analyze for:
 ---
 
 ## 📝 Session Log
+
+### Session 2026-02-02 06:43
+- **FEATURE: War Monitor** - Added detection and notification for war justifications
+  - **Purpose**: Alert the player when other countries are justifying war against them
+  - **How it works**:
+    - Monitors `workspace.CountryData.[YourCountry].Diplomacy.Actions` folder
+    - Any country appearing in the Actions folder means they're justifying war
+    - Sends both UI log messages and Roblox notifications when detected
+  - **New files**: `warmonitor.lua` - dedicated monitoring module
+  - **Config options**: `WarMonitorEnabled`, `WarMonitorCheckInterval`
+  - **UI changes**:
+    - Dashboard: Added "War Alert" section showing active justifications
+    - Automation tab: Added War Monitor toggle and interval slider
+    - Status bar: Now shows War:ON/OFF indicator
+  - **Notifications**: Uses `StarterGui:SetCore("SendNotification")` for in-game alerts
 
 ### Session 2026-02-02 05:27
 - **FIX: Auto-buy makes multiple small trades instead of one big trade** - Fixed verification to track difference
