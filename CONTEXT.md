@@ -134,6 +134,20 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 01:20
+- **FIX: Factory material deficit when auto-sell is running** - Auto-buy was being blocked by sell cycles
+  - **Problem**: User reported constant factory material deficit despite auto-buy being enabled
+  - **Root Cause**: In `autobuyer.lua` line 305, the `if not State.isRunning` check was blocking auto-buy from running whenever auto-sell was processing countries
+  - Auto-sell cycles can take a long time (processing 240 countries), during which NO factory material purchases were happening
+  - **Fix**: Removed the `State.isRunning` block from autobuyer
+    - Auto-buy now runs ALWAYS, regardless of whether auto-sell is active
+    - This makes factory materials PRIORITY - they're purchased even during sell cycles
+    - The two systems don't conflict because:
+      1. Auto-sell uses "Sell" trades (you selling to other countries)
+      2. Auto-buy uses "Buy" trades (you buying from other countries)
+    - Updated config.lua with documentation about this priority behavior
+  - **Result**: Factories will now receive materials continuously without being blocked by sell operations
+
 ### Session 2026-02-01 04:16
 - **FIX: Flow queue not accounting for existing trades** - Fixed issue where flow queue didn't check country's current capacity
   - **Problem**: When processing queued trades, the flow queue didn't re-check what the country was already buying

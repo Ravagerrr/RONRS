@@ -300,10 +300,10 @@ function M.start()
             
             UI.updateAutoBuy()
             
-            -- Only run if we're not currently in a sell cycle
-            if not State.isRunning then
-                M.runCheck()
-            end
+            -- Factory material purchases are PRIORITY - run even during sell cycles
+            -- This ensures factories never run out of materials due to long sell cycles
+            -- The sell cycle uses "Sell" trades, auto-buy uses "Buy" trades - they don't conflict
+            M.runCheck()
             
             task.wait(Config.AutoBuyCheckInterval)
         end

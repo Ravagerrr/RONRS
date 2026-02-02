@@ -98,6 +98,11 @@ return {
     AutoBuyTargetSurplus = 0.1,  -- Target flow surplus (buys to +0.1 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyStopAtPositiveFlow = 1,  -- Stop auto-buying when flow reaches this positive value (e.g., 1 means stop when flow >= 1)
+    
+    -- Auto-Buy Priority: Factory materials are now ALWAYS prioritized
+    -- Auto-buy runs even during sell cycles to prevent factory material shortages
+    -- This ensures your factories never run out of materials due to long-running sell operations
+    
     AutoBuyResources = {
         {name = "Tungsten", gameName = "Tungsten", enabled = true},
         {name = "Titanium", gameName = "Titanium", enabled = true},
