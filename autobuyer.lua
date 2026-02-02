@@ -94,24 +94,33 @@ local function findSellingCountries(resourceGameName)
 end
 
 -- Attempt to buy from a country
+-- Uses fast polling for verification instead of flat wait
 local function attemptBuy(seller, resourceGameName, amount, price)
     pcall(function()
         ManageAlliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
     end)
     
-    task.wait(Config.WaitTime)
+    -- Fast polling: check frequently for trade verification
+    -- Configurable via Config.AutoBuyPollInterval and Config.AutoBuyMaxPolls
+    local maxPolls = Config.AutoBuyMaxPolls or 3
+    local pollInterval = Config.AutoBuyPollInterval or 0.1
     
-    -- Verify the trade was accepted
-    local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
-    if not res then return false end
-    local trade = res:FindFirstChild("Trade")
-    if not trade then return false end
-    
-    for _, obj in ipairs(trade:GetChildren()) do
-        if obj:IsA("Vector3Value") and obj.Name == seller.name and obj.Value.X > 0 then
-            return true
+    for poll = 1, maxPolls do
+        task.wait(pollInterval)
+        
+        -- Verify the trade was accepted
+        local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
+        if not res then continue end
+        local trade = res:FindFirstChild("Trade")
+        if not trade then continue end
+        
+        for _, obj in ipairs(trade:GetChildren()) do
+            if obj:IsA("Vector3Value") and obj.Name == seller.name and obj.Value.X > 0 then
+                return true  -- Found! Exit early
+            end
         end
     end
+    
     return false
 end
 
@@ -226,7 +235,8 @@ local function checkAndBuyResource(resource)
             UI.log(string.format("[AutoBuy] Failed %s from %s, trying next", resource.gameName, seller.name), "warning")
         end
         
-        task.wait(Config.ResourceDelay)
+        -- Delay between seller attempts (configurable, default 0.2s for fast buying)
+        task.wait(Config.AutoBuyRetryDelay or 0.2)
     end
     
     if boughtTotal > 0 then

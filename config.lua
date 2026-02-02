@@ -99,6 +99,11 @@ return {
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyStopAtPositiveFlow = 1,  -- Stop auto-buying when flow reaches this positive value (e.g., 1 means stop when flow >= 1)
     
+    -- Auto-Buy Speed Settings (optimized for game's ~0.3s server cooldown)
+    AutoBuyPollInterval = 0.1,   -- How often to check if trade was accepted (fast polling)
+    AutoBuyMaxPolls = 3,         -- Max poll attempts (0.1 * 3 = 0.3s max wait)
+    AutoBuyRetryDelay = 0.2,     -- Delay between seller attempts when one fails
+    
     -- Auto-Buy Priority: Factory materials are now ALWAYS prioritized
     -- Auto-buy runs even during sell cycles to prevent factory material shortages
     -- This ensures your factories never run out of materials due to long-running sell operations

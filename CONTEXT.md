@@ -134,6 +134,16 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 02:05
+- **FIX: Auto-buy trades too slow** - Optimized timing for faster material acquisition
+  - **Problem**: User reported trades were working correctly but taking too long between trades
+  - **Root Cause**: Auto-buy was using the same `Config.WaitTime` (0.5s flat wait) as selling trades
+  - **Fix**: Implemented fast polling for auto-buy verification:
+    - Changed from flat 0.5s wait to polling: check every 0.1s up to 3 times (0.3s max)
+    - Returns immediately when trade is verified (often after just 0.1-0.2s)
+    - Reduced seller retry delay from `Config.ResourceDelay` (0.3s) to hardcoded 0.2s
+  - **Result**: Auto-buy is now ~2-3x faster, matching the game's ~0.3s server cooldown
+
 ### Session 2026-02-02 01:32
 - **FIX: Auto-buy leaves flow at -0.1 instead of +0.1** - Simplified the neededAmount calculation
   - **Problem**: User reported script leaves them at -0.1 flow instead of reaching the +0.1 target
