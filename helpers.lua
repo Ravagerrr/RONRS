@@ -25,6 +25,7 @@ local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redunda
 -- When true, script-initiated trades are in progress and we block AlertPopup
 M.isScriptTrading = false
 local alertPopupHooked = false
+local alertPopupNewConnection = nil  -- Store connection for potential cleanup
 
 -- Refresh the player's country (call when country might have changed)
 -- Uses caching to avoid excessive GetAttribute calls
@@ -89,7 +90,7 @@ function M.setupAlertPopupBlocking()
             end
             
             -- Create a single new connection that calls all original handlers when not blocking
-            AlertPopup.OnClientEvent:Connect(function(...)
+            alertPopupNewConnection = AlertPopup.OnClientEvent:Connect(function(...)
                 if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
                     -- Block the popup by not calling original handlers
                     return
@@ -104,8 +105,7 @@ function M.setupAlertPopupBlocking()
             warn("[RONRS] AlertPopup blocking enabled")
         else
             -- getconnections not available - blocking won't work
-            -- Just mark as hooked to prevent repeated setup attempts
-            alertPopupHooked = true
+            -- Don't set alertPopupHooked so future attempts can retry if API becomes available
             warn("[RONRS] AlertPopup blocking unavailable (getconnections not supported)")
         end
     end)
