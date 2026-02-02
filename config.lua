@@ -80,7 +80,7 @@ return {
     
     -- Debug
     -- Enable to log detailed country info at start of each trade run
-    DebugLogging = true,
+    DebugLogging = false,
     
     -- UI Log Settings
     -- Number of log entries to display in the UI (higher = more scrolling)
