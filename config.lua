@@ -116,6 +116,6 @@ return {
         {name = "Gold", gameName = "Gold", enabled = true},
         {name = "Copper", gameName = "Copper", enabled = true},
         {name = "Chromium", gameName = "Chromium", enabled = true},
-        {name = "Aluminum", gameName = "Aluminum", enabled = true},
+        {name = "Aluminium", gameName = "Aluminium", enabled = true},
     },
 }
