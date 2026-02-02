@@ -95,9 +95,9 @@ return {
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
     AutoBuyCheckInterval = 0.5,  -- Fast real-time detection
-    AutoBuyTargetSurplus = 0.1,  -- Target flow surplus (buys to +0.1 instead of 0)
+    AutoBuyTargetSurplus = 1.0,  -- Target flow surplus (buys to +1.0 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
-    AutoBuyStopAtPositiveFlow = 1,  -- Stop auto-buying when flow reaches this positive value (e.g., 1 means stop when flow >= 1)
+    AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
     
     -- Auto-Buy Speed Settings (optimized for game's ~0.3s server cooldown)
     AutoBuyPollInterval = 0.1,   -- How often to check if trade was accepted (fast polling)
