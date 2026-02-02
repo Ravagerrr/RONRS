@@ -78,24 +78,28 @@ function M.setupAlertPopupBlocking()
         -- This allows us to intercept and conditionally block the popup
         if getconnections then
             local connections = getconnections(AlertPopup.OnClientEvent)
+            
+            -- Collect all original handlers first, then disable them
+            local originalHandlers = {}
             for _, conn in pairs(connections) do
-                -- Capture the original function in a local variable for this iteration
-                -- This ensures each connection's closure has the correct function reference
-                local capturedFunc = conn.Function
+                if conn.Function then
+                    table.insert(originalHandlers, conn.Function)
+                end
                 conn:Disable()
-                
-                -- Create new connection that checks our flag before calling original
-                AlertPopup.OnClientEvent:Connect(function(...)
-                    if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
-                        -- Block the popup by not calling original handler
-                        return
-                    end
-                    -- Call original handler when not blocking
-                    if capturedFunc then
-                        pcall(capturedFunc, ...)
-                    end
-                end)
             end
+            
+            -- Create a single new connection that calls all original handlers when not blocking
+            AlertPopup.OnClientEvent:Connect(function(...)
+                if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
+                    -- Block the popup by not calling original handlers
+                    return
+                end
+                -- Call all original handlers when not blocking
+                for _, handler in ipairs(originalHandlers) do
+                    pcall(handler, ...)
+                end
+            end)
+            
             alertPopupHooked = true
             warn("[RONRS] AlertPopup blocking enabled")
         else

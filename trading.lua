@@ -576,7 +576,7 @@ end
 function M.stop()
     State.isRunning = false
     -- Ensure AlertPopup blocking is disabled when stop() is called externally (e.g., emergency stop)
-    -- Normal completion already calls stopScriptTrade() at line 570
+    -- Normal completion already calls stopScriptTrade() at the end of run()
     Helpers.stopScriptTrade()
 end
 
