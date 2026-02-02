@@ -25,7 +25,6 @@ local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redunda
 -- When true, script-initiated trades are in progress and we block AlertPopup
 M.isScriptTrading = false
 local alertPopupHooked = false
-local alertPopupConnection = nil
 
 -- Refresh the player's country (call when country might have changed)
 -- Uses caching to avoid excessive GetAttribute calls
@@ -68,7 +67,7 @@ end
 function M.setupAlertPopupBlocking()
     if alertPopupHooked then return end
     
-    local success = pcall(function()
+    local success, err = pcall(function()
         local GameManager = workspace:WaitForChild("GameManager", 5)
         if not GameManager then return end
         
@@ -80,8 +79,9 @@ function M.setupAlertPopupBlocking()
         if getconnections then
             local connections = getconnections(AlertPopup.OnClientEvent)
             for _, conn in pairs(connections) do
-                -- Store the original function and disable it
-                local originalFunc = conn.Function
+                -- Capture the original function in a local variable for this iteration
+                -- This ensures each connection's closure has the correct function reference
+                local capturedFunc = conn.Function
                 conn:Disable()
                 
                 -- Create new connection that checks our flag before calling original
@@ -91,21 +91,24 @@ function M.setupAlertPopupBlocking()
                         return
                     end
                     -- Call original handler when not blocking
-                    if originalFunc then
-                        pcall(originalFunc, ...)
+                    if capturedFunc then
+                        pcall(capturedFunc, ...)
                     end
                 end)
             end
             alertPopupHooked = true
+            warn("[RONRS] AlertPopup blocking enabled")
         else
-            -- Fallback: Just connect our own handler (doesn't block, but flag is tracked)
-            -- The game's original handler will still run
-            alertPopupConnection = AlertPopup.OnClientEvent:Connect(function(...)
-                -- We can't block here without getconnections, but the flag is set
-            end)
+            -- getconnections not available - blocking won't work
+            -- Just mark as hooked to prevent repeated setup attempts
             alertPopupHooked = true
+            warn("[RONRS] AlertPopup blocking unavailable (getconnections not supported)")
         end
     end)
+    
+    if not success and err then
+        warn("[RONRS] AlertPopup blocking setup failed: " .. tostring(err))
+    end
 end
 
 -- Start blocking AlertPopup (call before script-initiated trades)
