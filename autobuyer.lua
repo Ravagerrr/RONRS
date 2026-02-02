@@ -349,6 +349,8 @@ end
 
 function M.stop()
     M.isMonitoring = false
+    -- Ensure AlertPopup blocking is disabled when auto-buy stops
+    Helpers.stopScriptTrade()
     UI.updateAutoBuy()
 end
 

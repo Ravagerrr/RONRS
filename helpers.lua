@@ -25,7 +25,7 @@ local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redunda
 -- When true, script-initiated trades are in progress and we block AlertPopup
 M.isScriptTrading = false
 local alertPopupHooked = false
-local originalOnClientEvent = nil
+local alertPopupConnection = nil
 
 -- Refresh the player's country (call when country might have changed)
 -- Uses caching to avoid excessive GetAttribute calls
@@ -63,7 +63,8 @@ function M.init(cfg)
 end
 
 -- Setup the AlertPopup blocking hook
--- This hooks into the AlertPopup remote event and blocks it during script trades
+-- Disconnects the game's original handler and replaces with our filtered version
+-- NOTE: This approach works in Roblox exploit environments that support getconnections
 function M.setupAlertPopupBlocking()
     if alertPopupHooked then return end
     
@@ -74,17 +75,36 @@ function M.setupAlertPopupBlocking()
         local AlertPopup = GameManager:FindFirstChild("AlertPopup")
         if not AlertPopup or not AlertPopup:IsA("RemoteEvent") then return end
         
-        -- Hook the OnClientEvent by connecting our own handler
-        -- When script is trading, we simply don't process the event (block it)
-        AlertPopup.OnClientEvent:Connect(function(...)
-            if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
-                -- Block the popup by doing nothing
-                return
+        -- Use getconnections to get all existing handlers on this event
+        -- This allows us to intercept and conditionally block the popup
+        if getconnections then
+            local connections = getconnections(AlertPopup.OnClientEvent)
+            for _, conn in pairs(connections) do
+                -- Store the original function and disable it
+                local originalFunc = conn.Function
+                conn:Disable()
+                
+                -- Create new connection that checks our flag before calling original
+                AlertPopup.OnClientEvent:Connect(function(...)
+                    if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
+                        -- Block the popup by not calling original handler
+                        return
+                    end
+                    -- Call original handler when not blocking
+                    if originalFunc then
+                        pcall(originalFunc, ...)
+                    end
+                end)
             end
-            -- Otherwise let it through (original behavior handled by game's own handler)
-        end)
-        
-        alertPopupHooked = true
+            alertPopupHooked = true
+        else
+            -- Fallback: Just connect our own handler (doesn't block, but flag is tracked)
+            -- The game's original handler will still run
+            alertPopupConnection = AlertPopup.OnClientEvent:Connect(function(...)
+                -- We can't block here without getconnections, but the flag is set
+            end)
+            alertPopupHooked = true
+        end
     end)
 end
 

@@ -416,6 +416,7 @@ function M.run()
     end
     if allMaxedOut then
         UI.log("=== All resources maxed out - nothing to trade ===", "success")
+        Helpers.stopScriptTrade()  -- Ensure flag is cleared on early exit
         State.isRunning = false
         return
     end
@@ -574,6 +575,8 @@ end
 
 function M.stop()
     State.isRunning = false
+    -- Ensure AlertPopup blocking is disabled when trading stops
+    Helpers.stopScriptTrade()
 end
 
 return M
