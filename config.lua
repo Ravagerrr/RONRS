@@ -100,8 +100,8 @@ return {
     AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
     
     -- Auto-Buy Speed Settings (optimized for game's ~0.3s server cooldown)
-    AutoBuyPollInterval = 0.1,   -- How often to check if trade was accepted (fast polling)
-    AutoBuyMaxPolls = 3,         -- Max poll attempts (0.1 * 3 = 0.3s max wait)
+    AutoBuyPollInterval = 0.15,  -- How often to check if trade was accepted
+    AutoBuyMaxPolls = 5,         -- Max poll attempts (0.15 * 5 = 0.75s max wait for full trade)
     AutoBuyRetryDelay = 0.2,     -- Delay between seller attempts when one fails
     
     -- Auto-Buy Priority: Factory materials are now ALWAYS prioritized

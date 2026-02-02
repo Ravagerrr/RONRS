@@ -134,6 +134,18 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 05:27
+- **FIX: Auto-buy makes multiple small trades instead of one big trade** - Fixed verification to track difference
+  - **Problem**: When needing 10 copper from a country with 10+ flow, script bought 2, 2, 2, 2, 2 instead of one 10
+  - **Root Cause**: `attemptBuy` read the trade entry immediately and got a partial/stale value
+    - If a pre-existing trade showed 2, it would return 2 even though we requested 10
+    - The verification was checking too quickly before the game updated the trade amount
+  - **Fix**:
+    1. Added `getCurrentTradeAmount()` helper to get trade amount BEFORE the request
+    2. Changed `attemptBuy` to calculate the DIFFERENCE (afterAmount - beforeAmount)
+    3. Increased polling: 0.15s × 5 = 0.75s max wait (was 0.1s × 3 = 0.3s)
+  - **Result**: Now correctly buys full requested amount in one trade when possible
+
 ### Session 2026-02-02 04:21
 - **FIX: Auto-buy only gets partial amounts, splits across countries** - Now tracks actual bought amount
   - **Problem**: When needing 10 copper, script would buy 2 from 5 different countries instead of continuing from one source

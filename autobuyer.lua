@@ -93,9 +93,27 @@ local function findSellingCountries(resourceGameName)
     return sellers
 end
 
+-- Get current trade amount with a specific seller (0 if no trade exists)
+local function getCurrentTradeAmount(resourceGameName, sellerName)
+    local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
+    if not res then return 0 end
+    local trade = res:FindFirstChild("Trade")
+    if not trade then return 0 end
+    
+    for _, obj in ipairs(trade:GetChildren()) do
+        if obj:IsA("Vector3Value") and obj.Name == sellerName and obj.Value.X > 0 then
+            return obj.Value.X
+        end
+    end
+    return 0
+end
+
 -- Attempt to buy from a country
--- Returns the actual amount bought (from the trade entry), or 0 if failed
+-- Returns the actual amount bought (difference from before), or 0 if failed
 local function attemptBuy(seller, resourceGameName, amount, price)
+    -- Record trade amount BEFORE the request
+    local beforeAmount = getCurrentTradeAmount(resourceGameName, seller.name)
+    
     pcall(function()
         ManageAlliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
     end)
@@ -108,21 +126,17 @@ local function attemptBuy(seller, resourceGameName, amount, price)
     for poll = 1, maxPolls do
         task.wait(pollInterval)
         
-        -- Verify the trade was accepted and get ACTUAL amount bought
-        local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
-        if not res then continue end
-        local trade = res:FindFirstChild("Trade")
-        if not trade then continue end
+        -- Get trade amount AFTER the request
+        local afterAmount = getCurrentTradeAmount(resourceGameName, seller.name)
         
-        for _, obj in ipairs(trade:GetChildren()) do
-            if obj:IsA("Vector3Value") and obj.Name == seller.name and obj.Value.X > 0 then
-                -- Return the ACTUAL amount from the trade entry, not what we requested
-                return obj.Value.X
-            end
+        -- Check if trade amount increased
+        if afterAmount > beforeAmount then
+            -- Return the DIFFERENCE (how much we actually bought this time)
+            return afterAmount - beforeAmount
         end
     end
     
-    return 0  -- Failed - no trade found
+    return 0  -- Failed - no trade increase detected
 end
 
 -- Check and buy for a single resource
