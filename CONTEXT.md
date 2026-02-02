@@ -162,6 +162,17 @@ When user pastes TRADE| lines, analyze for:
     3. Increased polling: 0.15s × 5 = 0.75s max wait (was 0.1s × 3 = 0.3s)
   - **Result**: Now correctly buys full requested amount in one trade when possible
 
+### Session 2026-02-02 06:40
+- **FEATURE: Block AlertPopup during script trades** - Aesthetic improvement to reduce visual spam
+  - **Problem**: Fast automated trades cause AlertPopup spam, creating visual clutter
+  - **Solution**: 
+    1. Added `BlockAlertPopupDuringTrade` config option (default: true)
+    2. Added `isScriptTrading` flag and `startScriptTrade()`/`stopScriptTrade()` helpers
+    3. Hook AlertPopup.OnClientEvent to block when script is trading
+    4. Wrapped trading.lua `run()`, `processFlowQueue()`, and autobuyer.lua buying loop
+  - **Files modified**: helpers.lua, config.lua, trading.lua, autobuyer.lua, ui.lua
+  - **Result**: Popups blocked only during script trades, manual trades still show popups
+
 ### Session 2026-02-02 06:35
 - **DOCS: Expanded README** with quick start, configuration overview, and key files
 

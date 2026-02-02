@@ -21,6 +21,12 @@ M.myCountry = nil
 local countryCacheTime = 0
 local COUNTRY_CACHE_TTL = 0.5 -- Cache country for 0.5 seconds to reduce redundant lookups
 
+-- AlertPopup blocking state
+-- When true, script-initiated trades are in progress and we block AlertPopup
+M.isScriptTrading = false
+local alertPopupHooked = false
+local alertPopupNewConnection = nil  -- Store connection for potential cleanup
+
 -- Refresh the player's country (call when country might have changed)
 -- Uses caching to avoid excessive GetAttribute calls
 function M.refreshMyCountry()
@@ -87,6 +93,72 @@ function M.init(cfg)
     -- Initialize country on startup (force refresh by resetting cache)
     countryCacheTime = 0
     M.refreshMyCountry()
+    
+    -- Setup AlertPopup blocking if enabled
+    M.setupAlertPopupBlocking()
+end
+
+-- Setup the AlertPopup blocking hook
+-- Disconnects the game's original handler and replaces with our filtered version
+-- NOTE: This approach works in Roblox exploit environments that support getconnections
+function M.setupAlertPopupBlocking()
+    if alertPopupHooked then return end
+    
+    local success, err = pcall(function()
+        local GameManager = workspace:WaitForChild("GameManager", 5)
+        if not GameManager then return end
+        
+        local AlertPopup = GameManager:FindFirstChild("AlertPopup")
+        if not AlertPopup or not AlertPopup:IsA("RemoteEvent") then return end
+        
+        -- Use getconnections to get all existing handlers on this event
+        -- This allows us to intercept and conditionally block the popup
+        if getconnections then
+            local connections = getconnections(AlertPopup.OnClientEvent)
+            
+            -- Collect all original handlers first, then disable them
+            local originalHandlers = {}
+            for _, conn in pairs(connections) do
+                if conn.Function then
+                    table.insert(originalHandlers, conn.Function)
+                end
+                conn:Disable()
+            end
+            
+            -- Create a single new connection that calls all original handlers when not blocking
+            alertPopupNewConnection = AlertPopup.OnClientEvent:Connect(function(...)
+                if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
+                    -- Block the popup by not calling original handlers
+                    return
+                end
+                -- Call all original handlers when not blocking
+                for _, handler in ipairs(originalHandlers) do
+                    pcall(handler, ...)
+                end
+            end)
+            
+            alertPopupHooked = true
+            warn("[RONRS] AlertPopup blocking enabled")
+        else
+            -- getconnections not available - blocking won't work
+            -- Don't set alertPopupHooked so future attempts can retry if API becomes available
+            warn("[RONRS] AlertPopup blocking unavailable (getconnections not supported)")
+        end
+    end)
+    
+    if not success and err then
+        warn("[RONRS] AlertPopup blocking setup failed: " .. tostring(err))
+    end
+end
+
+-- Start blocking AlertPopup (call before script-initiated trades)
+function M.startScriptTrade()
+    M.isScriptTrading = true
+end
+
+-- Stop blocking AlertPopup (call after script-initiated trades complete)
+function M.stopScriptTrade()
+    M.isScriptTrading = false
 end
 
 -- Get enabled resources sorted by priority
