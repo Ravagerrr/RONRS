@@ -134,6 +134,20 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-02-02 04:21
+- **FIX: Auto-buy only gets partial amounts, splits across countries** - Now tracks actual bought amount
+  - **Problem**: When needing 10 copper, script would buy 2 from 5 different countries instead of continuing from one source
+  - **Root Cause**: `attemptBuy` only checked IF a trade existed, not HOW MUCH was bought:
+    ```lua
+    if obj.Value.X > 0 then return true  -- Only checked existence!
+    ```
+    So when requesting 10 but only getting 2, it thought it succeeded and exited the loop.
+  - **Fix**: 
+    1. Changed `attemptBuy` to return actual amount bought (from `obj.Value.X`) instead of just true/false
+    2. Updated buying loop to use actual amount and CONTINUE buying if we got less than requested
+    3. Only exits loop when full amount is received OR all sellers exhausted
+  - **Result**: Script now efficiently continues buying from multiple sellers until the full need is met
+
 ### Session 2026-02-02 02:05
 - **FIX: Auto-buy trades too slow** - Optimized timing for faster material acquisition
   - **Problem**: User reported trades were working correctly but taking too long between trades

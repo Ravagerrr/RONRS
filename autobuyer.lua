@@ -94,7 +94,7 @@ local function findSellingCountries(resourceGameName)
 end
 
 -- Attempt to buy from a country
--- Uses fast polling for verification instead of flat wait
+-- Returns the actual amount bought (from the trade entry), or 0 if failed
 local function attemptBuy(seller, resourceGameName, amount, price)
     pcall(function()
         ManageAlliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
@@ -108,7 +108,7 @@ local function attemptBuy(seller, resourceGameName, amount, price)
     for poll = 1, maxPolls do
         task.wait(pollInterval)
         
-        -- Verify the trade was accepted
+        -- Verify the trade was accepted and get ACTUAL amount bought
         local res = Helpers.getResourceFolder(Helpers.myCountry, resourceGameName)
         if not res then continue end
         local trade = res:FindFirstChild("Trade")
@@ -116,12 +116,13 @@ local function attemptBuy(seller, resourceGameName, amount, price)
         
         for _, obj in ipairs(trade:GetChildren()) do
             if obj:IsA("Vector3Value") and obj.Name == seller.name and obj.Value.X > 0 then
-                return true  -- Found! Exit early
+                -- Return the ACTUAL amount from the trade entry, not what we requested
+                return obj.Value.X
             end
         end
     end
     
-    return false
+    return 0  -- Failed - no trade found
 end
 
 -- Check and buy for a single resource
@@ -221,15 +222,25 @@ local function checkAndBuyResource(resource)
         UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx", 
             buyAmount, resource.gameName, seller.name, price), "info")
         
-        if attemptBuy(seller, resource.gameName, buyAmount, price) then
-            boughtTotal = boughtTotal + buyAmount
-            remainingNeed = remainingNeed - buyAmount
+        -- attemptBuy now returns ACTUAL amount bought (not just true/false)
+        local actualBought = attemptBuy(seller, resource.gameName, buyAmount, price)
+        
+        if actualBought > 0 then
+            boughtTotal = boughtTotal + actualBought
+            remainingNeed = remainingNeed - actualBought
             M.purchases = M.purchases + 1
             
-            UI.log(string.format("[AutoBuy] OK %s from %s", resource.gameName, seller.name), "success")
-            
-            -- Exit loop immediately after successful purchase to minimize trades
-            break
+            -- Log actual amount vs requested
+            if actualBought < buyAmount then
+                UI.log(string.format("[AutoBuy] Partial: got %.2f/%.2f %s from %s", 
+                    actualBought, buyAmount, resource.gameName, seller.name), "warning")
+                -- DON'T break - continue to next seller to get remaining amount
+            else
+                UI.log(string.format("[AutoBuy] OK %.2f %s from %s", 
+                    actualBought, resource.gameName, seller.name), "success")
+                -- Full amount received, exit loop
+                break
+            end
         else
             -- AI NPCs don't accept flexibility - if 1.0x fails, move to next seller
             UI.log(string.format("[AutoBuy] Failed %s from %s, trying next", resource.gameName, seller.name), "warning")
