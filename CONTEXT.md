@@ -146,6 +146,9 @@ When user pastes TRADE| lines, analyze for:
     3. Increased polling: 0.15s × 5 = 0.75s max wait (was 0.1s × 3 = 0.3s)
   - **Result**: Now correctly buys full requested amount in one trade when possible
 
+### Session 2026-02-02 06:35
+- **DOCS: Expanded README** with quick start, configuration overview, and key files
+
 ### Session 2026-02-02 04:21
 - **FIX: Auto-buy only gets partial amounts, splits across countries** - Now tracks actual bought amount
   - **Problem**: When needing 10 copper, script would buy 2 from 5 different countries instead of continuing from one source
