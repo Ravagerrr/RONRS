@@ -223,9 +223,9 @@ local function checkAndBuyResource(resource)
             break 
         end
         
-        -- AI NPCs can sell as much as needed - buy full amount from one seller to minimize trades
-        -- Prioritize larger trades from fewer sellers to save time (AI NPCs can handle deficit)
-        local buyAmount = remainingNeed  -- Buy full needed amount from one seller
+        -- Limit buy amount to the seller's available flow
+        -- This prevents failed trades when requesting more than seller can provide
+        local buyAmount = math.min(remainingNeed, seller.flow)
         
         if buyAmount < Config.MinAmount then 
             continue 
@@ -253,6 +253,10 @@ local function checkAndBuyResource(resource)
             else
                 UI.log(string.format("[AutoBuy] OK %.2f %s from %s", 
                     actualBought, resource.gameName, seller.name), "success")
+                -- If we still need more, continue to next seller
+                if remainingNeed > 0 then
+                    continue
+                end
                 -- Full amount received, exit loop
                 break
             end
