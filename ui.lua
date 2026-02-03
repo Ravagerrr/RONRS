@@ -415,9 +415,18 @@ function M.createWindow()
     
     Logs:CreateSection("Actions")
     Logs:CreateButton({
-        Name = "📋 Copy Logs",
-        Callback = function() 
-            if #M.Logs > 0 then setclipboard(table.concat(M.Logs, "\n")) end 
+        Name = "📋 Copy Logs (Filtered)",
+        Callback = function()
+            -- Only copy logs that pass the current filter
+            local filtered = {}
+            for _, entry in ipairs(M.Logs) do
+                if shouldShowLog(entry) then
+                    table.insert(filtered, entry)
+                end
+            end
+            if #filtered > 0 then 
+                setclipboard(table.concat(filtered, "\n")) 
+            end 
         end
     })
     Logs:CreateButton({
