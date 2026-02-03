@@ -1,5 +1,5 @@
 --[[
-    Trade Hub v2.0 - Reorganized UI
+    Trade Hub v2.1 - Bug Fixes & Improvements
     Cleaner navigation, less redundancy
 ]]
 
@@ -44,7 +44,7 @@ local function loadModule(name)
 end
 
 print("══════════════════════════")
-print("  Trade Hub v2.0")
+print("  Trade Hub v2.1")
 print("══════════════════════════")
 
 local Config = loadModule("config")
