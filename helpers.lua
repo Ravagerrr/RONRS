@@ -127,8 +127,12 @@ function M.setupAlertPopupBlocking()
             
             -- Create a single new connection that calls all original handlers when not blocking
             alertPopupNewConnection = AlertPopup.OnClientEvent:Connect(function(...)
+                -- Block ALL popups if BlockAlertPopupAlways is enabled
+                if Config.BlockAlertPopupAlways then
+                    return
+                end
+                -- Block during script trades if BlockAlertPopupDuringTrade is enabled
                 if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
-                    -- Block the popup by not calling original handlers
                     return
                 end
                 -- Call all original handlers when not blocking

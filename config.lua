@@ -96,8 +96,9 @@ return {
     LogFilterSystem = true,      -- System logs (=== Trade Started ===, etc.)
     
     -- Alert Popup Blocking
-    -- When enabled, blocks the AlertPopup remote event during script-initiated trades
-    -- This prevents visual spam from fast automated trades while allowing manual trade popups
+    -- BlockAlertPopupAlways: Block ALL alert popups (not just during trades)
+    -- BlockAlertPopupDuringTrade: Only block during script-initiated trades
+    BlockAlertPopupAlways = false,
     BlockAlertPopupDuringTrade = true,
     
     -- Auto-Sell

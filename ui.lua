@@ -369,6 +369,11 @@ function M.createWindow()
     
     Settings:CreateSection("🎨 Visuals")
     Settings:CreateToggle({
+        Name = "Block ALL Alert Popups",
+        CurrentValue = Config.BlockAlertPopupAlways,
+        Callback = function(v) Config.BlockAlertPopupAlways = v end
+    })
+    Settings:CreateToggle({
         Name = "Block Alert Popups During Trades",
         CurrentValue = Config.BlockAlertPopupDuringTrade,
         Callback = function(v) Config.BlockAlertPopupDuringTrade = v end
