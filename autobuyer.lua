@@ -166,14 +166,12 @@ local function checkAndBuyResource(resource)
     local neededAmount = 0
     
     if factoryConsumption > 0 then
-        -- Factory mode: factories are consuming this resource
-        -- Flow already accounts for existing incoming trades
-        -- If flow < targetFlow, we need to buy more
-        if flowBefore < targetFlow then
-            neededAmount = targetFlow - flowBefore  -- e.g., 0.1 - 0.0 = 0.1, or 0.1 - (-5) = 5.1
-        else
-            return false, "Already at target"
-        end
+        -- Factory mode: factory is non-operational and needs resources
+        -- factoryConsumption = how much the factory needs to become operational
+        -- We need to buy: factoryConsumption + targetFlow - flowBefore
+        -- Example: factory needs 10, flow = 0, target = 1 → need = 10 + 1 - 0 = 11
+        -- Example: factory needs 10, flow = -2, target = 1 → need = 10 + 1 - (-2) = 13
+        neededAmount = factoryConsumption + targetFlow - flowBefore
     else
         -- Fallback to flow-based check if no factory consumption exists
         -- Only trigger if flow is NEGATIVE (actively consuming the resource)
@@ -236,8 +234,8 @@ local function checkAndBuyResource(resource)
         -- AI NPCs ALWAYS use 1.0x price - they don't accept discounts when selling
         local price = 1.0
         
-        UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx", 
-            buyAmount, resource.gameName, seller.name, price), "info")
+        UI.log(string.format("[AutoBuy] Buying %.2f %s from %s @ %.1fx (seller flow: %.2f)", 
+            buyAmount, resource.gameName, seller.name, price, seller.flow), "info")
         
         -- attemptBuy now returns ACTUAL amount bought (not just true/false)
         local actualBought = attemptBuy(seller, resource.gameName, buyAmount, price)
