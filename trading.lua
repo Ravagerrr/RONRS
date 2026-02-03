@@ -274,7 +274,11 @@ function M.processFlowQueue()
             sellAmount = math.min(item.remainingAmount, avail)
         end
         
-        if sellAmount < Config.MinAmount then continue end
+        if sellAmount < Config.MinAmount then 
+            -- Amount too small to trade, remove from queue to prevent indefinite accumulation
+            table.insert(toRemove, key)
+            continue 
+        end
         
         -- Attempt the trade
         UI.log(string.format("[FLOW Q] Trying %.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "info")
