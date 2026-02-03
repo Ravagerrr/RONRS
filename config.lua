@@ -86,6 +86,15 @@ return {
     -- Number of log entries to display in the UI (higher = more scrolling)
     LogDisplayCount = 100,
     
+    -- Log Filters
+    -- Toggle visibility of logs from different modules (true = show, false = hide)
+    LogFilterAutoBuy = true,     -- [AutoBuy] logs
+    LogFilterAutoSell = true,    -- Auto-Sell, TRIGGERED logs
+    LogFilterTrading = true,     -- [x/y] country trade logs, OK/FAIL/RETRY
+    LogFilterFlowQueue = true,   -- [FLOW Q] logs
+    LogFilterWarMonitor = true,  -- War Monitor logs
+    LogFilterSystem = true,      -- System logs (=== Trade Started ===, etc.)
+    
     -- Alert Popup Blocking
     -- When enabled, blocks the AlertPopup remote event during script-initiated trades
     -- This prevents visual spam from fast automated trades while allowing manual trade popups

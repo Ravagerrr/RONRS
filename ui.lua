@@ -32,7 +32,55 @@ function M.init(cfg, state, helpers, trading, autosell, autobuyer, warmonitor)
     WarMonitor = warmonitor
 end
 
+-- Check if a log message should be shown based on filters
+local function shouldShowLog(msg)
+    -- Check AutoBuy filter
+    if not Config.LogFilterAutoBuy then
+        if msg:find("%[AutoBuy%]") or msg:find("Auto%-Buy:") then
+            return false
+        end
+    end
+    
+    -- Check AutoSell filter
+    if not Config.LogFilterAutoSell then
+        if msg:find("Auto%-Sell:") or msg:find("TRIGGERED:") then
+            return false
+        end
+    end
+    
+    -- Check Trading filter (country trades with [x/y] format)
+    if not Config.LogFilterTrading then
+        if msg:find("%[%d+/%d+%]") then
+            return false
+        end
+    end
+    
+    -- Check FlowQueue filter
+    if not Config.LogFilterFlowQueue then
+        if msg:find("%[FLOW Q%]") then
+            return false
+        end
+    end
+    
+    -- Check WarMonitor filter
+    if not Config.LogFilterWarMonitor then
+        if msg:find("War Monitor:") or msg:find("justifying war") or msg:find("⚠️") then
+            return false
+        end
+    end
+    
+    -- Check System filter (=== messages ===)
+    if not Config.LogFilterSystem then
+        if msg:find("^=== ") or msg:find("RETRY:") or msg:find("STOPPED") then
+            return false
+        end
+    end
+    
+    return true
+end
+
 function M.log(msg, msgType)
+    -- Always store in full log history
     local entry = string.format("[%s] %s", os.date("%H:%M:%S"), msg)
     table.insert(M.Logs, 1, entry)
     while #M.Logs > 10000 do table.remove(M.Logs) end
@@ -49,11 +97,21 @@ function M.updateLogs()
     if not M.Elements.LogParagraph then return end
     local text = ""
     local displayCount = Config.LogDisplayCount or 100
-    for i = 1, math.min(displayCount, #M.Logs) do
-        text = text .. M.Logs[i] .. "\n"
+    local shown = 0
+    local i = 1
+    
+    -- Filter logs based on settings
+    while shown < displayCount and i <= #M.Logs do
+        local entry = M.Logs[i]
+        if shouldShowLog(entry) then
+            text = text .. entry .. "\n"
+            shown = shown + 1
+        end
+        i = i + 1
     end
+    
     pcall(function()
-        M.Elements.LogParagraph:Set({Title = string.format("Logs (%d)", #M.Logs), Content = text ~= "" and text or "Ready"})
+        M.Elements.LogParagraph:Set({Title = string.format("Logs (%d shown / %d total)", shown, #M.Logs), Content = text ~= "" and text or "Ready"})
     end)
 end
 
@@ -322,6 +380,38 @@ function M.createWindow()
     local Logs = Window:CreateTab("Logs", 4483362458)
     
     M.Elements.LogParagraph = Logs:CreateParagraph({Title = "Activity Log", Content = "Ready"})
+    
+    Logs:CreateSection("🔍 Log Filters")
+    Logs:CreateToggle({
+        Name = "Show Auto-Buy Logs",
+        CurrentValue = Config.LogFilterAutoBuy,
+        Callback = function(v) Config.LogFilterAutoBuy = v; M.updateLogs() end
+    })
+    Logs:CreateToggle({
+        Name = "Show Auto-Sell Logs",
+        CurrentValue = Config.LogFilterAutoSell,
+        Callback = function(v) Config.LogFilterAutoSell = v; M.updateLogs() end
+    })
+    Logs:CreateToggle({
+        Name = "Show Trading Logs",
+        CurrentValue = Config.LogFilterTrading,
+        Callback = function(v) Config.LogFilterTrading = v; M.updateLogs() end
+    })
+    Logs:CreateToggle({
+        Name = "Show Flow Queue Logs",
+        CurrentValue = Config.LogFilterFlowQueue,
+        Callback = function(v) Config.LogFilterFlowQueue = v; M.updateLogs() end
+    })
+    Logs:CreateToggle({
+        Name = "Show War Monitor Logs",
+        CurrentValue = Config.LogFilterWarMonitor,
+        Callback = function(v) Config.LogFilterWarMonitor = v; M.updateLogs() end
+    })
+    Logs:CreateToggle({
+        Name = "Show System Logs",
+        CurrentValue = Config.LogFilterSystem,
+        Callback = function(v) Config.LogFilterSystem = v; M.updateLogs() end
+    })
     
     Logs:CreateSection("Actions")
     Logs:CreateButton({
