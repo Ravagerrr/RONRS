@@ -1,5 +1,5 @@
 --[[
-    UI MODULE v2.1
+    UI MODULE v2.1.1
     Reorganized Interface - Clean & Easy to Navigate
     
     Tabs:
@@ -168,7 +168,7 @@ end
 
 function M.createWindow()
     local Window = Rayfield:CreateWindow({
-        Name = "Trade Hub v2.1",
+        Name = "Trade Hub v2.1.1",
         LoadingTitle = "Loading...",
         ConfigurationSaving = {Enabled = true, FolderName = "ETH", FileName = "cfg_v5"}
     })
@@ -407,7 +407,7 @@ function M.createWindow()
     -- INITIALIZATION
     -- ══════════════════════════════════════════════════════════════
     
-    M.log("Trade Hub v2.1 loaded", "info")
+    M.log("Trade Hub v2.1.1 loaded", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else

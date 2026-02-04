@@ -1,5 +1,5 @@
 --[[
-    Trade Hub v2.1 - Bug Fixes & Improvements
+    Trade Hub v2.1.1 - Bug Fixes & Improvements
     Cleaner navigation, less redundancy
 ]]
 
@@ -43,7 +43,7 @@ local function loadModule(name)
     end
 end
 
-print("Trade Hub v2.1")
+print("Trade Hub v2.1.1")
 
 local Config = loadModule("config")
 local Helpers = loadModule("helpers")
