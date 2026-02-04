@@ -53,22 +53,31 @@ function M.hasCountry()
 end
 
 -- Get countries that are currently justifying war against us
--- War justifications appear in: workspace.CountryData.[YourCountry].Diplomacy.Actions.[EnemyCountry]
--- Returns a table of country names that are justifying war
+-- War justifications appear in: workspace.CountryData.[OtherCountry].Diplomacy.Actions.[MyCountry]
+-- We need to check OTHER countries' Actions folders to see if OUR name appears there
+-- Returns a table of country names that are justifying war against us
 function M.getWarJustifications()
     M.refreshMyCountry()
-    if not M.myCountry then return {} end
+    if not M.myCountryName then return {} end
     
-    local diplomacy = M.myCountry:FindFirstChild("Diplomacy")
-    if not diplomacy then return {} end
-    
-    local actions = diplomacy:FindFirstChild("Actions")
-    if not actions then return {} end
-    
+    local CountryData = workspace:WaitForChild("CountryData")
     local justifications = {}
-    for _, entry in ipairs(actions:GetChildren()) do
-        -- Each child in Actions folder represents a country justifying war
-        table.insert(justifications, entry.Name)
+    
+    -- Check every country's Diplomacy.Actions folder for our country name
+    for _, country in ipairs(CountryData:GetChildren()) do
+        -- Skip our own country
+        if country.Name == M.myCountryName then continue end
+        
+        local diplomacy = country:FindFirstChild("Diplomacy")
+        if not diplomacy then continue end
+        
+        local actions = diplomacy:FindFirstChild("Actions")
+        if not actions then continue end
+        
+        -- If our country name appears in their Actions folder, they're justifying war on us
+        if actions:FindFirstChild(M.myCountryName) then
+            table.insert(justifications, country.Name)
+        end
     end
     
     return justifications
@@ -77,15 +86,20 @@ end
 -- Check if a specific country is justifying war against us
 function M.isJustifyingWar(countryName)
     M.refreshMyCountry()
-    if not M.myCountry then return false end
+    if not M.myCountryName then return false end
     
-    local diplomacy = M.myCountry:FindFirstChild("Diplomacy")
+    local CountryData = workspace:WaitForChild("CountryData")
+    local country = CountryData:FindFirstChild(countryName)
+    if not country then return false end
+    
+    local diplomacy = country:FindFirstChild("Diplomacy")
     if not diplomacy then return false end
     
     local actions = diplomacy:FindFirstChild("Actions")
     if not actions then return false end
     
-    return actions:FindFirstChild(countryName) ~= nil
+    -- If our country name appears in their Actions folder, they're justifying war on us
+    return actions:FindFirstChild(M.myCountryName) ~= nil
 end
 
 function M.init(cfg)
@@ -127,8 +141,12 @@ function M.setupAlertPopupBlocking()
             
             -- Create a single new connection that calls all original handlers when not blocking
             alertPopupNewConnection = AlertPopup.OnClientEvent:Connect(function(...)
+                -- Block ALL popups if BlockAlertPopupAlways is enabled
+                if Config.BlockAlertPopupAlways then
+                    return
+                end
+                -- Block during script trades if BlockAlertPopupDuringTrade is enabled
                 if Config.BlockAlertPopupDuringTrade and M.isScriptTrading then
-                    -- Block the popup by not calling original handlers
                     return
                 end
                 -- Call all original handlers when not blocking
