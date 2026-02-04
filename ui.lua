@@ -265,13 +265,6 @@ function M.createWindow()
         CurrentValue = Config.AutoSellThreshold,
         Callback = function(v) Config.AutoSellThreshold = v end
     })
-    Automation:CreateSlider({
-        Name = "Check Interval (s)",
-        Range = {0.2, 5},
-        Increment = 0.1,
-        CurrentValue = Config.AutoSellCheckInterval,
-        Callback = function(v) Config.AutoSellCheckInterval = v end
-    })
     
     Automation:CreateSection("Auto-Buy")
     Automation:CreateToggle({
@@ -283,13 +276,6 @@ function M.createWindow()
                 if v then AutoBuyer.start() else AutoBuyer.stop() end
             end
         end
-    })
-    Automation:CreateSlider({
-        Name = "Check Interval (s)",
-        Range = {0.2, 5},
-        Increment = 0.1,
-        CurrentValue = Config.AutoBuyCheckInterval,
-        Callback = function(v) Config.AutoBuyCheckInterval = v end
     })
     
     Automation:CreateSection("War Monitor")

@@ -101,12 +101,12 @@ return {
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
-    AutoSellCheckInterval = 0.5,  -- Fast real-time detection
+    AutoSellCheckInterval = 0.2,  -- Fast real-time detection
     
     -- Auto-Buy (Flow Protection)
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
-    AutoBuyCheckInterval = 0.5,  -- Fast real-time detection
+    AutoBuyCheckInterval = 0.2,  -- Fast real-time detection
     AutoBuyTargetSurplus = 1.0,  -- Target flow surplus (buys to +1.0 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
