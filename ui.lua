@@ -132,11 +132,21 @@ function M.updateStats()
         -- Update war alert status
         if M.Elements.WarAlertLabel then
             if WarMonitor and WarMonitor.isMonitoring then
-                local justifications = WarMonitor.getActiveJustifications()
-                if #justifications > 0 then
-                    M.Elements.WarAlertLabel:Set(string.format("WAR ALERT: %s", table.concat(justifications, ", ")))
+                local justifying = WarMonitor.getActiveJustifications()
+                local ready = WarMonitor.getReadyToDeclare()
+                
+                local parts = {}
+                if #ready > 0 then
+                    table.insert(parts, "CAN DECLARE: " .. table.concat(ready, ", "))
+                end
+                if #justifying > 0 then
+                    table.insert(parts, "Justifying: " .. table.concat(justifying, ", "))
+                end
+                
+                if #parts > 0 then
+                    M.Elements.WarAlertLabel:Set(table.concat(parts, " | "))
                 else
-                    M.Elements.WarAlertLabel:Set("No war justifications detected")
+                    M.Elements.WarAlertLabel:Set("No war threats detected")
                 end
             else
                 M.Elements.WarAlertLabel:Set("War monitor disabled")
@@ -292,13 +302,6 @@ function M.createWindow()
                 if v then WarMonitor.start() else WarMonitor.stop() end
             end
         end
-    })
-    Automation:CreateSlider({
-        Name = "Check Interval (s)",
-        Range = {0.5, 5},
-        Increment = 0.5,
-        CurrentValue = Config.WarMonitorCheckInterval,
-        Callback = function(v) Config.WarMonitorCheckInterval = v end
     })
     
     -- ══════════════════════════════════════════════════════════════

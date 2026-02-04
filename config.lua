@@ -132,7 +132,7 @@ return {
     },
     
     -- War Monitor (detects when countries are justifying war against you)
-    -- War justifications appear in: workspace.CountryData.[YourCountry].Diplomacy.Actions.[EnemyCountry]
+    -- War justifications appear in: workspace.CountryData.[OtherCountry].Diplomacy.Actions.[YourCountry]
     WarMonitorEnabled = true,
-    WarMonitorCheckInterval = 1.0,  -- How often to check for war justifications (seconds)
+    WarMonitorCheckInterval = 0.2,  -- Fast real-time detection (same as Auto-Buy/Auto-Sell)
 }
