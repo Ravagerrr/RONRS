@@ -51,11 +51,11 @@ function M.checkJustifications()
             -- New justification detected!
             M.knownJustifications[countryName] = true
             
-            local message = string.format("⚠️ %s is justifying war against you!", countryName)
+            local message = string.format("%s is justifying war against you!", countryName)
             UI.log(message, "warning")
             
             -- Send a Roblox notification
-            sendNotification("⚔️ WAR ALERT", countryName .. " is justifying war!", 10)
+            sendNotification("WAR ALERT", countryName .. " is justifying war!", 10)
         end
     end
     
@@ -69,7 +69,7 @@ function M.checkJustifications()
     for countryName, _ in pairs(M.knownJustifications) do
         if not currentSet[countryName] then
             M.knownJustifications[countryName] = nil
-            UI.log(string.format("ℹ️ %s stopped justifying war", countryName), "info")
+            UI.log(string.format("%s stopped justifying war", countryName), "info")
         end
     end
 end
@@ -116,8 +116,6 @@ function M.start()
             
             task.wait(Config.WarMonitorCheckInterval)
         end
-        
-        UI.log("War Monitor: OFF", "warning")
     end)
 end
 

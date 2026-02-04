@@ -344,7 +344,6 @@ function M.start()
             task.wait(Config.AutoBuyCheckInterval)
         end
         
-        UI.log("Auto-Buy: OFF", "warning")
         UI.updateAutoBuy()
     end)
 end

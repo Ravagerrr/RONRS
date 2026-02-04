@@ -43,9 +43,7 @@ local function loadModule(name)
     end
 end
 
-print("══════════════════════════")
-print("  Trade Hub v2.1")
-print("══════════════════════════")
+print("Trade Hub v2.1")
 
 local Config = loadModule("config")
 local Helpers = loadModule("helpers")

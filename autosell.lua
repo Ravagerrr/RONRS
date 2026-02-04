@@ -100,7 +100,6 @@ function M.start()
             task.wait(Config.AutoSellCheckInterval)
         end
         
-        UI.log("Auto-Sell: OFF", "warning")
         UI.updateAutoSell()
     end)
 end

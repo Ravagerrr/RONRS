@@ -41,37 +41,16 @@ local function shouldShowLog(msg)
         end
     end
     
-    -- Check AutoSell filter
-    if not Config.LogFilterAutoSell then
-        if msg:find("Auto%-Sell:") or msg:find("TRIGGERED:") then
-            return false
-        end
-    end
-    
-    -- Check Trading filter (country trades with [x/y] format)
+    -- Check Trading filter (includes auto-sell, flow queue, country trades)
     if not Config.LogFilterTrading then
-        if msg:find("%[%d+/%d+%]") then
+        if msg:find("%[%d+/%d+%]") or msg:find("Auto%-Sell:") or msg:find("TRIGGERED:") or msg:find("%[FLOW Q%]") then
             return false
         end
     end
     
-    -- Check FlowQueue filter
-    if not Config.LogFilterFlowQueue then
-        if msg:find("%[FLOW Q%]") then
-            return false
-        end
-    end
-    
-    -- Check WarMonitor filter
-    if not Config.LogFilterWarMonitor then
-        if msg:find("War Monitor:") or msg:find("justifying war") or msg:find("⚠️") then
-            return false
-        end
-    end
-    
-    -- Check System filter (=== messages ===)
+    -- Check System filter (includes war monitor, system messages, retries)
     if not Config.LogFilterSystem then
-        if msg:find("^=== ") or msg:find("RETRY:") or msg:find("STOPPED") then
+        if msg:find("^=== ") or msg:find("RETRY:") or msg:find("STOPPED") or msg:find("War Monitor:") or msg:find("justifying war") then
             return false
         end
     end
@@ -155,9 +134,9 @@ function M.updateStats()
             if WarMonitor and WarMonitor.isMonitoring then
                 local justifications = WarMonitor.getActiveJustifications()
                 if #justifications > 0 then
-                    M.Elements.WarAlertLabel:Set(string.format("⚠️ WAR: %s", table.concat(justifications, ", ")))
+                    M.Elements.WarAlertLabel:Set(string.format("WAR ALERT: %s", table.concat(justifications, ", ")))
                 else
-                    M.Elements.WarAlertLabel:Set("✅ No war justifications detected")
+                    M.Elements.WarAlertLabel:Set("No war justifications detected")
                 end
             else
                 M.Elements.WarAlertLabel:Set("War monitor disabled")
@@ -205,7 +184,7 @@ function M.createWindow()
     M.Elements.StatsLabel = Dashboard:CreateLabel("Trades: 0 OK | 0 Skip | 0 Fail")
     M.Elements.AutomationStats = Dashboard:CreateLabel("Sell Triggers: 0 | Buy Purchases: 0")
     
-    Dashboard:CreateSection("⚔️ War Alert")
+    Dashboard:CreateSection("War Alert")
     M.Elements.WarAlertLabel = Dashboard:CreateLabel("No war justifications detected")
     
     Dashboard:CreateSection("Resource Flow")
@@ -215,7 +194,7 @@ function M.createWindow()
     
     Dashboard:CreateSection("Emergency")
     Dashboard:CreateButton({
-        Name = "⛔ STOP EVERYTHING",
+        Name = "STOP EVERYTHING",
         Callback = function()
             State.isRunning = false
             AutoSell.stop()
@@ -230,7 +209,7 @@ function M.createWindow()
     -- ══════════════════════════════════════════════════════════════
     local Resources = Window:CreateTab("Resources", 4483362458)
     
-    Resources:CreateSection("📤 Sell Resources")
+    Resources:CreateSection("Sell Resources")
     for i, res in ipairs(Config.Resources) do
         local cap = res.hasCap and string.format("Max %d", res.capAmount) or "No Cap"
         Resources:CreateToggle({
@@ -243,7 +222,7 @@ function M.createWindow()
         })
     end
     
-    Resources:CreateSection("📥 Buy Resources (Auto-Buy)")
+    Resources:CreateSection("Buy Resources (Auto-Buy)")
     for i, res in ipairs(Config.AutoBuyResources) do
         Resources:CreateToggle({
             Name = res.gameName,
@@ -260,7 +239,7 @@ function M.createWindow()
     -- ══════════════════════════════════════════════════════════════
     local Automation = Window:CreateTab("Automation", 4483362458)
     
-    Automation:CreateSection("📤 Auto-Sell")
+    Automation:CreateSection("Auto-Sell")
     Automation:CreateToggle({
         Name = "Enable Auto-Sell",
         CurrentValue = Config.AutoSellEnabled,
@@ -284,7 +263,7 @@ function M.createWindow()
         Callback = function(v) Config.AutoSellCheckInterval = v end
     })
     
-    Automation:CreateSection("📥 Auto-Buy")
+    Automation:CreateSection("Auto-Buy")
     Automation:CreateToggle({
         Name = "Enable Auto-Buy",
         CurrentValue = Config.AutoBuyEnabled,
@@ -303,7 +282,7 @@ function M.createWindow()
         Callback = function(v) Config.AutoBuyCheckInterval = v end
     })
     
-    Automation:CreateSection("⚔️ War Monitor")
+    Automation:CreateSection("War Monitor")
     Automation:CreateToggle({
         Name = "Enable War Monitor",
         CurrentValue = Config.WarMonitorEnabled,
@@ -327,7 +306,7 @@ function M.createWindow()
     -- ══════════════════════════════════════════════════════════════
     local Settings = Window:CreateTab("Settings", 4483362458)
     
-    Settings:CreateSection("🛡️ Flow Protection")
+    Settings:CreateSection("Flow Protection")
     Settings:CreateToggle({
         Name = "Smart Sell (Reserve Flow)",
         CurrentValue = Config.SmartSell,
@@ -341,7 +320,7 @@ function M.createWindow()
         Callback = function(v) Config.SmartSellReserve = v end
     })
     
-    Settings:CreateSection("⏱️ Timing")
+    Settings:CreateSection("Timing")
     Settings:CreateSlider({
         Name = "Trade Cooldown (s)",
         Range = {0.3, 2},
@@ -350,7 +329,7 @@ function M.createWindow()
         Callback = function(v) Config.WaitTime = v end
     })
     
-    Settings:CreateSection("🔍 Trade Filters")
+    Settings:CreateSection("Trade Filters")
     Settings:CreateToggle({
         Name = "Skip Player Countries",
         CurrentValue = Config.SkipPlayerCountries,
@@ -367,7 +346,7 @@ function M.createWindow()
         Callback = function(v) Config.SkipExistingBuyers = v end
     })
     
-    Settings:CreateSection("🎨 Visuals")
+    Settings:CreateSection("Visuals")
     Settings:CreateToggle({
         Name = "Block ALL Alert Popups",
         CurrentValue = Config.BlockAlertPopupAlways,
@@ -386,31 +365,16 @@ function M.createWindow()
     
     M.Elements.LogParagraph = Logs:CreateParagraph({Title = "Activity Log", Content = "Ready"})
     
-    Logs:CreateSection("🔍 Log Filters")
-    Logs:CreateToggle({
-        Name = "Show Auto-Buy Logs",
-        CurrentValue = Config.LogFilterAutoBuy,
-        Callback = function(v) Config.LogFilterAutoBuy = v; M.updateLogs() end
-    })
-    Logs:CreateToggle({
-        Name = "Show Auto-Sell Logs",
-        CurrentValue = Config.LogFilterAutoSell,
-        Callback = function(v) Config.LogFilterAutoSell = v; M.updateLogs() end
-    })
+    Logs:CreateSection("Log Filters")
     Logs:CreateToggle({
         Name = "Show Trading Logs",
         CurrentValue = Config.LogFilterTrading,
         Callback = function(v) Config.LogFilterTrading = v; M.updateLogs() end
     })
     Logs:CreateToggle({
-        Name = "Show Flow Queue Logs",
-        CurrentValue = Config.LogFilterFlowQueue,
-        Callback = function(v) Config.LogFilterFlowQueue = v; M.updateLogs() end
-    })
-    Logs:CreateToggle({
-        Name = "Show War Monitor Logs",
-        CurrentValue = Config.LogFilterWarMonitor,
-        Callback = function(v) Config.LogFilterWarMonitor = v; M.updateLogs() end
+        Name = "Show Auto-Buy Logs",
+        CurrentValue = Config.LogFilterAutoBuy,
+        Callback = function(v) Config.LogFilterAutoBuy = v; M.updateLogs() end
     })
     Logs:CreateToggle({
         Name = "Show System Logs",
@@ -420,7 +384,7 @@ function M.createWindow()
     
     Logs:CreateSection("Actions")
     Logs:CreateButton({
-        Name = "📋 Copy Logs (Filtered)",
+        Name = "Copy Logs (Filtered)",
         Callback = function()
             -- Only copy logs that pass the current filter
             local filtered = {}
@@ -435,7 +399,7 @@ function M.createWindow()
         end
     })
     Logs:CreateButton({
-        Name = "🗑️ Clear Logs",
+        Name = "Clear Logs",
         Callback = function() M.Logs = {} M.updateLogs() end
     })
     
@@ -443,7 +407,7 @@ function M.createWindow()
     -- INITIALIZATION
     -- ══════════════════════════════════════════════════════════════
     
-    M.log("=== Trade Hub v2.1 ===", "info")
+    M.log("Trade Hub v2.1 loaded", "info")
     if Helpers.myCountryName then
         M.log("Country: " .. Helpers.myCountryName, "info")
     else
