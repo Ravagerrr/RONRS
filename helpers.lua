@@ -529,23 +529,24 @@ end
 -- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]"
 M.FactoryConsumption = {
     ["Electronics Factory"] = {
-        ["Titanium"] = 1,
-        ["Copper"] = 1,
-        ["Gold"] = 1,
+        ["Copper"] = 2,
+        ["Gold"] = 2,
     },
     ["Steel Manufactory"] = {
-        ["Iron"] = 2,
+        ["Iron"] = 4,
+        ["Titanium"] = 0.2,
     },
     ["Fertilizer Factory"] = {
-        ["Phosphate"] = 1,
+        ["Phosphate"] = 3.5,
     },
     ["Motor Factory"] = {
-        ["Iron"] = 1,
-        ["Copper"] = 1,
-        ["Tungsten"] = 1,
+        ["Tungsten"] = 2,
+        ["Steel"] = 1,
     },
     ["Aircraft Manufactory"] = {
-        ["Aluminum"] = 2,  -- Fallback: game shows "Aluminum [Need: 2]"
+        ["Aluminum"] = 2,
+        ["Chromium"] = 2,
+        ["Titanium"] = 2,
     },
 }
 
