@@ -709,4 +709,45 @@ function M.getTotalResourceNeed(resourceGameName)
     return cityDeficit + factoryConsumption
 end
 
+-- Get cities sorted by population (lowest first)
+-- Used for factory building to prioritize low-population cities
+function M.getCitiesByPopulation()
+    local cities = M.getControlledCities()
+    
+    -- Get population for each city and sort
+    local citiesWithPop = {}
+    for _, city in ipairs(cities) do
+        local pop = city:GetAttribute("Population") or 0
+        table.insert(citiesWithPop, {city = city, population = pop})
+    end
+    
+    -- Sort by population (lowest first)
+    table.sort(citiesWithPop, function(a, b)
+        return a.population < b.population
+    end)
+    
+    return citiesWithPop
+end
+
+-- Build a factory at a specific city
+-- Returns true if successful, false otherwise
+function M.buildFactory(city, factoryType)
+    local CreateBuilding = workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding")
+    
+    local success = pcall(function()
+        CreateBuilding:FireServer({city}, factoryType)
+    end)
+    
+    return success
+end
+
+-- Available factory types for building
+M.FactoryTypes = {
+    "Electronics Factory",
+    "Steel Manufactory",
+    "Motor Factory",
+    "Fertilizer Factory",
+    "Aircraft Manufactory",
+}
+
 return M
