@@ -13,7 +13,12 @@
 local M = {}
 local Config, State, Helpers, Trading, AutoSell, AutoBuyer, WarMonitor
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local rayfieldCode = game:HttpGet('https://sirius.menu/rayfield')
+local Rayfield = loadstring(rayfieldCode)
+if not Rayfield then
+    error("Failed to load Rayfield UI library")
+end
+Rayfield = Rayfield()
 
 M.Elements = {}
 M.Logs = {}
