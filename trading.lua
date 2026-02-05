@@ -376,11 +376,7 @@ function M.run()
     
     local startTime = tick()
     
-    UI.log("=== Trade Started ===", "info")
-    for _, res in ipairs(enabledResources) do
-        local capInfo = res.hasCap and string.format("Cap: %d", res.capAmount) or "No Cap"
-        UI.log(string.format("%s: %.2f avail | %s", res.gameName, Helpers.getAvailableFlow(res), capInfo), "info")
-    end
+    UI.log("Trade cycle started", "info")
     
     local countries = Helpers.getCountries()
     local allBuyers = Helpers.getAllBuyers()
@@ -419,7 +415,7 @@ function M.run()
         end
     end
     if allMaxedOut then
-        UI.log("=== All resources maxed out - nothing to trade ===", "success")
+        UI.log("All resources maxed - nothing to trade", "success")
         Helpers.stopScriptTrade()  -- Ensure flag is cleared on early exit
         State.isRunning = false
         return
@@ -567,8 +563,7 @@ function M.run()
     end
     
     local elapsed = tick() - startTime
-    UI.log("=== Complete ===", "info")
-    UI.log(string.format("%.1fs | OK:%d Skip:%d Fail:%d", elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
+    UI.log(string.format("Done in %.1fs | OK:%d Skip:%d Fail:%d", elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
     
     -- Stop blocking AlertPopup after script trades complete
     Helpers.stopScriptTrade()

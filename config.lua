@@ -86,14 +86,11 @@ return {
     -- Number of log entries to display in the UI (higher = more scrolling)
     LogDisplayCount = 100,
     
-    -- Log Filters
-    -- Toggle visibility of logs from different modules (true = show, false = hide)
-    LogFilterAutoBuy = true,     -- [AutoBuy] logs
-    LogFilterAutoSell = true,    -- Auto-Sell, TRIGGERED logs
-    LogFilterTrading = true,     -- [x/y] country trade logs, OK/FAIL/RETRY
-    LogFilterFlowQueue = true,   -- [FLOW Q] logs
-    LogFilterWarMonitor = true,  -- War Monitor logs
-    LogFilterSystem = true,      -- System logs (=== Trade Started ===, etc.)
+    -- Log Filters (Simplified)
+    -- Toggle visibility of different log types (true = show, false = hide)
+    LogFilterTrading = true,     -- Trading logs, flow queue, auto-sell triggers
+    LogFilterAutoBuy = true,     -- Auto-buy logs
+    LogFilterSystem = true,      -- System logs, war monitor, retries
     
     -- Alert Popup Blocking
     -- BlockAlertPopupAlways: Block ALL alert popups (not just during trades)
@@ -104,12 +101,12 @@ return {
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
-    AutoSellCheckInterval = 0.5,  -- Fast real-time detection
+    AutoSellCheckInterval = 0.2,  -- Fast real-time detection
     
     -- Auto-Buy (Flow Protection)
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
-    AutoBuyCheckInterval = 0.5,  -- Fast real-time detection
+    AutoBuyCheckInterval = 0.2,  -- Fast real-time detection
     AutoBuyTargetSurplus = 1.0,  -- Target flow surplus (buys to +1.0 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
@@ -135,7 +132,7 @@ return {
     },
     
     -- War Monitor (detects when countries are justifying war against you)
-    -- War justifications appear in: workspace.CountryData.[YourCountry].Diplomacy.Actions.[EnemyCountry]
+    -- War justifications appear in: workspace.CountryData.[OtherCountry].Diplomacy.Actions.[YourCountry]
     WarMonitorEnabled = true,
-    WarMonitorCheckInterval = 1.0,  -- How often to check for war justifications (seconds)
+    WarMonitorCheckInterval = 0.2,  -- Fast real-time detection (same as Auto-Buy/Auto-Sell)
 }

@@ -529,23 +529,24 @@ end
 -- Format: "ResourceName [Need: X]" e.g., "Gold [Need: 2]"
 M.FactoryConsumption = {
     ["Electronics Factory"] = {
-        ["Titanium"] = 1,
-        ["Copper"] = 1,
-        ["Gold"] = 1,
+        ["Copper"] = 2,
+        ["Gold"] = 2,
     },
     ["Steel Manufactory"] = {
-        ["Iron"] = 2,
+        ["Iron"] = 4,
+        ["Titanium"] = 0.2,
     },
     ["Fertilizer Factory"] = {
-        ["Phosphate"] = 1,
+        ["Phosphate"] = 3.5,
     },
     ["Motor Factory"] = {
-        ["Iron"] = 1,
-        ["Copper"] = 1,
-        ["Tungsten"] = 1,
+        ["Tungsten"] = 2,
+        ["Steel"] = 1,
     },
     ["Aircraft Manufactory"] = {
-        ["Aluminum"] = 2,  -- Fallback: game shows "Aluminum [Need: 2]"
+        ["Aluminum"] = 2,
+        ["Chromium"] = 2,
+        ["Titanium"] = 2,
     },
 }
 
@@ -707,5 +708,46 @@ function M.getTotalResourceNeed(resourceGameName)
     local factoryConsumption = M.getFactoryConsumption(resourceGameName)
     return cityDeficit + factoryConsumption
 end
+
+-- Get cities sorted by population (lowest first)
+-- Used for factory building to prioritize low-population cities
+function M.getCitiesByPopulation()
+    local cities = M.getControlledCities()
+    
+    -- Get population for each city and sort
+    local citiesWithPop = {}
+    for _, city in ipairs(cities) do
+        local pop = city:GetAttribute("Population") or 0
+        table.insert(citiesWithPop, {city = city, population = pop})
+    end
+    
+    -- Sort by population (lowest first)
+    table.sort(citiesWithPop, function(a, b)
+        return a.population < b.population
+    end)
+    
+    return citiesWithPop
+end
+
+-- Build a factory at a specific city
+-- Returns true if successful, false otherwise
+function M.buildFactory(city, factoryType)
+    local CreateBuilding = workspace:WaitForChild("GameManager"):WaitForChild("CreateBuilding")
+    
+    local success = pcall(function()
+        CreateBuilding:FireServer({city}, factoryType)
+    end)
+    
+    return success
+end
+
+-- Available factory types for building
+M.FactoryTypes = {
+    "Electronics Factory",
+    "Steel Manufactory",
+    "Motor Factory",
+    "Fertilizer Factory",
+    "Aircraft Manufactory",
+}
 
 return M
