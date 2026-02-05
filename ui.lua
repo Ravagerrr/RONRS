@@ -303,9 +303,14 @@ function M.createWindow()
     Tools:CreateDropdown({
         Name = "Factory Type",
         Options = Helpers.FactoryTypes,
-        CurrentOption = {selectedFactory},
+        CurrentOption = {"Electronics Factory"},
         Callback = function(option)
-            selectedFactory = option[1]
+            -- Rayfield may pass option as string or table
+            if type(option) == "table" then
+                selectedFactory = option[1] or "Electronics Factory"
+            else
+                selectedFactory = option or "Electronics Factory"
+            end
         end
     })
     Tools:CreateSlider({
