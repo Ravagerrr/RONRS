@@ -296,23 +296,9 @@ function M.createWindow()
     local Tools = Window:CreateTab("Tools", 4483362458)
     
     -- Factory Builder state
-    local selectedFactory = "Electronics Factory"
     local factoryCount = 1
     
     Tools:CreateSection("Factory Builder")
-    Tools:CreateDropdown({
-        Name = "Factory Type",
-        Options = Helpers.FactoryTypes,
-        CurrentOption = {"Electronics Factory"},
-        Callback = function(option)
-            -- Rayfield may pass option as string or table
-            if type(option) == "table" then
-                selectedFactory = option[1] or "Electronics Factory"
-            else
-                selectedFactory = option or "Electronics Factory"
-            end
-        end
-    })
     Tools:CreateSlider({
         Name = "Quantity",
         Range = {1, 10},
@@ -320,47 +306,67 @@ function M.createWindow()
         CurrentValue = 1,
         Callback = function(v) factoryCount = v end
     })
-    Tools:CreateButton({
-        Name = "Build Factories",
-        Callback = function()
-            if not Helpers.hasCountry() then
-                M.log("No country selected", "warning")
-                return
-            end
-            
-            local cities = Helpers.getCitiesByPopulation()
-            if #cities == 0 then
-                M.log("No cities available", "warning")
-                return
-            end
-            
-            local built = 0
-            local cityIndex = 1
-            
-            M.log(string.format("Building %d %s...", factoryCount, selectedFactory), "info")
-            
-            for i = 1, factoryCount do
-                if cityIndex > #cities then
-                    -- Cycle back to first city if we run out
-                    cityIndex = 1
-                end
-                
-                local cityData = cities[cityIndex]
-                local success = Helpers.buildFactory(cityData.city, selectedFactory)
-                
-                if success then
-                    built = built + 1
-                    M.log(string.format("Built %s in %s (pop: %d)", selectedFactory, cityData.city.Name, cityData.population), "success")
-                else
-                    M.log(string.format("Failed to build in %s", cityData.city.Name), "warning")
-                end
-                
-                cityIndex = cityIndex + 1
-                task.wait(0.3)  -- Small delay between builds
-            end
-            
-            M.log(string.format("Factory building complete: %d/%d built", built, factoryCount), "info")
+    
+    -- Helper function to build factories
+    local function buildFactories(factoryType)
+        if not Helpers.hasCountry() then
+            M.log("No country selected", "warning")
+            return
         end
+        
+        local cities = Helpers.getCitiesByPopulation()
+        if #cities == 0 then
+            M.log("No cities available", "warning")
+            return
+        end
+        
+        local built = 0
+        local cityIndex = 1
+        
+        M.log(string.format("Building %d %s...", factoryCount, factoryType), "info")
+        
+        for i = 1, factoryCount do
+            if cityIndex > #cities then
+                cityIndex = 1
+            end
+            
+            local cityData = cities[cityIndex]
+            local success = Helpers.buildFactory(cityData.city, factoryType)
+            
+            if success then
+                built = built + 1
+                M.log(string.format("Built %s in %s (pop: %d)", factoryType, cityData.city.Name, cityData.population), "success")
+            else
+                M.log(string.format("Failed to build in %s", cityData.city.Name), "warning")
+            end
+            
+            cityIndex = cityIndex + 1
+            task.wait(0.3)
+        end
+        
+        M.log(string.format("Factory building complete: %d/%d built", built, factoryCount), "info")
+    end
+    
+    -- Create a button for each factory type
+    Tools:CreateButton({
+        Name = "Build Electronics Factory",
+        Callback = function() buildFactories("Electronics Factory") end
+    })
+    Tools:CreateButton({
+        Name = "Build Steel Manufactory",
+        Callback = function() buildFactories("Steel Manufactory") end
+    })
+    Tools:CreateButton({
+        Name = "Build Motor Factory",
+        Callback = function() buildFactories("Motor Factory") end
+    })
+    Tools:CreateButton({
+        Name = "Build Fertilizer Factory",
+        Callback = function() buildFactories("Fertilizer Factory") end
+    })
+    Tools:CreateButton({
+        Name = "Build Aircraft Manufactory",
+        Callback = function() buildFactories("Aircraft Manufactory") end
     })
     
     -- ══════════════════════════════════════════════════════════════
