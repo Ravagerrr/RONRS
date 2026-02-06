@@ -14,11 +14,19 @@ local M = {}
 local Config, State, Helpers, Trading, AutoSell, AutoBuyer, WarMonitor
 
 local rayfieldCode = game:HttpGet('https://sirius.menu/rayfield')
-local Rayfield = loadstring(rayfieldCode)
-if not Rayfield then
-    error("Failed to load Rayfield UI library")
+-- Validate response: empty/nil or very short responses indicate fetch failure
+-- (actual Rayfield library is thousands of characters)
+if not rayfieldCode or #rayfieldCode < 100 then
+    error("Failed to fetch Rayfield UI library (empty or invalid response)")
 end
-Rayfield = Rayfield()
+local rayfieldLoader, loadErr = loadstring(rayfieldCode)
+if not rayfieldLoader then
+    error("Failed to load Rayfield UI library: " .. tostring(loadErr))
+end
+local Rayfield = rayfieldLoader()
+if not Rayfield then
+    error("Rayfield UI library returned nil")
+end
 
 M.Elements = {}
 M.Logs = {}
