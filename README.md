@@ -11,12 +11,37 @@ The script focuses on safe, repeatable trade behavior with retries, flow protect
 - **Logging dashboard** with real-time status and copyable logs.
 
 ## 🚀 Quick Start
+
+### Loadstring (Recommended)
+Copy and paste this into your executor:
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua"))()
+```
+
+### For Forks or Different Branches
+If you're using a fork or testing a different branch, set the base URL before loading.
+
+> **Note:** Make sure your URL ends with a trailing slash `/`
+
+```lua
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
+loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua"))()
+```
+
+**Examples:**
+```lua
+-- For a fork (replace YourUsername with your GitHub username)
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
+loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua"))()
+
+-- For a specific branch
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/dev/"
+loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua"))()
+```
+
+### Alternative: Copy-Paste
 1. Copy the contents of **`main.lua`** into your executor and run it.
-2. (Optional) If testing a fork/branch, set the base URL first:
-   ```lua
-   _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
-   ```
-3. The UI loads automatically with default settings and starts Auto-Sell / Auto-Buy (if enabled).
+2. The UI loads automatically with default settings and starts Auto-Sell / Auto-Buy (if enabled).
 
 ## ⚙️ Configuration (config.lua)
 Most options are configurable in **`config.lua`**.  
