@@ -9,7 +9,17 @@
 local M = {}
 local Config, State, Helpers, UI
 
-local ManageAlliance = workspace:WaitForChild("GameManager"):WaitForChild("ManageAlliance")
+-- Lazy-load ManageAlliance to avoid nil errors during module load
+local ManageAlliance = nil
+local function getManageAlliance()
+    if not ManageAlliance then
+        local GameManager = workspace:FindFirstChild("GameManager")
+        if GameManager then
+            ManageAlliance = GameManager:FindFirstChild("ManageAlliance")
+        end
+    end
+    return ManageAlliance
+end
 
 M.isMonitoring = false
 M.purchases = 0
@@ -114,8 +124,14 @@ local function attemptBuy(seller, resourceGameName, amount, price)
     -- Record trade amount BEFORE the request
     local beforeAmount = getCurrentTradeAmount(resourceGameName, seller.name)
     
+    local alliance = getManageAlliance()
+    if not alliance then
+        warn("[RONRS] ManageAlliance not available - cannot initiate purchase")
+        return 0
+    end
+    
     pcall(function()
-        ManageAlliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
+        alliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
     end)
     
     -- Fast polling: check frequently for trade verification
