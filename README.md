@@ -16,14 +16,14 @@ The script focuses on safe, repeatable trade behavior with retries, flow protect
 Copy and paste this into your executor for live updates with cache-busting:
 
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua?t=" .. tostring(tick())))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/main/main.lua?t=" .. tostring(tick())))()
 ```
 
 ### Debug Loadstring (If Getting Errors)
 If you're getting "attempt to call a nil value" errors, use this version to see what's failing:
 
 ```lua
-local url = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua?t=" .. tostring(tick())
+local url = "https://raw.githubusercontent.com/Ravagerrr/RONRS/main/main.lua?t=" .. tostring(tick())
 print("[RONRS] Fetching: " .. url)
 
 local success, content = pcall(function()
@@ -61,7 +61,7 @@ end
 
 ### Alternative: Simple Loadstring (May Cache)
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/main/main.lua"))()
 ```
 
 ### Fork/Branch Testing
@@ -69,7 +69,7 @@ If testing a fork or different branch, set the base URL **and** use it in the lo
 ```lua
 -- Replace YourUsername with the fork owner's username
 -- Replace branch-name with the branch (e.g., "main" or "feature-branch")
-_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/branch-name/"
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/branch-name/"
 loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))()
 ```
 
@@ -77,7 +77,7 @@ loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))
 
 **Example for testing a PR branch:**
 ```lua
-_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/copilot/fix-nil-value-error-again/"
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/copilot/fix-nil-value-error-again/"
 loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))()
 ```
 

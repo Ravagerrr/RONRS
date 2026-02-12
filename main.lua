@@ -13,9 +13,9 @@ end
 
 -- BASE_URL Configuration
 -- To test a fork or different branch, set _G.RONRS_BASE_URL before executing:
--- Example for fork: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
--- Example for branch: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/your-branch/"
-local BASE_URL = _G.RONRS_BASE_URL or "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/"
+-- Example for fork: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/main/"
+-- Example for branch: _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/your-branch/"
+local BASE_URL = _G.RONRS_BASE_URL or "https://raw.githubusercontent.com/Ravagerrr/RONRS/main/"
 
 -- Log which source we're loading from (helps debug fork issues)
 print("[Source] " .. BASE_URL)
