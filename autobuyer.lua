@@ -124,11 +124,14 @@ local function attemptBuy(seller, resourceGameName, amount, price)
     -- Record trade amount BEFORE the request
     local beforeAmount = getCurrentTradeAmount(resourceGameName, seller.name)
     
+    local alliance = getManageAlliance()
+    if not alliance then
+        warn("[RONRS] ManageAlliance not available - cannot initiate purchase")
+        return 0
+    end
+    
     pcall(function()
-        local alliance = getManageAlliance()
-        if alliance then
-            alliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
-        end
+        alliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
     end)
     
     -- Fast polling: check frequently for trade verification

@@ -33,11 +33,14 @@ local function attemptTrade(country, resource, amount, price)
     -- Fire the trade request once
     -- If it fails, the queue-based retry system handles re-attempting after other countries
     -- This respects the game's ~10 second cooldown between trades with the same country
+    local alliance = getManageAlliance()
+    if not alliance then
+        warn("[RONRS] ManageAlliance not available - cannot initiate trade")
+        return false
+    end
+    
     pcall(function()
-        local alliance = getManageAlliance()
-        if alliance then
-            alliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
-        end
+        alliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
     end)
     
     -- Poll to verify trade was registered
@@ -296,13 +299,16 @@ function M.processFlowQueue()
         -- Attempt the trade
         UI.log(string.format("[FLOW Q] Trying %.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "info")
         
+        local alliance = getManageAlliance()
+        if not alliance then
+            UI.log("[FLOW Q] ManageAlliance not available", "warning")
+            continue
+        end
+        
         local beforeAmount = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
         
         pcall(function()
-            local alliance = getManageAlliance()
-            if alliance then
-                alliance:FireServer(item.countryName, "ResourceTrade", {item.resource.gameName, "Sell", sellAmount, item.price, "Trade"})
-            end
+            alliance:FireServer(item.countryName, "ResourceTrade", {item.resource.gameName, "Sell", sellAmount, item.price, "Trade"})
         end)
         
         -- Poll to verify trade was registered
