@@ -13,19 +13,53 @@
 local M = {}
 local Config, State, Helpers, Trading, AutoSell, AutoBuyer, WarMonitor
 
-local rayfieldCode = game:HttpGet('https://sirius.menu/rayfield')
--- Validate response: empty/nil or very short responses indicate fetch failure
--- (actual Rayfield library is thousands of characters)
-if not rayfieldCode or #rayfieldCode < 100 then
-    error("Failed to fetch Rayfield UI library (empty or invalid response)")
-end
-local rayfieldLoader, loadErr = loadstring(rayfieldCode)
-if not rayfieldLoader then
-    error("Failed to load Rayfield UI library: " .. tostring(loadErr))
-end
-local Rayfield = rayfieldLoader()
-if not Rayfield then
-    error("Rayfield UI library returned nil")
+-- Load Rayfield UI library with robust error handling
+local Rayfield
+do
+    -- Check if loadstring is available (some executors may not have it)
+    if not loadstring then
+        error("loadstring is not available in this executor - cannot load Rayfield UI")
+    end
+    
+    -- Check if HttpGet is available
+    if not game or not game.HttpGet then
+        error("game:HttpGet is not available - cannot fetch Rayfield UI")
+    end
+    
+    -- Fetch Rayfield code
+    local fetchSuccess, rayfieldCode = pcall(function()
+        return game:HttpGet('https://sirius.menu/rayfield')
+    end)
+    
+    if not fetchSuccess then
+        error("Failed to fetch Rayfield UI: " .. tostring(rayfieldCode))
+    end
+    
+    -- Validate response: empty/nil or very short responses indicate fetch failure
+    -- (actual Rayfield library is thousands of characters)
+    if not rayfieldCode or type(rayfieldCode) ~= "string" then
+        error("Failed to fetch Rayfield UI library (invalid response, got " .. tostring(type(rayfieldCode)) .. ")")
+    end
+    if #rayfieldCode < 100 then
+        error("Failed to fetch Rayfield UI library (response too short: " .. #rayfieldCode .. " characters)")
+    end
+    
+    -- Compile the Rayfield code
+    local rayfieldLoader, loadErr = loadstring(rayfieldCode)
+    if not rayfieldLoader then
+        error("Failed to compile Rayfield UI library: " .. tostring(loadErr))
+    end
+    
+    -- Execute the Rayfield loader
+    local execSuccess, execResult = pcall(rayfieldLoader)
+    if not execSuccess then
+        error("Failed to execute Rayfield UI library: " .. tostring(execResult))
+    end
+    
+    Rayfield = execResult
+    if not Rayfield then
+        error("Rayfield UI library returned nil after execution")
+    end
 end
 
 M.Elements = {}

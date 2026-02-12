@@ -24,14 +24,29 @@ local function loadModule(name)
     local url = BASE_URL .. name .. ".lua"
     print("[Loader] " .. name)
     
+    -- Check if loadstring is available
+    if not loadstring then
+        warn("[FAIL] " .. name .. ": loadstring is not available in this executor")
+        return nil
+    end
+    
     local success, result = pcall(function()
         local content = game:HttpGet(url)
+        if not content or type(content) ~= "string" then
+            error("HttpGet returned " .. tostring(type(content)) .. " instead of string")
+        end
         if content:find("404") or #content < 20 then
-            error("404 or empty")
+            error("404 or empty (length: " .. #content .. ")")
         end
         local func, err = loadstring(content)
-        if not func then error(tostring(err)) end
-        return func()
+        if not func then 
+            error("loadstring failed: " .. tostring(err)) 
+        end
+        local execSuccess, execResult = pcall(func)
+        if not execSuccess then
+            error("module execution failed: " .. tostring(execResult))
+        end
+        return execResult
     end)
     
     if success then
