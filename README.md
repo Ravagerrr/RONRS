@@ -19,6 +19,46 @@ Copy and paste this into your executor for live updates with cache-busting:
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua?t=" .. tostring(tick())))()
 ```
 
+### Debug Loadstring (If Getting Errors)
+If you're getting "attempt to call a nil value" errors, use this version to see what's failing:
+
+```lua
+local url = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua?t=" .. tostring(tick())
+print("[RONRS] Fetching: " .. url)
+
+local success, content = pcall(function()
+    return game:HttpGet(url)
+end)
+
+if not success then
+    warn("[RONRS] HttpGet failed: " .. tostring(content))
+    return
+end
+
+if not content or type(content) ~= "string" then
+    warn("[RONRS] Invalid response: " .. tostring(type(content)))
+    return
+end
+
+if #content < 100 then
+    warn("[RONRS] Response too short (" .. #content .. " chars): " .. content:sub(1, 200))
+    return
+end
+
+print("[RONRS] Fetched " .. #content .. " characters, loading...")
+
+local loader, loadErr = loadstring(content)
+if not loader then
+    warn("[RONRS] loadstring failed: " .. tostring(loadErr))
+    return
+end
+
+local execSuccess, execErr = pcall(loader)
+if not execSuccess then
+    warn("[RONRS] Execution failed: " .. tostring(execErr))
+end
+```
+
 ### Alternative: Simple Loadstring (May Cache)
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua"))()
@@ -84,6 +124,24 @@ Retry attempts are delayed by processing other countries to respect game cooldow
 
 ## 📈 Debug & Analysis
 To analyze trade acceptance, collect `TRADE|` logs and review **`TRADE_ANALYSIS.md`** for details.
+
+## 🔧 Troubleshooting
+
+### "attempt to call a nil value" Error
+This error usually means one of:
+1. **`game:HttpGet` is blocked or unavailable** - Your executor may not support HTTP requests, or Roblox is blocking the GitHub URL.
+2. **`loadstring` is not available** - Some executors don't have loadstring.
+3. **The fetch returned an error page instead of code** - GitHub might be rate-limiting or returning a 404.
+
+**Solution:** Use the "Debug Loadstring" version above to see exactly what's failing.
+
+### No UI Showing
+If the script runs but no UI appears:
+1. **Rayfield failed to load** - The Rayfield UI library from `sirius.menu` may be down.
+2. **UI was destroyed** - Re-inject the script.
+
+### Script Stops Working After a While
+The game may have kicked you or the script hit an error. Check your executor's console for error messages.
 
 ---
 
