@@ -25,9 +25,19 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/
 ```
 
 ### Fork/Branch Testing
-If testing a fork or different branch, set the base URL before running the loadstring:
+If testing a fork or different branch, set the base URL **and** use it in the loadstring:
 ```lua
-_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
+-- Replace YourUsername with the fork owner's username
+-- Replace branch-name with the branch (e.g., "main" or "feature-branch")
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/branch-name/"
+loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))()
+```
+
+**Important:** The `_G.RONRS_BASE_URL` must be set **before** the loadstring runs, AND the loadstring URL should also point to the same fork/branch to load `main.lua` from there.
+
+**Example for testing a PR branch:**
+```lua
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/copilot/fix-nil-value-error-again/"
 loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))()
 ```
 
