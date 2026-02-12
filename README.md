@@ -11,12 +11,27 @@ The script focuses on safe, repeatable trade behavior with retries, flow protect
 - **Logging dashboard** with real-time status and copyable logs.
 
 ## 🚀 Quick Start
-1. Copy the contents of **`main.lua`** into your executor and run it.
-2. (Optional) If testing a fork/branch, set the base URL first:
-   ```lua
-   _G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
-   ```
-3. The UI loads automatically with default settings and starts Auto-Sell / Auto-Buy (if enabled).
+
+### Loadstring (Recommended - Always Fresh)
+Copy and paste this into your executor for live updates with cache-busting:
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua?t=" .. tostring(tick())))()
+```
+
+### Alternative: Simple Loadstring (May Cache)
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ravagerrr/RONRS/refs/heads/main/main.lua"))()
+```
+
+### Fork/Branch Testing
+If testing a fork or different branch, set the base URL before running the loadstring:
+```lua
+_G.RONRS_BASE_URL = "https://raw.githubusercontent.com/YourUsername/RONRS/refs/heads/main/"
+loadstring(game:HttpGet(_G.RONRS_BASE_URL .. "main.lua?t=" .. tostring(tick())))()
+```
+
+The UI loads automatically with default settings and starts Auto-Sell / Auto-Buy (if enabled).
 
 ## ⚙️ Configuration (config.lua)
 Most options are configurable in **`config.lua`**.  
