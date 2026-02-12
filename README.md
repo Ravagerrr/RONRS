@@ -129,11 +129,18 @@ To analyze trade acceptance, collect `TRADE|` logs and review **`TRADE_ANALYSIS.
 
 ### "attempt to call a nil value" Error
 This error usually means one of:
-1. **`game:HttpGet` is blocked or unavailable** - Your executor may not support HTTP requests, or Roblox is blocking the GitHub URL.
-2. **`loadstring` is not available** - Some executors don't have loadstring.
-3. **The fetch returned an error page instead of code** - GitHub might be rate-limiting or returning a 404.
+1. **Repository is private** - Private GitHub repos return 404 for raw file URLs. Make the repository **public** for loadstring to work.
+2. **`game:HttpGet` is blocked or unavailable** - Your executor may not support HTTP requests, or Roblox is blocking the GitHub URL.
+3. **`loadstring` is not available** - Some executors don't have loadstring.
+4. **The fetch returned an error page instead of code** - GitHub might be rate-limiting or returning a 404.
 
-**Solution:** Use the "Debug Loadstring" version above to see exactly what's failing.
+**Solution:** Use the "Debug Loadstring" version above to see exactly what's failing. If it shows "404: Not Found", the repository is likely private.
+
+### 404: Not Found
+If the debug loadstring shows `404: Not Found`:
+1. **Make sure the repository is PUBLIC** - Go to GitHub repo Settings → Danger Zone → Change visibility → Make public
+2. **Check the URL is correct** - Branch name should be exact (e.g., `main` not `master`)
+3. **Wait a few minutes** - GitHub can take time to propagate visibility changes
 
 ### No UI Showing
 If the script runs but no UI appears:
