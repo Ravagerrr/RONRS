@@ -68,6 +68,8 @@ M.Rayfield = Rayfield
 M.lastLogUpdate = 0
 M.Window = nil
 M.isRunning = true  -- Controls the background update loop
+M.MAX_LOGS = 10000  -- Maximum log entries to keep
+M.TRIM_THRESHOLD = 12000  -- Trigger batch trim when exceeding this
 
 function M.init(cfg, state, helpers, trading, autosell, autobuyer, warmonitor)
     Config = cfg
@@ -109,11 +111,11 @@ function M.log(msg, msgType)
     -- Always store in full log history (append to end for O(1) insert)
     local entry = string.format("[%s] %s", os.date("%H:%M:%S"), msg)
     table.insert(M.Logs, entry)
-    -- Batch trim: when exceeding 12000, keep only the latest 10000 entries
+    -- Batch trim: when exceeding threshold, keep only the latest MAX_LOGS entries
     -- This avoids O(n) shifts on every insert that caused lag with large log buffers
-    if #M.Logs > 12000 then
+    if #M.Logs > M.TRIM_THRESHOLD then
         local newLogs = {}
-        for j = #M.Logs - 9999, #M.Logs do
+        for j = #M.Logs - M.MAX_LOGS + 1, #M.Logs do
             newLogs[#newLogs + 1] = M.Logs[j]
         end
         M.Logs = newLogs
