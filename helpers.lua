@@ -400,20 +400,25 @@ function M.getNextPriceTier(current)
     else return nil end
 end
 
+-- Cached sorted spending tiers (sorted once on first use to avoid re-sorting every call)
+local sortedSpendingTiers = nil
+
 -- Get dynamic spending limit based on country revenue
 -- Bigger countries can afford higher cost/revenue ratios
 function M.getMaxSpendingPercent(revenue)
     -- Check revenue tiers from config
     -- Tiers must be sorted highest to lowest minRevenue for correct matching
     if Config.RevenueSpendingTiers then
-        -- Sort tiers by minRevenue descending to ensure correct matching
-        local sortedTiers = {}
-        for _, tier in ipairs(Config.RevenueSpendingTiers) do
-            table.insert(sortedTiers, tier)
+        -- Sort tiers once and cache (avoids O(n log n) sort on every call)
+        if not sortedSpendingTiers then
+            sortedSpendingTiers = {}
+            for _, tier in ipairs(Config.RevenueSpendingTiers) do
+                sortedSpendingTiers[#sortedSpendingTiers + 1] = tier
+            end
+            table.sort(sortedSpendingTiers, function(a, b) return a[1] > b[1] end)
         end
-        table.sort(sortedTiers, function(a, b) return a[1] > b[1] end)
         
-        for _, tier in ipairs(sortedTiers) do
+        for _, tier in ipairs(sortedSpendingTiers) do
             local minRevenue, maxPercent = tier[1], tier[2]
             if revenue >= minRevenue then
                 return maxPercent
