@@ -66,6 +66,8 @@ M.Elements = {}
 M.Logs = {}
 M.Rayfield = Rayfield
 M.lastLogUpdate = 0
+M.lastStatsUpdate = 0
+M.logsDirty = false
 M.Window = nil
 M.isRunning = true  -- Controls the background update loop
 M.MAX_LOGS = 10000  -- Maximum log entries to keep
@@ -120,11 +122,16 @@ function M.log(msg, msgType)
         end
         M.Logs = newLogs
     end
-    warn(entry)
+    -- Only print to Roblox console if enabled (reduces lag from console output)
+    if Config.ConsoleLogging then
+        warn(entry)
+    end
     
+    M.logsDirty = true
     local now = tick()
-    if now - M.lastLogUpdate > 0.1 then
+    if now - M.lastLogUpdate > 0.5 then
         M.lastLogUpdate = now
+        M.logsDirty = false
         M.updateLogs()
     end
 end
@@ -154,6 +161,17 @@ function M.updateLogs()
 end
 
 function M.updateStats()
+    -- Throttle UI updates to at most once per second to reduce lag
+    local now = tick()
+    if now - M.lastStatsUpdate < 1 then return end
+    M.lastStatsUpdate = now
+    
+    -- Flush any pending log updates
+    if M.logsDirty then
+        M.logsDirty = false
+        M.updateLogs()
+    end
+    
     pcall(function()
         -- Update resource stats
         for _, res in ipairs(Config.Resources) do
@@ -483,6 +501,11 @@ function M.createWindow()
         Name = "Block Alert Popups During Trades",
         CurrentValue = Config.BlockAlertPopupDuringTrade,
         Callback = function(v) Config.BlockAlertPopupDuringTrade = v end
+    })
+    Settings:CreateToggle({
+        Name = "Console Logging (warn)",
+        CurrentValue = Config.ConsoleLogging,
+        Callback = function(v) Config.ConsoleLogging = v end
     })
     
     -- ══════════════════════════════════════════════════════════════

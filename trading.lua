@@ -522,7 +522,6 @@ function M.run()
                     State.Stats.ByResource[configResource.name].Skipped = State.Stats.ByResource[configResource.name].Skipped + 1
                 end
                 
-                UI.updateStats()
             end)
             
             if not ok then
@@ -574,8 +573,6 @@ function M.run()
                     else
                         State.Stats.Failed = State.Stats.Failed + 1
                     end
-                    
-                    UI.updateStats()
                 end)
                 
                 if not ok then State.Stats.Failed = State.Stats.Failed + 1 end
