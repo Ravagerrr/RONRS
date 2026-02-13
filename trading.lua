@@ -39,9 +39,7 @@ local function attemptTrade(country, resource, amount, price)
         return false
     end
     
-    pcall(function()
-        alliance:FireServer(country.Name, "ResourceTrade", {resource.gameName, "Sell", amount, price, "Trade"})
-    end)
+    Helpers.fireTradeServer(alliance, country.Name, {resource.gameName, "Sell", amount, price, "Trade"})
     
     -- Poll to verify trade was registered
     local maxPolls = 5
@@ -307,9 +305,7 @@ function M.processFlowQueue()
         
         local beforeAmount = Helpers.getSellingAmountTo(item.resource.gameName, item.countryName)
         
-        pcall(function()
-            alliance:FireServer(item.countryName, "ResourceTrade", {item.resource.gameName, "Sell", sellAmount, item.price, "Trade"})
-        end)
+        Helpers.fireTradeServer(alliance, item.countryName, {item.resource.gameName, "Sell", sellAmount, item.price, "Trade"})
         
         -- Poll to verify trade was registered
         local maxPolls = 5

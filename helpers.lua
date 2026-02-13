@@ -179,6 +179,38 @@ function M.stopScriptTrade()
     M.isScriptTrading = false
 end
 
+-- Global trade throttle: ensures all buy/sell FireServer calls are equally spaced
+-- Prevents auto-buy and auto-sell from firing trades at the same time
+local lastTradeFireTime = 0
+local tradeFireLocked = false
+
+function M.fireTradeServer(alliance, countryName, tradeArgs)
+    -- Wait for any in-flight trade call to finish
+    while tradeFireLocked do
+        task.wait(0.05)
+    end
+    tradeFireLocked = true
+
+    -- Enforce minimum spacing between any two trade FireServer calls
+    local elapsed = tick() - lastTradeFireTime
+    local minSpacing = Config.WaitTime or 0.3
+    if elapsed < minSpacing then
+        task.wait(minSpacing - elapsed)
+    end
+
+    -- Fire the trade (pcall ensures lock is always released even on error)
+    local ok, err = pcall(function()
+        alliance:FireServer(countryName, "ResourceTrade", tradeArgs)
+    end)
+
+    lastTradeFireTime = tick()
+    tradeFireLocked = false
+
+    if not ok then
+        warn("[RONRS] FireServer failed: " .. tostring(err))
+    end
+end
+
 -- Get enabled resources sorted by priority
 function M.getEnabledResources()
     local enabled = {}
