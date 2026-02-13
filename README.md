@@ -6,9 +6,11 @@ The script focuses on safe, repeatable trade behavior with retries, flow protect
 ## ✨ Highlights
 - **Auto-Sell** surplus flow with smart flow reserve protection.
 - **Auto-Buy** factory materials when flow goes negative.
+- **War Monitor** detects and alerts when countries justify war against you.
+- **Factory Builder** quickly builds factories across your cities.
 - **Retry queue** for trade cooldowns (works with the game’s ~10s trade cooldown).
 - **Flow queue** to finish partially limited trades later when flow is available.
-- **Logging dashboard** with real-time status and copyable logs.
+- **Logging dashboard** with real-time status, filters, and copyable logs.
 
 ## 🚀 Quick Start
 
@@ -97,6 +99,10 @@ Key settings:
 - `AutoBuyTargetSurplus` – buy until flow reaches this target
 - `AutoBuyCheckInterval` – polling interval
 
+### War Monitor
+- `WarMonitorEnabled` – enable/disable war justification detection
+- `WarMonitorCheckInterval` – polling interval
+
 ### Trading Behavior
 - `MinAmount` – minimum trade amount
 - `RetryEnabled` – enable tiered retries (1.0x → 0.5x → 0.1x)
@@ -117,8 +123,10 @@ Retry attempts are delayed by processing other countries to respect game cooldow
 | `main.lua` | Entry point / loader |
 | `trading.lua` | Trade execution, retry logic |
 | `helpers.lua` | Pricing, country data, flow helpers |
+| `config.lua` | Configuration and settings |
 | `autosell.lua` | Auto-sell trigger loop |
 | `autobuyer.lua` | Auto-buy logic |
+| `warmonitor.lua` | War justification detection and alerts |
 | `ui.lua` | UI layout and logs |
 | `TRADE_ANALYSIS.md` | Debug analysis notes |
 

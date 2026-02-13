@@ -68,6 +68,8 @@ M.Rayfield = Rayfield
 M.lastLogUpdate = 0
 M.Window = nil
 M.isRunning = true  -- Controls the background update loop
+M.MAX_LOGS = 10000  -- Maximum log entries to keep
+M.TRIM_THRESHOLD = 12000  -- Trigger batch trim when exceeding this
 
 function M.init(cfg, state, helpers, trading, autosell, autobuyer, warmonitor)
     Config = cfg
@@ -106,10 +108,18 @@ local function shouldShowLog(msg)
 end
 
 function M.log(msg, msgType)
-    -- Always store in full log history
+    -- Always store in full log history (append to end for O(1) insert)
     local entry = string.format("[%s] %s", os.date("%H:%M:%S"), msg)
-    table.insert(M.Logs, 1, entry)
-    while #M.Logs > 10000 do table.remove(M.Logs) end
+    table.insert(M.Logs, entry)
+    -- Batch trim: when exceeding threshold, keep only the latest MAX_LOGS entries
+    -- This avoids O(n) shifts on every insert that caused lag with large log buffers
+    if #M.Logs > M.TRIM_THRESHOLD then
+        local newLogs = {}
+        for j = #M.Logs - M.MAX_LOGS + 1, #M.Logs do
+            newLogs[#newLogs + 1] = M.Logs[j]
+        end
+        M.Logs = newLogs
+    end
     warn(entry)
     
     local now = tick()
@@ -121,20 +131,22 @@ end
 
 function M.updateLogs()
     if not M.Elements.LogParagraph then return end
-    local text = ""
+    local parts = {}
     local displayCount = Config.LogDisplayCount or 100
     local shown = 0
-    local i = 1
+    local i = #M.Logs
     
-    -- Filter logs based on settings
-    while shown < displayCount and i <= #M.Logs do
+    -- Filter logs based on settings (iterate from newest to oldest)
+    while shown < displayCount and i >= 1 do
         local entry = M.Logs[i]
         if shouldShowLog(entry) then
-            text = text .. entry .. "\n"
+            parts[#parts + 1] = entry
             shown = shown + 1
         end
-        i = i + 1
+        i = i - 1
     end
+    
+    local text = table.concat(parts, "\n")
     
     pcall(function()
         M.Elements.LogParagraph:Set({Title = string.format("Logs (%d shown / %d total)", shown, #M.Logs), Content = text ~= "" and text or "Ready"})
@@ -501,11 +513,11 @@ function M.createWindow()
     Logs:CreateButton({
         Name = "Copy Logs (Filtered)",
         Callback = function()
-            -- Only copy logs that pass the current filter
+            -- Only copy logs that pass the current filter (newest first)
             local filtered = {}
-            for _, entry in ipairs(M.Logs) do
-                if shouldShowLog(entry) then
-                    table.insert(filtered, entry)
+            for i = #M.Logs, 1, -1 do
+                if shouldShowLog(M.Logs[i]) then
+                    filtered[#filtered + 1] = M.Logs[i]
                 end
             end
             if #filtered > 0 then 
