@@ -28,7 +28,7 @@ return {
     
     -- Trading
     MinAmount = 0.001,
-    WaitTime = 0.5,
+    WaitTime = 0.3,
     ResourceDelay = 0.3,
     
     -- Retry
@@ -103,12 +103,12 @@ return {
     -- Auto-Sell
     AutoSellEnabled = true,
     AutoSellThreshold = 5,
-    AutoSellCheckInterval = 1,  -- Check interval in seconds (1s balances responsiveness and performance)
+    AutoSellCheckInterval = 0.1,  -- Check interval in seconds
     
     -- Auto-Buy (Flow Protection)
     -- Automatically buys resources when your country's flow goes negative
     AutoBuyEnabled = true,
-    AutoBuyCheckInterval = 1,  -- Check interval in seconds (1s balances responsiveness and performance)
+    AutoBuyCheckInterval = 0.1,  -- Check interval in seconds
     AutoBuyTargetSurplus = 1.0,  -- Target flow surplus (buys to +1.0 instead of 0)
     AutoBuyRequireNoDebt = true,  -- Only auto-buy when not in debt (balance > 0)
     AutoBuyStopAtPositiveFlow = 2,  -- Stop auto-buying when flow reaches this positive value (e.g., 2 means stop when flow >= 2)
@@ -116,7 +116,7 @@ return {
     -- Auto-Buy Speed Settings (optimized for game's ~0.3s server cooldown)
     AutoBuyPollInterval = 0.15,  -- How often to check if trade was accepted
     AutoBuyMaxPolls = 5,         -- Max poll attempts (0.15 * 5 = 0.75s max wait for full trade)
-    AutoBuyRetryDelay = 0.2,     -- Delay between seller attempts when one fails
+    AutoBuyRetryDelay = 0.3,     -- Delay between seller attempts
     
     -- Auto-Buy Priority: Factory materials are now ALWAYS prioritized
     -- Auto-buy runs even during sell cycles to prevent factory material shortages
@@ -136,5 +136,5 @@ return {
     -- War Monitor (detects when countries are justifying war against you)
     -- War justifications appear in: workspace.CountryData.[OtherCountry].Diplomacy.Actions.[YourCountry]
     WarMonitorEnabled = true,
-    WarMonitorCheckInterval = 5,  -- Check interval in seconds (justifications take 1-2 min, 5s gives plenty of warning)
+    WarMonitorCheckInterval = 0.1,  -- Check interval in seconds
 }

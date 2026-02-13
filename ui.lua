@@ -468,7 +468,7 @@ function M.createWindow()
     Settings:CreateSection("Timing")
     Settings:CreateSlider({
         Name = "Trade Cooldown (s)",
-        Range = {0.3, 2},
+        Range = {0.1, 2},
         Increment = 0.1,
         CurrentValue = Config.WaitTime,
         Callback = function(v) Config.WaitTime = v end
