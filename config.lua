@@ -69,15 +69,15 @@ return {
     -- Format: {minRevenue, maxSpendingPercent}
     -- Countries with revenue >= minRevenue can spend up to maxSpendingPercent
     -- Tiers are checked from highest to lowest revenue
-    -- CALIBRATED: Brazil ($12.4M revenue) accepted 60 units = 39.8% spending
-    -- Using conservative values below actual observed limits for safety margin
+    -- India ($12M+ revenue, flow -200) accepts ~100 units = ~68% spending
+    -- Large countries can spend a much higher % of revenue on trade
     RevenueSpendingTiers = {
-        {10000000, 0.38},  -- $10M+ revenue: can spend up to 38%
-        {5000000, 0.35},   -- $5M+ revenue: can spend up to 35%
-        {1000000, 0.32},   -- $1M+ revenue: can spend up to 32%
-        {500000, 0.28},    -- $500K+ revenue: can spend up to 28%
-        {100000, 0.25},    -- $100K+ revenue: can spend up to 25%
-        {0, 0.20},         -- Below $100K: can spend up to 20%
+        {10000000, 0.70},  -- $10M+ revenue: can spend up to 70%
+        {5000000, 0.60},   -- $5M+ revenue: can spend up to 60%
+        {1000000, 0.50},   -- $1M+ revenue: can spend up to 50%
+        {500000, 0.40},    -- $500K+ revenue: can spend up to 40%
+        {100000, 0.32},    -- $100K+ revenue: can spend up to 32%
+        {0, 0.25},         -- Below $100K: can spend up to 25%
     },
     
     -- Debug

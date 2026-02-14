@@ -49,13 +49,18 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
    - The algorithm for Consumer Goods has been perfected and AI countries always accept properly calculated trades
    - When already trading with all AI countries, the script stops early (no need to print or attempt trades)
 
-5. **Flow is consumption RATE, not max trade capacity**
-   - A country with flow -25 can accept 100+ units — flow doesn't cap trade amount
-   - The only limit is what the country can AFFORD (revenue * spending percent / price per unit)
-   - Previous bug: `affordable = math.min(maxAffordable, maxDemand)` where `maxDemand = abs(flow)` — this wrongly capped trades to the flow rate
-   - Example: India with $12M revenue and flow -25 was capped to 25 units instead of ~55+ units
+5. **Flow-based demand cap IS correct**
+   - AI countries only buy what they need — their negative flow IS the demand cap
+   - India with flow -200 accepts up to 200 units (not more)
+   - The flow cap `affordable = math.min(maxAffordable, maxDemand)` is correct game behavior
+   - The REAL bottleneck was the revenue spending tiers being too conservative (38% max was way too low)
 
-6. **Retrying at different price CANCELS the existing trade**
+6. **Revenue spending tiers were too conservative**
+   - India ($12M+ revenue, flow -200) was only getting ~25 units because spending was capped at 38%
+   - Actual game allows large countries to spend 70%+ of revenue on trade
+   - Updated tiers: $10M+ → 70%, $5M+ → 60%, $1M+ → 50%, $500K+ → 40%
+
+7. **Retrying at different price CANCELS the existing trade**
    - Game mechanic: when you retry a trade with the same country at a different price tier, the game cancels the original trade
    - This means a successful 25-unit trade at 1.0x gets CANCELLED when we retry at 0.5x
    - Net result: we LOSE revenue instead of gaining more
@@ -67,14 +72,16 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 1. Pre-evaluate ALL country+resource pairs (no network, instant)
 2. Sort by trade amount DESCENDING (largest bulk orders first)
 3. Execute trades at 1.0x price (biggest first)
-4. Retry system DISABLED by default (retries cancel existing trades)
+4. Amount capped to: min(maxAffordable, abs(flow), availableFlow)
+5. Retry system DISABLED by default (retries cancel existing trades)
 ```
 
 ### Pending Tasks
 
 - [ ] User will run script and paste TRADE| output
 - [ ] Analyze ranking correlation with trade acceptance
-- [x] Fix flow-based demand cap — flow is rate, not max capacity
+- [x] Restore flow-based demand cap — confirmed correct game behavior
+- [x] Increase revenue spending tiers — 38% was far too conservative
 - [x] Disable retry system — retries cancel existing trades
 
 ---

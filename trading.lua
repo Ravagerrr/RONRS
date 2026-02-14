@@ -131,10 +131,16 @@ function M.evaluateCountryResource(country, resource, buyers, retryState)
         -- Electronics: cap at capAmount (5), but also check what they can afford at this price
         affordable = math.min(resource.capAmount, maxAffordable)
     else
-        -- Consumer Goods: Limited by what they can afford (revenue-based)
-        -- Flow is the consumption RATE, not the max trade capacity
-        -- Countries accept trades far exceeding their flow (e.g., India with flow -25 accepts 100+)
-        affordable = maxAffordable
+        -- Consumer Goods: Limited by negative flow (demand) AND what they can afford
+        -- AI countries only buy resources they have negative flow for (actual consumption/demand)
+        -- Cap to their demand (absolute value of negative flow) or what they can afford, whichever is lower
+        if data.flow < 0 then
+            local maxDemand = math.abs(data.flow)
+            affordable = math.min(maxAffordable, maxDemand)
+        else
+            -- If flow is positive or zero, just use what they can afford
+            affordable = maxAffordable
+        end
     end
     
     if affordable < Config.MinAmount then return false, nil, "Insufficient" end
