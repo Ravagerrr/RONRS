@@ -66,6 +66,13 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
    - Net result: we LOSE revenue instead of gaining more
    - Retry system disabled by default to prevent this
 
+8. **Consumer Goods maxed-out detection was broken**
+   - Electronics correctly detected "all 238 AI countries traded" and stopped
+   - Consumer Goods compared buyers (50) vs total AI countries (238) → never triggered maxed
+   - Many AI countries have positive/zero CG flow → will NEVER buy CG → shouldn't be counted
+   - Fix: count only countries with negative flow (eligible buyers) for each resource
+   - Also added 5-second backoff when a cycle produces 0 successful trades
+
 ### Current Algorithm
 
 ```
@@ -75,15 +82,19 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 4. Flow used as FILTER only (skip if flow >= -0.1), NOT as amount cap
 5. Amount = min(maxAffordable, availableFlow) — flow caps our outgoing supply, not their demand
 6. Retry system DISABLED by default (retries cancel existing trades)
+7. Maxed-out detection: count eligible countries per resource (with demand), not total AI
+8. AutoSell backoff: 5s cooldown when last cycle had 0 successful trades
 ```
 
 ### Pending Tasks
 
-- [ ] User will run script and paste TRADE| output — calibrate spending tiers with real data
-- [ ] Analyze ranking correlation with trade acceptance
+- [x] Analyze trading logs from Libya session
+- [x] Fix Consumer Goods spam loop — maxed-out detection now counts eligible countries only
+- [x] Add 5-second AutoSell backoff when 0 trades succeed
 - [x] Remove flow-based amount cap — flow doesn't map 1:1 to trade amount
 - [x] Increase revenue spending tiers — 38% was far too conservative
 - [x] Disable retry system — retries cancel existing trades
+- [ ] Further calibrate spending tiers with more live data
 
 ---
 
@@ -183,6 +194,13 @@ When user pastes TRADE| lines, analyze for:
   - **Fix**: Disabled retry system by default (`RetryEnabled = false`)
   - Consumer Goods already succeeds 100% at 1.0x when amount is correctly calculated
   - **Files modified**: config.lua
+- **FIX: Consumer Goods spam loop — broken maxed-out detection**
+  - **Problem**: After trading with all available CG countries, AutoSell kept triggering every 0.1s, running full 240-country evaluations that all got skipped. 39 consecutive spam cycles observed.
+  - **Root Cause**: Maxed-out check compared CG buyers (50) vs total AI countries (238). Many AI countries have positive/zero CG flow → will never buy CG → but were still counted in denominator. So CG never appeared "maxed".
+  - **Fix 1**: Count only eligible countries per resource (countries with negative flow for non-capped resources) instead of total AI countries
+  - **Fix 2**: Early exit from `run()` when 0 pending trades after Phase 1 evaluation
+  - **Fix 3**: 5-second backoff in AutoSell when last cycle had 0 successful trades
+  - **Files modified**: trading.lua, autosell.lua
 
 ### Session 2026-02-02 06:43
 - **FEATURE: War Monitor** - Added detection and notification for war justifications
@@ -365,351 +383,31 @@ At the end of each session, add:
 
 This ensures continuity across sessions even with memory wipe.
 
+---
 
-[13:07:24] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:24] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:24] Trade cycle started
-[13:07:24] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:23] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:23] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:23] Trade cycle started
-[13:07:23] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:23] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:23] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:23] Trade cycle started
-[13:07:23] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:22] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:22] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:22] Trade cycle started
-[13:07:22] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:22] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:22] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:22] Trade cycle started
-[13:07:22] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:21] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:21] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:21] Trade cycle started
-[13:07:21] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:21] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:21] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:21] Trade cycle started
-[13:07:21] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:20] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:20] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:20] Trade cycle started
-[13:07:20] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:20] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:20] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:20] Trade cycle started
-[13:07:20] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:20] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:19] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:19] Trade cycle started
-[13:07:19] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:19] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:19] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:19] Trade cycle started
-[13:07:19] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:19] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:18] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:18] Trade cycle started
-[13:07:18] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:18] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:18] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:18] Trade cycle started
-[13:07:18] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:18] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:17] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:17] Trade cycle started
-[13:07:17] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:17] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:17] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:17] Trade cycle started
-[13:07:17] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:17] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:17] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:17] Trade cycle started
-[13:07:17] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:16] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:16] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:16] Trade cycle started
-[13:07:16] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:16] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:16] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:16] Trade cycle started
-[13:07:16] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:15] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:15] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:15] Trade cycle started
-[13:07:15] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:15] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:15] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:15] Trade cycle started
-[13:07:15] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:14] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:14] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:14] Trade cycle started
-[13:07:14] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:14] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:14] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:14] Trade cycle started
-[13:07:14] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:14] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:13] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:13] Trade cycle started
-[13:07:13] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:13] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:13] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:13] Trade cycle started
-[13:07:13] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:13] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:12] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:12] Trade cycle started
-[13:07:12] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:12] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:12] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:12] Trade cycle started
-[13:07:12] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:12] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:11] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:11] Trade cycle started
-[13:07:11] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:11] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:11] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:11] Trade cycle started
-[13:07:11] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:11] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:11] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:11] Trade cycle started
-[13:07:11] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:10] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:10] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:10] Trade cycle started
-[13:07:10] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:10] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:10] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:10] Trade cycle started
-[13:07:10] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:09] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:09] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:09] Trade cycle started
-[13:07:09] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:09] Done in 0.2s | OK:0 Skip:240 Fail:0
-[13:07:09] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:09] Trade cycle started
-[13:07:09] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:08] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:08] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:08] Trade cycle started
-[13:07:08] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:08] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:08] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:08] Trade cycle started
-[13:07:08] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:07] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:07] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:07] Trade cycle started
-[13:07:07] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:07] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:07] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:07] Trade cycle started
-[13:07:07] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:06] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:06] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:06] Trade cycle started
-[13:07:06] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:06] Done in 0.3s | OK:0 Skip:240 Fail:0
-[13:07:06] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:06] Trade cycle started
-[13:07:06] TRIGGERED: Consumer Goods 388.2 Electronics 539.3
-[13:07:05] Done in 0.8s | OK:1 Skip:239 Fail:0
-[13:07:05] [116/240] OK Consumer Goods Chad
-[13:07:04] [116/240] Consumer Goods Chad | 0.69 @ 1.0x ($82400/u) | Flow:-2.21 Rev:$226531 Cost:$56633
-[13:07:04] Electronics: Already trading with all 238 AI countries - skipping
-[13:07:04] Trade cycle started
-[13:07:04] TRIGGERED: Consumer Goods 388.9 Electronics 539.3
-[13:07:04] Done in 8.9s | OK:8 Skip:471 Fail:1
-[13:07:04] [2/2] OK Electronics Kosovo
-[13:07:03] [2/2] Electronics Kosovo | 0.63 @ 0.5x ($51000/u) | Flow:0.00 Rev:$127874 Cost:$31968
-[13:07:03] [1/2] FAIL Consumer Goods Chad
-[13:07:02] [1/2] Consumer Goods Chad | 1.37 @ 0.5x ($41200/u) | Flow:-2.21 Rev:$226494 Cost:$56624
-[13:07:02] RETRY: 2
-[13:07:02] [223/240] OK Electronics Faroe Islands
-[13:07:02] [223/240] Electronics Faroe Islands | 0.25 @ 1.0x ($102000/u) | Flow:0.00 Rev:$101077 Cost:$25269
-[13:07:01] [187/240] OK Consumer Goods New Caledonia
-[13:07:01] [187/240] Consumer Goods New Caledonia | 0.10 @ 1.0x ($82400/u) | Flow:-0.10 Rev:$106896 Cost:$8523
-[13:07:01] [163/240] RETRY Electronics Kosovo (will try 0.5x)
-[13:07:00] [163/240] Electronics Kosovo | 0.31 @ 1.0x ($102000/u) | Flow:0.00 Rev:$127866 Cost:$31966
-[13:06:59] [131/240] OK Electronics Brunei
-[13:06:59] [131/240] Electronics Brunei | 0.48 @ 1.0x ($102000/u) | Flow:0.00 Rev:$197217 Cost:$49304
-[13:06:59] [116/240] RETRY Consumer Goods Chad (will try 0.5x)
-[13:06:58] [116/240] Consumer Goods Chad | 0.69 @ 1.0x ($82400/u) | Flow:-2.21 Rev:$226494 Cost:$56624
-[13:06:58] [102/240] OK Electronics Finland
-[13:06:57] [102/240] Electronics Finland | 0.65 @ 1.0x ($102000/u) | Flow:0.00 Rev:$266561 Cost:$66640
-[13:06:57] [76/240] OK Electronics Switzerland
-[13:06:57] [76/240] Electronics Switzerland | 0.98 @ 1.0x ($102000/u) | Flow:0.00 Rev:$400174 Cost:$100044
-[13:06:56] [32/240] OK Consumer Goods Peru
-[13:06:56] [32/240] Consumer Goods Peru | 4.65 @ 1.0x ($82400/u) | Flow:-18.93 Rev:$1196985 Cost:$383035
-[13:06:55] [8/240] OK Consumer Goods Mexico
-[13:06:55] [8/240] Consumer Goods Mexico | 14.31 @ 1.0x ($82400/u) | Flow:-72.87 Rev:$3684055 Cost:$1178898
-[13:06:55] Trade cycle started
-[13:06:55] TRIGGERED: Consumer Goods 408.0 Electronics 542.3
-[13:06:54] Done in 63.5s | OK:52 Skip:420 Fail:8
-[13:06:54] [15/15] FAIL Electronics Faroe Islands
-[13:06:53] [15/15] Electronics Faroe Islands | 0.50 @ 0.5x ($51000/u) | Flow:0.00 Rev:$101077 Cost:$25269
-[13:06:53] [14/15] OK Consumer Goods Sao Tome And Principe
-[13:06:53] [14/15] Consumer Goods Sao Tome And Principe | 0.10 @ 0.5x ($41200/u) | Flow:-0.10 Rev:$106655 Cost:$4162
-[13:06:53] [13/15] FAIL Consumer Goods New Caledonia
-[13:06:52] [13/15] Consumer Goods New Caledonia | 0.10 @ 0.5x ($41200/u) | Flow:-0.10 Rev:$106894 Cost:$4260
-[13:06:52] [12/15] OK Consumer Goods Iceland
-[13:06:51] [12/15] Consumer Goods Iceland | 0.24 @ 0.5x ($41200/u) | Flow:-0.24 Rev:$114323 Cost:$9685
-[13:06:51] [11/15] FAIL Electronics Kosovo
-[13:06:50] [11/15] Electronics Kosovo | 0.63 @ 0.5x ($51000/u) | Flow:0.00 Rev:$127850 Cost:$31962
-[13:06:50] [10/15] OK Electronics Djibouti
-[13:06:50] [10/15] Electronics Djibouti | 0.84 @ 0.5x ($51000/u) | Flow:0.00 Rev:$172314 Cost:$43078
-[13:06:50] [9/15] FAIL Electronics Brunei
-[13:06:49] [9/15] Electronics Brunei | 0.97 @ 0.5x ($51000/u) | Flow:0.00 Rev:$197196 Cost:$49299
-[13:06:49] [8/15] OK Consumer Goods Honduras
-[13:06:48] [8/15] Consumer Goods Honduras | 1.35 @ 0.5x ($41200/u) | Flow:-2.38 Rev:$223018 Cost:$55754
-[13:06:48] [7/15] FAIL Consumer Goods Chad
-[13:06:47] [7/15] Consumer Goods Chad | 1.37 @ 0.5x ($41200/u) | Flow:-2.20 Rev:$226422 Cost:$56606
-[13:06:47] [6/15] OK Consumer Goods Georgia
-[13:06:47] [6/15] Consumer Goods Georgia | 1.45 @ 0.5x ($41200/u) | Flow:-2.03 Rev:$239708 Cost:$59927
-[13:06:47] [5/15] FAIL Electronics Finland
-[13:06:46] [5/15] Electronics Finland | 1.31 @ 0.5x ($51000/u) | Flow:0.00 Rev:$266466 Cost:$66616
-[13:06:46] [4/15] OK Consumer Goods Madagascar
-[13:06:45] [4/15] Consumer Goods Madagascar | 1.97 @ 0.5x ($41200/u) | Flow:-3.54 Rev:$324637 Cost:$81159
-[13:06:45] [3/15] FAIL Electronics Switzerland
-[13:06:44] [3/15] Electronics Switzerland | 1.96 @ 0.5x ($51000/u) | Flow:0.00 Rev:$400007 Cost:$100002
-[13:06:44] [2/15] OK Consumer Goods Greece
-[13:06:44] [2/15] Consumer Goods Greece | 2.85 @ 0.5x ($41200/u) | Flow:-6.72 Rev:$469883 Cost:$117471
-[13:06:44] [1/15] FAIL Consumer Goods Peru
-[13:06:43] [1/15] Consumer Goods Peru | 9.29 @ 0.5x ($41200/u) | Flow:-18.92 Rev:$1196389 Cost:$382844
-[13:06:43] RETRY: 15
-[13:06:43] [239/240] OK Electronics Niue
-[13:06:43] [239/240] Electronics Niue | 0.25 @ 1.0x ($102000/u) | Flow:0.00 Rev:$100131 Cost:$25033
-[13:06:43] [223/240] RETRY Electronics Faroe Islands (will try 0.5x)
-[13:06:42] [223/240] Electronics Faroe Islands | 0.25 @ 1.0x ($102000/u) | Flow:0.00 Rev:$101076 Cost:$25269
-[13:06:41] [206/240] OK Electronics Antigua And Barbuda
-[13:06:41] [206/240] Electronics Antigua And Barbuda | 0.25 @ 1.0x ($102000/u) | Flow:0.00 Rev:$102715 Cost:$25679
-[13:06:41] [190/240] RETRY Consumer Goods Sao Tome And Principe (will try 0.5x)
-[13:06:40] [190/240] Consumer Goods Sao Tome And Principe | 0.10 @ 1.0x ($82400/u) | Flow:-0.10 Rev:$106649 Cost:$8316
-[13:06:39] [189/240] OK Consumer Goods French Guiana
-[13:06:39] [189/240] Consumer Goods French Guiana | 0.12 @ 1.0x ($82400/u) | Flow:-0.12 Rev:$106700 Cost:$10046
-[13:06:39] [187/240] RETRY Consumer Goods New Caledonia (will try 0.5x)
-[13:06:38] [187/240] Consumer Goods New Caledonia | 0.10 @ 1.0x ($82400/u) | Flow:-0.10 Rev:$106888 Cost:$8513
-[13:06:38] [186/240] OK Electronics Jersey
-[13:06:37] [186/240] Electronics Jersey | 0.26 @ 1.0x ($102000/u) | Flow:0.00 Rev:$107641 Cost:$26910
-[13:06:37] [176/240] OK Consumer Goods Gibraltar
-[13:06:37] [176/240] Consumer Goods Gibraltar | 0.21 @ 1.0x ($82400/u) | Flow:-0.21 Rev:$113834 Cost:$17099
-[13:06:37] [173/240] RETRY Consumer Goods Iceland (will try 0.5x)
-[13:06:36] [173/240] Consumer Goods Iceland | 0.23 @ 1.0x ($82400/u) | Flow:-0.23 Rev:$114314 Cost:$19359
-[13:06:35] [171/240] OK Electronics Montenegro
-[13:06:35] [171/240] Electronics Montenegro | 0.29 @ 1.0x ($102000/u) | Flow:0.00 Rev:$118569 Cost:$29642
-[13:06:35] [163/240] RETRY Electronics Kosovo (will try 0.5x)
-[13:06:34] [163/240] Electronics Kosovo | 0.31 @ 1.0x ($102000/u) | Flow:0.00 Rev:$127826 Cost:$31956
-[13:06:34] [154/240] OK Electronics Papua New Guinea
-[13:06:33] [154/240] Electronics Papua New Guinea | 0.36 @ 1.0x ($102000/u) | Flow:0.00 Rev:$145628 Cost:$36407
-[13:06:33] [146/240] RETRY Electronics Djibouti (will try 0.5x)
-[13:06:32] [146/240] Electronics Djibouti | 0.42 @ 1.0x ($102000/u) | Flow:0.00 Rev:$172250 Cost:$43062
-[13:06:32] [138/240] OK Electronics Macedonia
-[13:06:32] [138/240] Electronics Macedonia | 0.46 @ 1.0x ($102000/u) | Flow:0.00 Rev:$186007 Cost:$46502
-[13:06:32] [131/240] RETRY Electronics Brunei (will try 0.5x)
-[13:06:31] [131/240] Electronics Brunei | 0.48 @ 1.0x ($102000/u) | Flow:0.00 Rev:$197164 Cost:$49291
-[13:06:30] [122/240] OK Electronics Nicaragua
-[13:06:30] [122/240] Electronics Nicaragua | 0.53 @ 1.0x ($102000/u) | Flow:0.00 Rev:$217083 Cost:$54271
-[13:06:30] [117/240] RETRY Consumer Goods Honduras (will try 0.5x)
-[13:06:29] [117/240] Consumer Goods Honduras | 0.68 @ 1.0x ($82400/u) | Flow:-2.37 Rev:$222877 Cost:$55719
-[13:06:29] [116/240] RETRY Consumer Goods Chad (will try 0.5x)
-[13:06:28] [116/240] Consumer Goods Chad | 0.69 @ 1.0x ($82400/u) | Flow:-2.20 Rev:$226276 Cost:$56569
-[13:06:27] [115/240] OK Consumer Goods Kyrgyzstan
-[13:06:27] [115/240] Consumer Goods Kyrgyzstan | 0.70 @ 1.0x ($82400/u) | Flow:-2.20 Rev:$229754 Cost:$57438
-[13:06:27] [114/240] OK Consumer Goods Nepal
-[13:06:26] [114/240] Consumer Goods Nepal | 0.70 @ 1.0x ($82400/u) | Flow:-2.59 Rev:$230038 Cost:$57510
-[13:06:26] [113/240] OK Consumer Goods Jamaica
-[13:06:25] [113/240] Consumer Goods Jamaica | 0.70 @ 1.0x ($82400/u) | Flow:-2.06 Rev:$230443 Cost:$57611
-[13:06:25] [112/240] OK Consumer Goods Costa Rica
-[13:06:24] [112/240] Consumer Goods Costa Rica | 0.70 @ 1.0x ($82400/u) | Flow:-2.36 Rev:$232297 Cost:$58074
-[13:06:24] [111/240] RETRY Consumer Goods Georgia (will try 0.5x)
-[13:06:23] [111/240] Consumer Goods Georgia | 0.73 @ 1.0x ($82400/u) | Flow:-2.02 Rev:$239521 Cost:$59880
-[13:06:23] [110/240] OK Consumer Goods Burkina Faso
-[13:06:22] [110/240] Consumer Goods Burkina Faso | 0.74 @ 1.0x ($82400/u) | Flow:-2.60 Rev:$245514 Cost:$61378
-[13:06:22] [109/240] OK Consumer Goods Cambodia
-[13:06:22] [109/240] Consumer Goods Cambodia | 0.75 @ 1.0x ($82400/u) | Flow:-2.59 Rev:$247395 Cost:$61849
-[13:06:21] [108/240] OK Consumer Goods Serbia
-[13:06:21] [108/240] Consumer Goods Serbia | 0.76 @ 1.0x ($82400/u) | Flow:-2.67 Rev:$249659 Cost:$62415
-[13:06:20] [107/240] OK Consumer Goods El Salvador
-[13:06:20] [107/240] Consumer Goods El Salvador | 0.76 @ 1.0x ($82400/u) | Flow:-2.73 Rev:$251526 Cost:$62882
-[13:06:19] [106/240] OK Consumer Goods Norway
-[13:06:19] [106/240] Consumer Goods Norway | 0.78 @ 1.0x ($82400/u) | Flow:-2.48 Rev:$257760 Cost:$64440
-[13:06:18] [105/240] OK Consumer Goods Guatemala
-[13:06:18] [105/240] Consumer Goods Guatemala | 0.79 @ 1.0x ($82400/u) | Flow:-3.19 Rev:$260177 Cost:$65044
-[13:06:17] [104/240] OK Consumer Goods Republic of Congo
-[13:06:17] [104/240] Consumer Goods Republic of Congo | 0.80 @ 1.0x ($82400/u) | Flow:-2.68 Rev:$262427 Cost:$65607
-[13:06:17] [103/240] OK Consumer Goods Uruguay
-[13:06:16] [103/240] Consumer Goods Uruguay | 0.80 @ 1.0x ($82400/u) | Flow:-2.96 Rev:$263116 Cost:$65779
-[13:06:16] [102/240] RETRY Electronics Finland (will try 0.5x)
-[13:06:15] [102/240] Electronics Finland | 0.65 @ 1.0x ($102000/u) | Flow:0.00 Rev:$266180 Cost:$66545
-[13:06:15] [102/240] OK Consumer Goods Finland
-[13:06:14] [102/240] Consumer Goods Finland | 0.81 @ 1.0x ($82400/u) | Flow:-2.80 Rev:$266180 Cost:$66545
-[13:06:14] [101/240] OK Consumer Goods Jordan
-[13:06:14] [101/240] Consumer Goods Jordan | 0.82 @ 1.0x ($82400/u) | Flow:-3.40 Rev:$270801 Cost:$67700
-[13:06:13] [100/240] OK Consumer Goods Qatar
-[13:06:13] [100/240] Consumer Goods Qatar | 0.82 @ 1.0x ($82400/u) | Flow:-1.60 Rev:$270850 Cost:$67712
-[13:06:12] [99/240] OK Consumer Goods Mali
-[13:06:12] [99/240] Consumer Goods Mali | 0.84 @ 1.0x ($82400/u) | Flow:-3.08 Rev:$275443 Cost:$68861
-[13:06:11] [98/240] OK Consumer Goods Czech Republic
-[13:06:11] [98/240] Consumer Goods Czech Republic | 0.84 @ 1.0x ($82400/u) | Flow:-3.27 Rev:$278505 Cost:$69626
-[13:06:10] [97/240] OK Consumer Goods Lebanon
-[13:06:10] [97/240] Consumer Goods Lebanon | 0.86 @ 1.0x ($82400/u) | Flow:-3.19 Rev:$282020 Cost:$70505
-[13:06:10] [96/240] OK Consumer Goods Niger
-[13:06:09] [96/240] Consumer Goods Niger | 0.86 @ 1.0x ($82400/u) | Flow:-2.20 Rev:$282167 Cost:$70542
-[13:06:09] [95/240] OK Consumer Goods Haiti
-[13:06:09] [95/240] Consumer Goods Haiti | 0.86 @ 1.0x ($82400/u) | Flow:-3.11 Rev:$283168 Cost:$70792
-[13:06:08] [94/240] OK Consumer Goods Turkmenistan
-[13:06:08] [94/240] Consumer Goods Turkmenistan | 0.87 @ 1.0x ($82400/u) | Flow:-1.96 Rev:$288184 Cost:$72046
-[13:06:07] [93/240] OK Consumer Goods Togo
-[13:06:06] [93/240] Consumer Goods Togo | 0.89 @ 1.0x ($82400/u) | Flow:-2.07 Rev:$292026 Cost:$73006
-[13:06:06] [92/240] OK Consumer Goods New Zealand
-[13:06:06] [92/240] Consumer Goods New Zealand | 0.91 @ 1.0x ($82400/u) | Flow:-4.71 Rev:$301169 Cost:$75292
-[13:06:05] [91/240] OK Consumer Goods Paraguay
-[13:06:05] [91/240] Consumer Goods Paraguay | 0.95 @ 1.0x ($82400/u) | Flow:-3.97 Rev:$314004 Cost:$78501
-[13:06:04] [90/240] OK Consumer Goods Azerbaijan
-[13:06:04] [90/240] Consumer Goods Azerbaijan | 0.96 @ 1.0x ($82400/u) | Flow:-3.62 Rev:$316958 Cost:$79240
-[13:06:03] [89/240] OK Consumer Goods Mongolia
-[13:06:03] [89/240] Consumer Goods Mongolia | 0.97 @ 1.0x ($82400/u) | Flow:-2.22 Rev:$319171 Cost:$79793
-[13:06:03] [88/240] OK Consumer Goods Kuwait
-[13:06:02] [88/240] Consumer Goods Kuwait | 0.97 @ 1.0x ($82400/u) | Flow:-2.57 Rev:$319447 Cost:$79862
-[13:06:02] [87/240] RETRY Consumer Goods Madagascar (will try 0.5x)
-[13:06:01] [87/240] Consumer Goods Madagascar | 0.98 @ 1.0x ($82400/u) | Flow:-3.53 Rev:$324122 Cost:$81030
-[13:06:01] [86/240] OK Consumer Goods Hungary
-[13:06:00] [86/240] Consumer Goods Hungary | 0.99 @ 1.0x ($82400/u) | Flow:-4.25 Rev:$326808 Cost:$81702
-[13:06:00] [85/240] OK Consumer Goods Uganda
-[13:06:00] [85/240] Consumer Goods Uganda | 1.00 @ 1.0x ($82400/u) | Flow:-4.28 Rev:$329109 Cost:$82277
-[13:05:59] [83/240] OK Consumer Goods Israel
-[13:05:59] [83/240] Consumer Goods Israel | 1.03 @ 1.0x ($82400/u) | Flow:-5.72 Rev:$339753 Cost:$84938
-[13:05:59] [76/240] RETRY Electronics Switzerland (will try 0.5x)
-[13:05:58] [76/240] Electronics Switzerland | 0.98 @ 1.0x ($102000/u) | Flow:0.00 Rev:$399339 Cost:$99835
-[13:05:57] [74/240] OK Consumer Goods Mozambique
-[13:05:57] [74/240] Consumer Goods Mozambique | 1.22 @ 1.0x ($82400/u) | Flow:-5.29 Rev:$401245 Cost:$100311
-[13:05:57] [66/240] RETRY Consumer Goods Greece (will try 0.5x)
-[13:05:56] [66/240] Consumer Goods Greece | 1.42 @ 1.0x ($82400/u) | Flow:-6.70 Rev:$468939 Cost:$117235
-[13:05:55] [51/240] OK Consumer Goods Ghana
-[13:05:55] [51/240] Consumer Goods Ghana | 2.05 @ 1.0x ($82400/u) | Flow:-6.26 Rev:$604641 Cost:$169299
-[13:05:54] [50/240] OK Consumer Goods Sierra Leone
-[13:05:54] [50/240] Consumer Goods Sierra Leone | 1.46 @ 1.0x ($82400/u) | Flow:-1.46 Rev:$626132 Cost:$119956
-[13:05:54] [32/240] RETRY Consumer Goods Peru (will try 0.5x)
-[13:05:53] [32/240] Consumer Goods Peru | 4.64 @ 1.0x ($82400/u) | Flow:-18.87 Rev:$1193714 Cost:$381988
-[13:05:53] [30/240] OK Electronics Taiwan
-[13:05:52] [30/240] Electronics Taiwan | 4.02 @ 1.0x ($102000/u) | Flow:0.00 Rev:$1280775 Cost:$409848
-[13:05:52] [27/240] OK Consumer Goods Bangladesh
-[13:05:52] [27/240] Consumer Goods Bangladesh | 6.13 @ 1.0x ($82400/u) | Flow:-24.59 Rev:$1579466 Cost:$505429
-[13:05:51] [8/240] OK Consumer Goods Mexico
-[13:05:50] [8/240] Consumer Goods Mexico | 14.27 @ 1.0x ($82400/u) | Flow:-72.69 Rev:$3675309 Cost:$1176099
-[13:05:50] Trade cycle started
-[13:05:50] TRIGGERED: Consumer Goods 452.4 Electronics 549.5
-[13:05:50] War Monitor: ON
-[13:05:50] Auto-Buy: ON
-[13:05:50] Auto-Sell: ON
-[13:05:49] Country: Libya
-[13:05:49] Trade Hub v2.1.1 loaded
+## 📊 Trading Log Analysis (2026-02-14)
+
+### Log Summary (from Libya session)
+- **63.5s trade cycle**: 52 OK, 420 Skip, 8 Fail
+- **Follow-up cycles**: 39 consecutive spam cycles with 0 OK, 240 Skip each (~0.3s each)
+- **Electronics**: Correctly detected "all 238 AI countries traded" → skipped
+- **Consumer Goods**: 388.2 flow available but ALL 240 countries skipped → spam loop
+
+### Consumer Goods @ 1.0x Results
+- **Successful trades**: Mexico (14.27), Bangladesh (6.13), Peru (4.65), Ghana (2.05), and 24 more
+- **Cost% range for OK trades**: 19.2% - 32.0%
+- **Cost% range for FAIL trades**: 7.7% - 32.0% (complete overlap — cost% NOT predictive)
+- **Countries that failed at 1.0x**: Chad, Georgia, Honduras, Greece, Madagascar, Peru, Iceland, New Caledonia, Sao Tome
+
+### Critical Bug Found: Consumer Goods Spam Loop
+- After trading with all available countries, AutoSell keeps triggering (388 flow > 5 threshold)
+- Script evaluates 240 countries → ALL skipped (Already Trading / No Demand)
+- Maxed-out check compares buyers (50) vs total AI countries (238) → never triggers
+- **Root cause**: Many AI countries have positive/zero CG flow → will NEVER buy → but still counted
+- **Fix**: Count only countries with negative flow (eligible buyers) for CG maxed-out detection
+
+### Spending Tier Observations
+- $100K-$500K countries: successful at ~25% cost (32% tier)
+- $500K-$1M countries: successful at ~25-28% cost (40% tier)  
+- $1M+ countries: successful at ~32% cost (50% tier)
+- Amounts are already below maxAffordable due to data.buyAmount subtraction

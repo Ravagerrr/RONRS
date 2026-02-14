@@ -422,25 +422,40 @@ function M.run()
     
     local totalCountries = #countries
     
-    -- Count AI countries (exclude own country and player countries)
-    -- This is used to detect when we're already trading with ALL AI countries
-    local aiCountryCount = 0
-    for _, country in ipairs(countries) do
-        if not (Config.SkipOwnCountry and country == Helpers.myCountry) and
-           not Helpers.isPlayerCountry(country.Name) then
-            aiCountryCount = aiCountryCount + 1
+    -- Count eligible AI countries per resource
+    -- For capped resources (Electronics): ALL AI countries are eligible (no flow requirement)
+    -- For uncapped resources (Consumer Goods): only countries with negative flow (demand) are eligible
+    -- This prevents the spam loop where CG never triggers "maxed" because many countries have no demand
+    local eligibleCountPerResource = {}
+    for _, res in ipairs(enabledResources) do
+        local eligible = 0
+        for _, country in ipairs(countries) do
+            if (Config.SkipOwnCountry and country == Helpers.myCountry) then continue end
+            if Helpers.isPlayerCountry(country.Name) then continue end
+            
+            if res.hasCap then
+                -- Capped resources: all AI countries are eligible
+                eligible = eligible + 1
+            else
+                -- Uncapped resources: only countries with negative flow are eligible
+                local data = Helpers.getCountryResourceData(country, res)
+                if data.valid and data.flow < (Config.MinDemandFlow or 0) then
+                    eligible = eligible + 1
+                end
+            end
         end
+        eligibleCountPerResource[res.name] = eligible
     end
     
-    -- Track which resources are already maxed out (trading with all AI countries)
-    -- Consumer Goods uses a 100% aced algo - trades always succeed when calculated correctly
-    -- If we're already trading with all AI countries for a resource, skip it entirely
+    -- Track which resources are already maxed out (trading with all eligible countries)
+    -- If we're already trading with all eligible countries for a resource, skip it entirely
     local resourcesMaxedOut = {}
     for _, res in ipairs(enabledResources) do
         local currentBuyers = Helpers.getBuyerCount(res)
-        if currentBuyers >= aiCountryCount and aiCountryCount > 0 then
+        local eligibleCount = eligibleCountPerResource[res.name] or 0
+        if currentBuyers >= eligibleCount and eligibleCount > 0 then
             resourcesMaxedOut[res.name] = true
-            UI.log(string.format("%s: Already trading with all %d AI countries - skipping", res.gameName, aiCountryCount), "success")
+            UI.log(string.format("%s: Already trading with all %d eligible countries - skipping", res.gameName, eligibleCount), "success")
         end
     end
     
@@ -536,6 +551,16 @@ function M.run()
     table.sort(pendingTrades, function(a, b) return a.amount > b.amount end)
     
     local totalTrades = #pendingTrades
+    
+    -- Early exit if no trades to execute
+    if totalTrades == 0 then
+        UI.log("No trades available - all countries maxed or filtered", "info")
+        Helpers.stopScriptTrade()
+        State.isRunning = false
+        UI.updateStats()
+        return
+    end
+    
     UI.log(string.format("Evaluated %d trades, executing largest first", totalTrades), "info")
     
     -- Phase 3: Execute sorted trades (biggest first)
