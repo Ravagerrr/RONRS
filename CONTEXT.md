@@ -98,10 +98,17 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 
 ### Trade Flow
 1. `autosell.lua` detects surplus flow → triggers `trading.run()`
-2. `trading.run()` iterates through countries sorted by revenue
-3. For each country, `processCountryResource()` calculates amount and price
-4. `attemptTrade()` fires the trade and verifies acceptance
+2. **Phase 1 - Evaluate**: `trading.run()` pre-evaluates ALL country+resource pairs (fast, no network calls)
+3. **Phase 2 - Sort**: Sorts pending trades by amount DESCENDING (largest bulk orders first)
+4. **Phase 3 - Execute**: Executes trades in sorted order, biggest first
 5. Failed trades get queued for retry at lower price tier
+
+### Bulk-First Strategy
+- **Goal**: When competing with other players, get the largest trades executed first
+- **Why**: Small 0.1-unit trades waste time while competitors grab the big orders
+- **How**: Pre-evaluate all trades, sort by amount (descending), then execute biggest first
+- Evaluation is instant (reads game data only), execution is where time is spent (FireServer + verification)
+- Available flow is re-checked before each execution since it may have changed
 
 ### Price Tiers
 - **1.0x** = Full price ($82,400/unit for Consumer Goods)
@@ -134,6 +141,17 @@ When user pastes TRADE| lines, analyze for:
 ---
 
 ## 📝 Session Log
+
+### Session 2026-02-14
+- **FEATURE: Bulk-first trade ordering** - Prioritize largest trades over small ones
+  - **Problem**: Script was executing trades in country-order (by revenue), which meant some tiny 0.1-unit trades would execute before larger bulk orders, wasting time when competing with other players
+  - **Solution**: Split trade execution into 3 phases:
+    1. **Evaluate**: Pre-evaluate ALL country+resource pairs instantly (no FireServer calls)
+    2. **Sort**: Sort pending trades by amount DESCENDING (largest first)
+    3. **Execute**: Fire trades in sorted order, biggest bulk orders first
+  - **Refactored**: `processCountryResource()` split into `evaluateCountryResource()` (pure evaluation) and `executeTrade()` (fires the trade). Legacy `processCountryResource()` kept as wrapper for retry system.
+  - **Safety**: Available flow is re-checked before each execution since it may have changed during the cycle
+  - **Files modified**: trading.lua, CONTEXT.md
 
 ### Session 2026-02-02 06:43
 - **FEATURE: War Monitor** - Added detection and notification for war justifications
