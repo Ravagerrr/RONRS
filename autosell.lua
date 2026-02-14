@@ -94,6 +94,12 @@ function M.start()
                         end
                         task.wait(0.5) 
                     end
+                    
+                    -- Backoff when last cycle had 0 successful trades
+                    -- This prevents spam when all tradeable countries are already maxed
+                    if State.Stats and State.Stats.Success == 0 then
+                        task.wait(5)  -- Wait 5 seconds before checking again
+                    end
                 end
             end
             

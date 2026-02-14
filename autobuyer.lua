@@ -130,9 +130,7 @@ local function attemptBuy(seller, resourceGameName, amount, price)
         return 0
     end
     
-    pcall(function()
-        alliance:FireServer(seller.name, "ResourceTrade", {resourceGameName, "Buy", amount, price, "Trade"})
-    end)
+    Helpers.fireTradeServer(alliance, seller.name, {resourceGameName, "Buy", amount, price, "Trade"})
     
     -- Fast polling: check frequently for trade verification
     -- Configurable via Config.AutoBuyPollInterval and Config.AutoBuyMaxPolls
