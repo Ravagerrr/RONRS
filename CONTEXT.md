@@ -49,11 +49,11 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
    - The algorithm for Consumer Goods has been perfected and AI countries always accept properly calculated trades
    - When already trading with all AI countries, the script stops early (no need to print or attempt trades)
 
-5. **Flow-based demand cap IS correct**
-   - AI countries only buy what they need — their negative flow IS the demand cap
-   - India with flow -200 accepts up to 200 units (not more)
-   - The flow cap `affordable = math.min(maxAffordable, maxDemand)` is correct game behavior
-   - The REAL bottleneck was the revenue spending tiers being too conservative (38% max was way too low)
+5. **Negative flow is required to buy, but NOT a 1:1 amount cap**
+   - AI countries only buy resources they have negative flow for — flow is used as a FILTER
+   - But flow does NOT map 1:1 to trade capacity: a country with -200 flow may only take ~100 units
+   - Flow is used ONLY to filter out countries with no demand (skip if flow >= MinDemandFlow)
+   - The revenue spending limit (maxAffordable) is the real constraint on trade amount
 
 6. **Revenue spending tiers were too conservative**
    - India ($12M+ revenue, flow -200) was only getting ~25 units because spending was capped at 38%
@@ -72,15 +72,16 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
 1. Pre-evaluate ALL country+resource pairs (no network, instant)
 2. Sort by trade amount DESCENDING (largest bulk orders first)
 3. Execute trades at 1.0x price (biggest first)
-4. Amount capped to: min(maxAffordable, abs(flow), availableFlow)
-5. Retry system DISABLED by default (retries cancel existing trades)
+4. Flow used as FILTER only (skip if flow >= -0.1), NOT as amount cap
+5. Amount = min(maxAffordable, availableFlow) — flow caps our outgoing supply, not their demand
+6. Retry system DISABLED by default (retries cancel existing trades)
 ```
 
 ### Pending Tasks
 
-- [ ] User will run script and paste TRADE| output
+- [ ] User will run script and paste TRADE| output — calibrate spending tiers with real data
 - [ ] Analyze ranking correlation with trade acceptance
-- [x] Restore flow-based demand cap — confirmed correct game behavior
+- [x] Remove flow-based amount cap — flow doesn't map 1:1 to trade amount
 - [x] Increase revenue spending tiers — 38% was far too conservative
 - [x] Disable retry system — retries cancel existing trades
 
@@ -168,13 +169,14 @@ When user pastes TRADE| lines, analyze for:
   - **Refactored**: `processCountryResource()` split into `evaluateCountryResource()` (pure evaluation) and `executeTrade()` (fires the trade). Legacy `processCountryResource()` kept as wrapper for retry system.
   - **Safety**: Available flow is re-checked before each execution since it may have changed during the cycle
   - **Files modified**: trading.lua, CONTEXT.md
-- **FIX: Consumer Goods capped to flow rate instead of revenue capacity**
-  - **Problem**: India with $12M revenue only got 25 Consumer Goods when it could afford ~55+
-  - **Root Cause**: `affordable = math.min(maxAffordable, math.abs(data.flow))` capped trades to the country's flow rate
-  - Flow is the consumption RATE (e.g., -25/tick), NOT the max trade capacity
-  - Countries accept trades far exceeding their flow rate
-  - **Fix**: Removed flow-based cap for Consumer Goods. Now uses `maxAffordable` (revenue-based) only
-  - **Files modified**: trading.lua
+- **FIX: Trade amount calculation — flow as filter, not amount cap**
+  - **Problem**: India with flow -200 only got ~25 Consumer Goods when it should accept ~100
+  - **Root Cause 1**: `affordable = math.min(maxAffordable, abs(flow))` used flow as amount cap, but flow doesn't map 1:1 to trade capacity (country with -200 flow takes ~100, not 200)
+  - **Root Cause 2**: Revenue spending tiers were too conservative (38% max for $10M+ countries)
+  - **Fix**: 
+    1. Removed flow-based amount cap — flow used as FILTER only (skip if no negative flow)
+    2. Increased spending tiers: $10M+ → 70%, $5M+ → 60%, $1M+ → 50%, $500K+ → 40%
+  - **Files modified**: trading.lua, config.lua
 - **FIX: Retry system cancels existing trades**
   - **Problem**: When retrying at a lower price tier (e.g., 0.5x after 1.0x fails), the game CANCELS the original trade
   - This means a successful trade gets lost when we attempt a retry

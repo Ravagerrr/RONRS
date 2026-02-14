@@ -69,7 +69,7 @@ return {
     -- Format: {minRevenue, maxSpendingPercent}
     -- Countries with revenue >= minRevenue can spend up to maxSpendingPercent
     -- Tiers are checked from highest to lowest revenue
-    -- India ($12M+ revenue, flow -200) accepts ~100 units = ~68% spending
+    -- India ($12M+ revenue, flow -200) accepts ~100 units ≈ 68% spending → tier set to 70%
     -- Large countries can spend a much higher % of revenue on trade
     RevenueSpendingTiers = {
         {10000000, 0.70},  -- $10M+ revenue: can spend up to 70%
