@@ -32,8 +32,10 @@ return {
     ResourceDelay = 0.3,
     
     -- Retry
-    -- MaxRetryPasses: 2 retries needed for full sequence (0.5 -> 0.2 -> 0.1)
-    RetryEnabled = true,
+    -- DISABLED: Game mechanic cancels existing trade when retrying at different price
+    -- This means a successful 1.0x trade gets cancelled when we retry at 0.5x, losing revenue
+    -- Consumer Goods trades already succeed 100% at 1.0x when amount is calculated correctly
+    RetryEnabled = false,
     MaxRetryPasses = 2,
     
     -- Filters

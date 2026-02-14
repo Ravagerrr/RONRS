@@ -49,24 +49,33 @@ TRADE|Slovakia|140|Cons|0.5x|1.31|2.43%|$221855|OK
    - The algorithm for Consumer Goods has been perfected and AI countries always accept properly calculated trades
    - When already trading with all AI countries, the script stops early (no need to print or attempt trades)
 
+5. **Flow is consumption RATE, not max trade capacity**
+   - A country with flow -25 can accept 100+ units — flow doesn't cap trade amount
+   - The only limit is what the country can AFFORD (revenue * spending percent / price per unit)
+   - Previous bug: `affordable = math.min(maxAffordable, maxDemand)` where `maxDemand = abs(flow)` — this wrongly capped trades to the flow rate
+   - Example: India with $12M revenue and flow -25 was capped to 25 units instead of ~55+ units
+
+6. **Retrying at different price CANCELS the existing trade**
+   - Game mechanic: when you retry a trade with the same country at a different price tier, the game cancels the original trade
+   - This means a successful 25-unit trade at 1.0x gets CANCELLED when we retry at 0.5x
+   - Net result: we LOSE revenue instead of gaining more
+   - Retry system disabled by default to prevent this
+
 ### Current Algorithm
 
 ```
-1. Try trade at 1.0x (maximum price)
-2. If fails → queue for retry at 0.5x
-3. Process other countries (~10s passes = cooldown)
-4. Retry at 0.5x
-5. If fails → queue for retry at 0.1x
-6. Final attempt at 0.1x
-7. If still fails → permanent fail
+1. Pre-evaluate ALL country+resource pairs (no network, instant)
+2. Sort by trade amount DESCENDING (largest bulk orders first)
+3. Execute trades at 1.0x price (biggest first)
+4. Retry system DISABLED by default (retries cancel existing trades)
 ```
 
 ### Pending Tasks
 
 - [ ] User will run script and paste TRADE| output
 - [ ] Analyze ranking correlation with trade acceptance
-- [ ] Update algorithm based on findings
-- [ ] Potentially create ranking-based price tier selection
+- [x] Fix flow-based demand cap — flow is rate, not max capacity
+- [x] Disable retry system — retries cancel existing trades
 
 ---
 
@@ -152,6 +161,19 @@ When user pastes TRADE| lines, analyze for:
   - **Refactored**: `processCountryResource()` split into `evaluateCountryResource()` (pure evaluation) and `executeTrade()` (fires the trade). Legacy `processCountryResource()` kept as wrapper for retry system.
   - **Safety**: Available flow is re-checked before each execution since it may have changed during the cycle
   - **Files modified**: trading.lua, CONTEXT.md
+- **FIX: Consumer Goods capped to flow rate instead of revenue capacity**
+  - **Problem**: India with $12M revenue only got 25 Consumer Goods when it could afford ~55+
+  - **Root Cause**: `affordable = math.min(maxAffordable, math.abs(data.flow))` capped trades to the country's flow rate
+  - Flow is the consumption RATE (e.g., -25/tick), NOT the max trade capacity
+  - Countries accept trades far exceeding their flow rate
+  - **Fix**: Removed flow-based cap for Consumer Goods. Now uses `maxAffordable` (revenue-based) only
+  - **Files modified**: trading.lua
+- **FIX: Retry system cancels existing trades**
+  - **Problem**: When retrying at a lower price tier (e.g., 0.5x after 1.0x fails), the game CANCELS the original trade
+  - This means a successful trade gets lost when we attempt a retry
+  - **Fix**: Disabled retry system by default (`RetryEnabled = false`)
+  - Consumer Goods already succeeds 100% at 1.0x when amount is correctly calculated
+  - **Files modified**: config.lua
 
 ### Session 2026-02-02 06:43
 - **FEATURE: War Monitor** - Added detection and notification for war justifications
