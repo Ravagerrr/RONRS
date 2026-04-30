@@ -393,11 +393,7 @@ function M.createWindow()
         end
         
         local cityData = cities[nextFactoryCityIndex]
-        nextFactoryCityIndex = nextFactoryCityIndex + 1
-        
-        if nextFactoryCityIndex > #cities then
-            nextFactoryCityIndex = 1
-        end
+        nextFactoryCityIndex = (nextFactoryCityIndex % #cities) + 1
         
         return cityData
     end
