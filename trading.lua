@@ -408,7 +408,9 @@ function M.run()
     -- Start blocking AlertPopup during script trades
     Helpers.startScriptTrade()
     
-    for _, res in ipairs(enabledResources) do
+    -- Initialize all Config.Resources (not just currently-enabled ones) so that
+    -- resources toggled on mid-run don't produce a nil ByResource crash.
+    for _, res in ipairs(Config.Resources) do
         State.Stats.ByResource[res.name] = {Success = 0, Skipped = 0, Failed = 0}
     end
     

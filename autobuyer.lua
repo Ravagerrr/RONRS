@@ -180,12 +180,12 @@ local function checkAndBuyResource(resource)
     local neededAmount = 0
     
     if factoryConsumption > 0 then
-        -- Factory mode: factory is non-operational and needs resources
-        -- factoryConsumption = how much the factory needs to become operational
-        -- We need to buy: factoryConsumption + targetFlow - flowBefore
-        -- Example: factory needs 10, flow = 0, target = 1 → need = 10 + 1 - 0 = 11
-        -- Example: factory needs 10, flow = -2, target = 1 → need = 10 + 1 - (-2) = 13
-        neededAmount = factoryConsumption + targetFlow - flowBefore
+        -- Factory mode: flow already reflects all consumption (including stopped factories)
+        -- Only buy if flow is still below the target surplus
+        if flowBefore >= targetFlow then
+            return false, "No Deficit"
+        end
+        neededAmount = targetFlow - flowBefore
     else
         -- Fallback to flow-based check if no factory consumption exists
         -- Only trigger if flow is NEGATIVE (actively consuming the resource)
@@ -208,8 +208,8 @@ local function checkAndBuyResource(resource)
     
     -- Log to UI when actually buying
     if factoryConsumption > 0 then
-        UI.log(string.format("[AutoBuy] %s need: %.2f (factory: %.2f, flow: %.2f, target: %.2f)", 
-            resource.gameName, neededAmount, factoryConsumption, flowBefore, targetFlow), "info")
+        UI.log(string.format("[AutoBuy] %s factory need (flow: %.2f → target: %.2f, need: %.2f)", 
+            resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     else
         UI.log(string.format("[AutoBuy] %s flow: %.2f, target: %.2f, need: %.2f", resource.gameName, flowBefore, targetFlow, neededAmount), "info")
     end

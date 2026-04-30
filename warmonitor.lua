@@ -111,7 +111,7 @@ function M.getJustificationCount()
 end
 
 -- Get count of countries ready to declare war
-function M.getReadyToDecareCount()
+function M.getReadyToDeclareCount()
     local count = 0
     for _ in pairs(M.readyToDeclare) do
         count = count + 1
