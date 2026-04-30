@@ -170,6 +170,13 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-04-30
+- **FIX: Factory Builder now spreads queued builds across cities**
+  - **Problem**: Pressing multiple factory buttons always restarted from the smallest city, stacking different factory queues in one place and slowing completion.
+  - **Fix**: Added a shared city cursor in the UI factory builder so each new build request continues from the next city instead of restarting at city index 1.
+  - **Result**: Repeated or mixed factory build requests now rotate across low-population cities more evenly, helping queued factories finish at roughly the same time.
+  - **Files modified**: `ui.lua`, `README.md`, `CONTEXT.md`
+
 ### Session 2026-02-14
 - **FEATURE: Bulk-first trade ordering** - Prioritize largest trades over small ones
   - **Problem**: Script was executing trades in country-order (by revenue), which meant some tiny 0.1-unit trades would execute before larger bulk orders, wasting time when competing with other players
