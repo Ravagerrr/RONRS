@@ -65,6 +65,7 @@ end
 function M.evaluateCountryResource(country, resource, buyers, retryState)
     local name = country.Name
     local resName = resource.name
+    local minTradeAmount = Helpers.getMinTradeAmount(resource)
     
     -- ALWAYS check Config directly for the latest enabled state
     local configResource = Helpers.getResourceByName(resName)
@@ -72,7 +73,7 @@ function M.evaluateCountryResource(country, resource, buyers, retryState)
     local isRetry = retryState and retryState[resName]
     
     local avail = Helpers.getAvailableFlow(resource)
-    if Config.SmartSell and avail < Config.MinAmount then
+    if Config.SmartSell and avail < minTradeAmount then
         return false, nil, "No Flow"
     end
     
@@ -128,7 +129,7 @@ function M.evaluateCountryResource(country, resource, buyers, retryState)
     
     local affordable
     if resource.hasCap then
-        -- Electronics: cap at capAmount (5), but also check what they can afford at this price
+        -- Capped manufactured goods: respect both the per-country cap and affordability
         affordable = math.min(resource.capAmount, maxAffordable)
     else
         -- Consumer Goods: Limited by what they can afford (revenue spending cap)
@@ -138,18 +139,18 @@ function M.evaluateCountryResource(country, resource, buyers, retryState)
         affordable = maxAffordable
     end
     
-    if affordable < Config.MinAmount then return false, nil, "Insufficient" end
+    if affordable < minTradeAmount then return false, nil, "Insufficient" end
     
     -- Subtract what they're already buying
     local remaining = affordable - data.buyAmount
-    if remaining < Config.MinAmount then return false, nil, "Max Capacity" end
+    if remaining < minTradeAmount then return false, nil, "Max Capacity" end
     
     -- Cap to available flow
     local amount = math.min(remaining, avail)
-    if amount < Config.MinAmount then return false, nil, "Flow Protection" end
+    if amount < minTradeAmount then return false, nil, "Flow Protection" end
     
     -- Track if this trade is flow-limited (wanted more than we could sell)
-    local isFlowLimited = remaining > avail and (remaining - amount) >= Config.MinAmount
+    local isFlowLimited = remaining > avail and (remaining - amount) >= minTradeAmount
     local flowLimitedAmount = remaining - amount  -- Amount we wanted but couldn't sell due to flow
     
     local totalCost = amount * actualPricePerUnit
@@ -217,7 +218,8 @@ end
 -- Called when a trade succeeded but was limited by available flow
 function M.queueFlowLimitedTrade(country, resource, remainingAmount, price, countryData)
     if not Config.FlowQueueEnabled then return end
-    if remainingAmount < Config.MinAmount then return end
+    local minTradeAmount = Helpers.getMinTradeAmount(resource)
+    if remainingAmount < minTradeAmount then return end
     
     local name = country.Name
     local resName = resource.name
@@ -258,6 +260,8 @@ function M.processFlowQueue()
     Helpers.startScriptTrade()
     
     for key, item in pairs(State.flowQueue) do
+        local minTradeAmount = Helpers.getMinTradeAmount(item.resource)
+
         -- Check if expired
         if item.expiresAt and now > item.expiresAt then
             UI.log(string.format("[FLOW Q] Expired: %s %s", item.resource.gameName, item.countryName), "warning")
@@ -267,7 +271,7 @@ function M.processFlowQueue()
         
         -- Check if we have enough flow now
         local avail = Helpers.getAvailableFlow(item.resource)
-        if avail < Config.MinAmount then continue end
+        if avail < minTradeAmount then continue end
         
         -- Check if country resource config is still enabled
         local configResource = Helpers.getResourceByName(item.resource.name)
@@ -295,7 +299,7 @@ function M.processFlowQueue()
             local maxCapacity = configResource.capAmount or 5
             local remainingCapacity = math.max(0, maxCapacity - countryData.buyAmount)
             
-            if remainingCapacity < Config.MinAmount then
+            if remainingCapacity < minTradeAmount then
                 -- Country has reached cap from other trades, remove from queue
                 UI.log(string.format("[FLOW Q] %s reached cap for %s, removing", item.countryName, item.resource.gameName), "info")
                 table.insert(toRemove, key)
@@ -309,7 +313,7 @@ function M.processFlowQueue()
             sellAmount = math.min(item.remainingAmount, avail)
         end
         
-        if sellAmount < Config.MinAmount then 
+        if sellAmount < minTradeAmount then 
             -- Amount too small to trade, remove from queue to prevent indefinite accumulation
             table.insert(toRemove, key)
             continue 
@@ -349,7 +353,7 @@ function M.processFlowQueue()
             UI.log(string.format("[FLOW Q] OK +%.2f %s to %s", sellAmount, item.resource.gameName, item.countryName), "success")
             
             -- If fully completed, remove from queue
-            if item.remainingAmount < Config.MinAmount then
+            if item.remainingAmount < minTradeAmount then
                 UI.log(string.format("[FLOW Q] Complete: %s %s", item.resource.gameName, item.countryName), "success")
                 table.insert(toRemove, key)
             else
@@ -527,7 +531,7 @@ function M.run()
             end
             
             local avail = Helpers.getAvailableFlow(configResource)
-            if avail < Config.MinAmount then continue end
+            if avail < Helpers.getMinTradeAmount(configResource) then continue end
             
             local ok = pcall(function()
                 local valid, tradeInfo, reason = M.evaluateCountryResource(
@@ -578,7 +582,7 @@ function M.run()
         
         -- Re-check available flow before executing (may have changed since evaluation)
         local avail = Helpers.getAvailableFlow(tradeInfo.resource)
-        if avail < Config.MinAmount then
+        if avail < Helpers.getMinTradeAmount(tradeInfo.resource) then
             State.Stats.Skipped = State.Stats.Skipped + 1
             State.Stats.ByResource[tradeInfo.resource.name].Skipped = State.Stats.ByResource[tradeInfo.resource.name].Skipped + 1
             continue
@@ -634,7 +638,7 @@ function M.run()
                 if not configResource or not configResource.enabled then continue end
                 
                 local avail = Helpers.getAvailableFlow(item.resource)
-                if avail < Config.MinAmount then
+                if avail < Helpers.getMinTradeAmount(item.resource) then
                     if pass < Config.MaxRetryPasses then
                         table.insert(State.retryQueue, item)
                     end

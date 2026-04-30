@@ -265,7 +265,12 @@ end
 -- Get available flow for specific resource
 function M.getAvailableFlow(resource)
     if not Config.SmartSell then return 999999 end
-    return math.max(0, M.getFlow(resource) - Config.SmartSellReserve)
+    local reserve = (resource and resource.flowReserve) or Config.SmartSellReserve
+    return math.max(0, M.getFlow(resource) - reserve)
+end
+
+function M.getMinTradeAmount(resource)
+    return (resource and resource.minAmount) or Config.MinAmount
 end
 
 -- Get total flow across all enabled resources
@@ -780,6 +785,7 @@ end
 
 -- Available factory types for building
 M.FactoryTypes = {
+    "Civilian Factory",
     "Electronics Factory",
     "Steel Manufactory",
     "Motor Factory",

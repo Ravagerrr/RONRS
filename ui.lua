@@ -374,6 +374,7 @@ function M.createWindow()
     
     -- Factory Builder state
     local factoryCount = 1
+    local nextFactoryCityIndex = 1
     
     Tools:CreateSection("Factory Builder")
     Tools:CreateSlider({
@@ -383,6 +384,19 @@ function M.createWindow()
         CurrentValue = 1,
         Callback = function(v) factoryCount = v end
     })
+    
+    local function getNextFactoryCity(cities)
+        if #cities == 0 then return nil end
+        
+        if nextFactoryCityIndex > #cities then
+            nextFactoryCityIndex = 1
+        end
+        
+        local cityData = cities[nextFactoryCityIndex]
+        nextFactoryCityIndex = (nextFactoryCityIndex % #cities) + 1
+        
+        return cityData
+    end
     
     -- Helper function to build factories
     local function buildFactories(factoryType)
@@ -398,33 +412,31 @@ function M.createWindow()
         end
         
         local built = 0
-        local cityIndex = 1
         
-        M.log(string.format("Building %d %s...", factoryCount, factoryType), "info")
+        M.log(string.format("Queueing %d %s across cities...", factoryCount, factoryType), "info")
         
         for i = 1, factoryCount do
-            if cityIndex > #cities then
-                cityIndex = 1
-            end
-            
-            local cityData = cities[cityIndex]
+            local cityData = getNextFactoryCity(cities)
             local success = Helpers.buildFactory(cityData.city, factoryType)
             
             if success then
                 built = built + 1
-                M.log(string.format("Built %s in %s (pop: %d)", factoryType, cityData.city.Name, cityData.population), "success")
+                M.log(string.format("Queued %s in %s (pop: %d)", factoryType, cityData.city.Name, cityData.population), "success")
             else
-                M.log(string.format("Failed to build in %s", cityData.city.Name), "warning")
+                M.log(string.format("Failed to queue %s in %s", factoryType, cityData.city.Name), "warning")
             end
             
-            cityIndex = cityIndex + 1
             task.wait(0.3)
         end
         
-        M.log(string.format("Factory building complete: %d/%d built", built, factoryCount), "info")
+        M.log(string.format("Factory queue complete: %d/%d queued", built, factoryCount), "info")
     end
     
     -- Create a button for each factory type
+    Tools:CreateButton({
+        Name = "Build Civilian Factory",
+        Callback = function() buildFactories("Civilian Factory") end
+    })
     Tools:CreateButton({
         Name = "Build Electronics Factory",
         Callback = function() buildFactories("Electronics Factory") end

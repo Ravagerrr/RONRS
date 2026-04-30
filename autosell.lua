@@ -69,7 +69,7 @@ function M.start()
                     local triggered = {}
                     for _, res in ipairs(Helpers.getEnabledResources()) do
                         local avail = Helpers.getAvailableFlow(res)
-                        if avail >= Config.MinAmount then
+                        if avail >= Helpers.getMinTradeAmount(res) then
                             table.insert(triggered, string.format("%s %.1f", res.gameName, avail))
                         end
                     end

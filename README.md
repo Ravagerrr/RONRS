@@ -5,9 +5,10 @@ The script focuses on safe, repeatable trade behavior with retries, flow protect
 
 ## ✨ Highlights
 - **Auto-Sell** surplus flow with smart flow reserve protection.
+- **Aircraft Parts auto-sell** support with a 5-unit country cap, 0.1 minimum trade size, a 1-unit reserve, and a price basis of about $83.2k/unit.
 - **Auto-Buy** factory materials when flow goes negative.
 - **War Monitor** detects and alerts when countries justify war against you.
-- **Factory Builder** quickly builds factories across your cities.
+- **Factory Builder** spreads new factories across your cities so build queues finish more evenly.
 - **Retry queue** for trade cooldowns (works with the game’s ~10s trade cooldown).
 - **Flow queue** to finish partially limited trades later when flow is available.
 - **Logging dashboard** with real-time status, filters, and copyable logs.

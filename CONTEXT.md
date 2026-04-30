@@ -170,6 +170,22 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-04-30
+- **FEATURE: Auto-sell supports Aircraft Parts**
+  - Added `Aircraft Parts` as a sellable resource in `config.lua`.
+  - Aircraft Parts now use a per-country cap of `5`, a per-resource minimum trade size of `0.1`, keep a reserved `1` unit of flow, and price affordability off roughly `$83,200` per unit (`~$416,000` for `5`).
+  - Added shared helper support for per-resource minimum trade amounts so capped/special resources can use tighter limits without changing the rest of the sell logic.
+  - **Files modified**: `config.lua`, `helpers.lua`, `trading.lua`, `autosell.lua`, `README.md`, `CONTEXT.md`
+- **FEATURE: Factory Builder supports Civilian Factory**
+  - Added `"Civilian Factory"` to the shared factory type list and exposed a matching Tools tab button.
+  - This uses the existing `CreateBuilding:FireServer({city}, factoryType)` path, so Civilian Factory requests now go through the same distributed queueing logic as the other build options.
+  - **Files modified**: `helpers.lua`, `ui.lua`, `CONTEXT.md`
+- **FIX: Factory Builder now spreads queued builds across cities**
+  - **Problem**: Pressing multiple factory buttons always restarted from the smallest city, stacking different factory queues in one place and slowing completion.
+  - **Fix**: Added a shared city cursor in the UI factory builder so each new build request continues from the next city instead of restarting at city index 1.
+  - **Result**: Repeated or mixed factory build requests now rotate across low-population cities more evenly, helping queued factories finish at roughly the same time.
+  - **Files modified**: `ui.lua`, `README.md`, `CONTEXT.md`
+
 ### Session 2026-02-14
 - **FEATURE: Bulk-first trade ordering** - Prioritize largest trades over small ones
   - **Problem**: Script was executing trades in country-order (by revenue), which meant some tiny 0.1-unit trades would execute before larger bulk orders, wasting time when competing with other players
