@@ -171,6 +171,10 @@ When user pastes TRADE| lines, analyze for:
 ## 📝 Session Log
 
 ### Session 2026-04-30
+- **FEATURE: Factory Builder supports Civilian Factory**
+  - Added `"Civilian Factory"` to the shared factory type list and exposed a matching Tools tab button.
+  - This uses the existing `CreateBuilding:FireServer({city}, factoryType)` path, so Civilian Factory requests now go through the same distributed queueing logic as the other build options.
+  - **Files modified**: `helpers.lua`, `ui.lua`, `CONTEXT.md`
 - **FIX: Factory Builder now spreads queued builds across cities**
   - **Problem**: Pressing multiple factory buttons always restarted from the smallest city, stacking different factory queues in one place and slowing completion.
   - **Fix**: Added a shared city cursor in the UI factory builder so each new build request continues from the next city instead of restarting at city index 1.

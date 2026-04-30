@@ -780,6 +780,7 @@ end
 
 -- Available factory types for building
 M.FactoryTypes = {
+    "Civilian Factory",
     "Electronics Factory",
     "Steel Manufactory",
     "Motor Factory",

@@ -434,6 +434,10 @@ function M.createWindow()
     
     -- Create a button for each factory type
     Tools:CreateButton({
+        Name = "Build Civilian Factory",
+        Callback = function() buildFactories("Civilian Factory") end
+    })
+    Tools:CreateButton({
         Name = "Build Electronics Factory",
         Callback = function() buildFactories("Electronics Factory") end
     })
