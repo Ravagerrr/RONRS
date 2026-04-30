@@ -171,6 +171,11 @@ When user pastes TRADE| lines, analyze for:
 ## 📝 Session Log
 
 ### Session 2026-04-30
+- **FEATURE: Auto-sell supports Aircraft Parts**
+  - Added `Aircraft Parts` as a sellable resource in `config.lua`.
+  - Aircraft Parts now use a per-country cap of `5`, a per-resource minimum trade size of `0.1`, keep a reserved `1` unit of flow, and price affordability off roughly `$83,200` per unit (`~$416,000` for `5`).
+  - Added shared helper support for per-resource minimum trade amounts so capped/special resources can use tighter limits without changing the rest of the sell logic.
+  - **Files modified**: `config.lua`, `helpers.lua`, `trading.lua`, `autosell.lua`, `README.md`, `CONTEXT.md`
 - **FEATURE: Factory Builder supports Civilian Factory**
   - Added `"Civilian Factory"` to the shared factory type list and exposed a matching Tools tab button.
   - This uses the existing `CreateBuilding:FireServer({city}, factoryType)` path, so Civilian Factory requests now go through the same distributed queueing logic as the other build options.

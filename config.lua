@@ -24,6 +24,17 @@ return {
             enabled = true,
             priority = 2,
         },
+        {
+            name = "AircraftParts",
+            gameName = "Aircraft Parts",
+            buyPrice = 83200,
+            hasCap = true,              -- HAS CAP
+            capAmount = 5,              -- Max 5
+            minAmount = 0.1,            -- Trades below 0.1 are rejected
+            flowReserve = 1,            -- Always keep 1 for ourselves
+            enabled = true,
+            priority = 3,
+        },
     },
     
     -- Trading
