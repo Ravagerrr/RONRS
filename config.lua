@@ -138,5 +138,5 @@ return {
     -- War Monitor (detects when countries are justifying war against you)
     -- War justifications appear in: workspace.CountryData.[OtherCountry].Diplomacy.Actions.[YourCountry]
     WarMonitorEnabled = true,
-    WarMonitorCheckInterval = 0.1,  -- Check interval in seconds
+    WarMonitorCheckInterval = 1,  -- Check interval in seconds (each check walks every country)
 }

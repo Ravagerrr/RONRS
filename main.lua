@@ -35,7 +35,9 @@ local function loadModule(name)
         if not content or type(content) ~= "string" then
             error("HttpGet returned " .. tostring(type(content)) .. " instead of string")
         end
-        if content:find("404") or #content < 20 then
+        -- GitHub raw returns the body "404: Not Found"; only match it at the start so
+        -- a module that merely contains the digits 404 still loads
+        if content:find("^%s*404") or #content < 20 then
             error("404 or empty (length: " .. #content .. ")")
         end
         local func, err = loadstring(content)

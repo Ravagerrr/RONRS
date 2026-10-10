@@ -255,7 +255,7 @@ function M.processFlowQueue()
     local toRemove = {}
     
     -- Start blocking AlertPopup during flow queue processing
-    Helpers.startScriptTrade()
+    Helpers.startScriptTrade("sell")
     
     for key, item in pairs(State.flowQueue) do
         -- Check if expired
@@ -369,7 +369,7 @@ function M.processFlowQueue()
     end
     
     -- Stop blocking AlertPopup after flow queue processing
-    Helpers.stopScriptTrade()
+    Helpers.stopScriptTrade("sell")
     
     return successCount
 end
@@ -406,7 +406,7 @@ function M.run()
     State.Stats = {Success = 0, Skipped = 0, Failed = 0, ByResource = {}}
     
     -- Start blocking AlertPopup during script trades
-    Helpers.startScriptTrade()
+    Helpers.startScriptTrade("sell")
     
     -- Initialize all Config.Resources (not just currently-enabled ones) so that
     -- resources toggled on mid-run don't produce a nil ByResource crash.
@@ -424,17 +424,21 @@ function M.run()
     
     local totalCountries = #countries
     
-    -- Count eligible AI countries per resource
+    -- Count eligible AI countries per resource that we are NOT already selling to
     -- For capped resources (Electronics): ALL AI countries are eligible (no flow requirement)
     -- For uncapped resources (Consumer Goods): only countries with negative flow (demand) are eligible
     -- This prevents the spam loop where CG never triggers "maxed" because many countries have no demand
+    -- Existing buyers are excluded: once supplied, their flow may no longer be negative, so comparing
+    -- buyer count against negative-flow count mixes two different sets and can report "maxed" too early
     local eligibleCountPerResource = {}
     for _, res in ipairs(enabledResources) do
         local eligible = 0
+        local resBuyers = allBuyers[res.name] or {}
         for _, country in ipairs(countries) do
             if (Config.SkipOwnCountry and country == Helpers.myCountry) then continue end
             if Helpers.isPlayerCountry(country.Name) then continue end
-            
+            if resBuyers[country.Name] then continue end
+
             if res.hasCap then
                 -- Capped resources: all AI countries are eligible
                 eligible = eligible + 1
@@ -450,14 +454,14 @@ function M.run()
     end
     
     -- Track which resources are already maxed out (trading with all eligible countries)
-    -- If we're already trading with all eligible countries for a resource, skip it entirely
+    -- If no eligible country is left that we aren't already selling to, skip the resource entirely
     local resourcesMaxedOut = {}
     for _, res in ipairs(enabledResources) do
         local currentBuyers = Helpers.getBuyerCount(res)
-        local eligibleCount = eligibleCountPerResource[res.name] or 0
-        if currentBuyers >= eligibleCount and eligibleCount > 0 then
+        local remainingEligible = eligibleCountPerResource[res.name] or 0
+        if remainingEligible == 0 and currentBuyers > 0 then
             resourcesMaxedOut[res.name] = true
-            UI.log(string.format("%s: Already trading with all %d eligible countries - skipping", res.gameName, eligibleCount), "success")
+            UI.log(string.format("%s: Already trading with all eligible countries (%d buyers) - skipping", res.gameName, currentBuyers), "success")
         end
     end
     
@@ -471,7 +475,7 @@ function M.run()
     end
     if allMaxedOut then
         UI.log("All resources maxed - nothing to trade", "success")
-        Helpers.stopScriptTrade()  -- Ensure flag is cleared on early exit
+        Helpers.stopScriptTrade("sell")  -- Ensure flag is cleared on early exit
         State.isRunning = false
         return
     end
@@ -557,7 +561,7 @@ function M.run()
     -- Early exit if no trades to execute
     if totalTrades == 0 then
         UI.log("No trades available - all countries maxed or filtered", "info")
-        Helpers.stopScriptTrade()
+        Helpers.stopScriptTrade("sell")
         State.isRunning = false
         UI.updateStats()
         return
@@ -585,8 +589,13 @@ function M.run()
         end
         
         -- Cap trade amount to current available flow (may have decreased)
+        -- Keep cost and flow-queue remainder in sync with the reduced amount
         if tradeInfo.amount > avail then
+            local uncovered = tradeInfo.amount - avail
             tradeInfo.amount = avail
+            tradeInfo.totalCost = avail * tradeInfo.actualPricePerUnit
+            tradeInfo.flowLimitedAmount = (tradeInfo.flowLimitedAmount or 0) + uncovered
+            tradeInfo.isFlowLimited = tradeInfo.flowLimitedAmount >= Config.MinAmount
         end
         
         local ok, err = pcall(function()
@@ -668,7 +677,7 @@ function M.run()
     UI.log(string.format("Done in %.1fs | OK:%d Skip:%d Fail:%d", elapsed, State.Stats.Success, State.Stats.Skipped, State.Stats.Failed), "info")
     
     -- Stop blocking AlertPopup after script trades complete
-    Helpers.stopScriptTrade()
+    Helpers.stopScriptTrade("sell")
     
     State.isRunning = false
     UI.updateStats()
@@ -678,7 +687,7 @@ function M.stop()
     State.isRunning = false
     -- Ensure AlertPopup blocking is disabled when stop() is called
     -- This handles both external stops (emergency button) and early exits from run()
-    Helpers.stopScriptTrade()
+    Helpers.stopScriptTrade("sell")
 end
 
 return M

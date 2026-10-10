@@ -170,6 +170,19 @@ When user pastes TRADE| lines, analyze for:
 
 ## 📝 Session Log
 
+### Session 2026-10-09
+- **FIX: Maxed-out detection stopped selling too early** - it compared buyer count against the count of countries with negative flow right now. Supplied buyers may no longer show negative flow, so 50 buyers vs 30 new countries with demand read as "maxed". Now counts eligible countries we are NOT already selling to; maxed only when that is 0. (trading.lua)
+- **FIX: Flow queue stale amounts** - when a trade is cut to the flow available at execution time, `totalCost`, `flowLimitedAmount` and `isFlowLimited` are recalculated. (trading.lua)
+- **FIX: AlertPopup blocking shared one flag** - auto-buy finishing during a sell cycle turned blocking off. `startScriptTrade`/`stopScriptTrade` now take an owner ("sell"/"buy"). (helpers.lua, trading.lua, autobuyer.lua)
+- **FIX: Loader 404 check** - only matches "404" at the start of the response, not anywhere in a module. (main.lua)
+- **FIX: Settings not saved** - Rayfield only saves elements with a `Flag`; added flags to all toggles/sliders except factory Quantity. Not yet tested in-game. (ui.lua)
+- **PERF**: factory consumption scan cached for 0.5s (was one full city scan per resource per pass); war monitor interval 0.1s → 1s. (helpers.lua, config.lua)
+- **Findings from a client dump** (server trade-acceptance logic is NOT visible to the client):
+  - Seller receives 80%: client computes sell income as `amount × basePrice × 0.8 × priceModifier`; buy cost has no 0.8
+  - Price modifier is a free number in the game UI, not only 1.0/0.5/0.1
+  - Electronics `ScalePercent=5` is the internal-market fulfillment growth per tick, so the "cap 5" is still only empirical
+  - Internal market demand = `Base + PopulationScale × population / 1e6` (GetRequirement.PolicyResource)
+
 ### Session 2026-02-14
 - **FEATURE: Bulk-first trade ordering** - Prioritize largest trades over small ones
   - **Problem**: Script was executing trades in country-order (by revenue), which meant some tiny 0.1-unit trades would execute before larger bulk orders, wasting time when competing with other players

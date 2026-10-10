@@ -169,14 +169,21 @@ function M.setupAlertPopupBlocking()
     end
 end
 
+-- Owners ("sell", "buy") that currently have script trades in progress
+-- Auto-buy runs during sell cycles, so one finishing must not unblock popups for the other
+local activeScriptTrades = {}
+
 -- Start blocking AlertPopup (call before script-initiated trades)
-function M.startScriptTrade()
+function M.startScriptTrade(owner)
+    activeScriptTrades[owner or "default"] = true
     M.isScriptTrading = true
 end
 
 -- Stop blocking AlertPopup (call after script-initiated trades complete)
-function M.stopScriptTrade()
-    M.isScriptTrading = false
+-- Safe to call more than once for the same owner
+function M.stopScriptTrade(owner)
+    activeScriptTrades[owner or "default"] = nil
+    M.isScriptTrading = next(activeScriptTrades) ~= nil
 end
 
 -- Global trade throttle: ensures all buy/sell FireServer calls are equally spaced
@@ -716,7 +723,16 @@ end
 -- Calculate total resource consumption from all factories
 -- Returns: table mapping resourceGameName to consumption amount
 -- Reads actual demands from factory Operational_Reason attributes when available
+local factoryConsumptionCache = nil
+local factoryConsumptionCacheTime = 0
+local FACTORY_CONSUMPTION_TTL = 0.5 -- Auto-buy asks once per resource per pass; scan cities once, not 8 times
+
 function M.getFactoryResourceConsumption()
+    local now = tick()
+    if factoryConsumptionCache and now - factoryConsumptionCacheTime < FACTORY_CONSUMPTION_TTL then
+        return factoryConsumptionCache
+    end
+
     local consumption = {}
     local factories = M.getFactories()
     
@@ -727,7 +743,9 @@ function M.getFactoryResourceConsumption()
             consumption[resourceName] = (consumption[resourceName] or 0) + amount
         end
     end
-    
+
+    factoryConsumptionCache = consumption
+    factoryConsumptionCacheTime = now
     return consumption
 end
 

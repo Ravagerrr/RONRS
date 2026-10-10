@@ -301,6 +301,7 @@ function M.createWindow()
         local cap = res.hasCap and string.format("Max %d", res.capAmount) or "No Cap"
         Resources:CreateToggle({
             Name = string.format("%s [%s]", res.gameName, cap),
+            Flag = "Sell" .. res.name,
             CurrentValue = res.enabled,
             Callback = function(v) 
                 Config.Resources[i].enabled = v 
@@ -313,6 +314,7 @@ function M.createWindow()
     for i, res in ipairs(Config.AutoBuyResources) do
         Resources:CreateToggle({
             Name = res.gameName,
+            Flag = "Buy" .. res.name,
             CurrentValue = res.enabled,
             Callback = function(v) 
                 Config.AutoBuyResources[i].enabled = v 
@@ -329,6 +331,7 @@ function M.createWindow()
     Automation:CreateSection("Auto-Sell")
     Automation:CreateToggle({
         Name = "Enable Auto-Sell",
+        Flag = "EnableAutoSell",
         CurrentValue = Config.AutoSellEnabled,
         Callback = function(v) 
             Config.AutoSellEnabled = v
@@ -337,6 +340,7 @@ function M.createWindow()
     })
     Automation:CreateSlider({
         Name = "Flow Threshold",
+        Flag = "FlowThreshold",
         Range = {1, 20},
         Increment = 0.5,
         CurrentValue = Config.AutoSellThreshold,
@@ -346,6 +350,7 @@ function M.createWindow()
     Automation:CreateSection("Auto-Buy")
     Automation:CreateToggle({
         Name = "Enable Auto-Buy",
+        Flag = "EnableAutoBuy",
         CurrentValue = Config.AutoBuyEnabled,
         Callback = function(v) 
             Config.AutoBuyEnabled = v
@@ -358,6 +363,7 @@ function M.createWindow()
     Automation:CreateSection("War Monitor")
     Automation:CreateToggle({
         Name = "Enable War Monitor",
+        Flag = "EnableWarMonitor",
         CurrentValue = Config.WarMonitorEnabled,
         Callback = function(v) 
             Config.WarMonitorEnabled = v
@@ -454,11 +460,13 @@ function M.createWindow()
     Settings:CreateSection("Flow Protection")
     Settings:CreateToggle({
         Name = "Smart Sell (Reserve Flow)",
+        Flag = "SmartSell",
         CurrentValue = Config.SmartSell,
         Callback = function(v) Config.SmartSell = v end
     })
     Settings:CreateSlider({
         Name = "Reserve Amount",
+        Flag = "ReserveAmount",
         Range = {0, 10},
         Increment = 0.5,
         CurrentValue = Config.SmartSellReserve,
@@ -468,6 +476,7 @@ function M.createWindow()
     Settings:CreateSection("Timing")
     Settings:CreateSlider({
         Name = "Trade Cooldown (s)",
+        Flag = "TradeCooldown",
         Range = {0.1, 2},
         Increment = 0.1,
         CurrentValue = Config.WaitTime,
@@ -477,16 +486,19 @@ function M.createWindow()
     Settings:CreateSection("Trade Filters")
     Settings:CreateToggle({
         Name = "Skip Player Countries",
+        Flag = "SkipPlayerCountries",
         CurrentValue = Config.SkipPlayerCountries,
         Callback = function(v) Config.SkipPlayerCountries = v end
     })
     Settings:CreateToggle({
         Name = "Skip Producing Countries",
+        Flag = "SkipProducingCountries",
         CurrentValue = Config.SkipProducingCountries,
         Callback = function(v) Config.SkipProducingCountries = v end
     })
     Settings:CreateToggle({
         Name = "Skip Existing Buyers",
+        Flag = "SkipExistingBuyers",
         CurrentValue = Config.SkipExistingBuyers,
         Callback = function(v) Config.SkipExistingBuyers = v end
     })
@@ -494,16 +506,19 @@ function M.createWindow()
     Settings:CreateSection("Visuals")
     Settings:CreateToggle({
         Name = "Block ALL Alert Popups",
+        Flag = "BlockALLAlertPopups",
         CurrentValue = Config.BlockAlertPopupAlways,
         Callback = function(v) Config.BlockAlertPopupAlways = v end
     })
     Settings:CreateToggle({
         Name = "Block Alert Popups During Trades",
+        Flag = "BlockAlertPopupsDuringTrades",
         CurrentValue = Config.BlockAlertPopupDuringTrade,
         Callback = function(v) Config.BlockAlertPopupDuringTrade = v end
     })
     Settings:CreateToggle({
         Name = "Console Logging (warn)",
+        Flag = "ConsoleLogging",
         CurrentValue = Config.ConsoleLogging,
         Callback = function(v) Config.ConsoleLogging = v end
     })
@@ -518,16 +533,19 @@ function M.createWindow()
     Logs:CreateSection("Log Filters")
     Logs:CreateToggle({
         Name = "Show Trading Logs",
+        Flag = "ShowTradingLogs",
         CurrentValue = Config.LogFilterTrading,
         Callback = function(v) Config.LogFilterTrading = v; M.updateLogs() end
     })
     Logs:CreateToggle({
         Name = "Show Auto-Buy Logs",
+        Flag = "ShowAutoBuyLogs",
         CurrentValue = Config.LogFilterAutoBuy,
         Callback = function(v) Config.LogFilterAutoBuy = v; M.updateLogs() end
     })
     Logs:CreateToggle({
         Name = "Show System Logs",
+        Flag = "ShowSystemLogs",
         CurrentValue = Config.LogFilterSystem,
         Callback = function(v) Config.LogFilterSystem = v; M.updateLogs() end
     })

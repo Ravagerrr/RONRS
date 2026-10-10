@@ -225,7 +225,7 @@ local function checkAndBuyResource(resource)
     local remainingNeed = neededAmount  -- Track remaining need during loop (neededAmount preserved for final summary)
     
     -- Start blocking AlertPopup during script trades
-    Helpers.startScriptTrade()
+    Helpers.startScriptTrade("buy")
     
     for idx, seller in ipairs(sellers) do
         -- Check if auto-buy was disabled mid-operation
@@ -284,7 +284,7 @@ local function checkAndBuyResource(resource)
     end
     
     -- Stop blocking AlertPopup after script trades complete
-    Helpers.stopScriptTrade()
+    Helpers.stopScriptTrade("buy")
     
     if boughtTotal > 0 then
         return true, string.format("Bought %.2f", boughtTotal)
@@ -365,7 +365,7 @@ end
 function M.stop()
     M.isMonitoring = false
     -- Ensure AlertPopup blocking is disabled when auto-buy stops
-    Helpers.stopScriptTrade()
+    Helpers.stopScriptTrade("buy")
     UI.updateAutoBuy()
 end
 
